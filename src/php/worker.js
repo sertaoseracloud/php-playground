@@ -15,8 +15,8 @@ onmessage = async ({ data }) => {
   const { executar, inspecionar } = await sessao;
   try {
     const resultado = data.acao === 'inspecionar'
-      ? { tabelas: await inspecionar(data.banco) }
-      : await executar(data.arquivos, data.req, data.banco);
+      ? { tabelas: await inspecionar(data.banco, data.opcoes) }
+      : await executar(data.arquivos, data.req, data.banco, data.opcoes);
     postMessage({ tipo: 'resposta', id: data.id, ...resultado });
   } catch (erro) {
     postMessage({ tipo: 'resposta', id: data.id, erroInterno: String(erro?.message ?? erro) });

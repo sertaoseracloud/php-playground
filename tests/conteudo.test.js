@@ -12,18 +12,18 @@ let sessao;
 beforeAll(async () => ({ php, sessao } = await iniciarPhp()));
 afterAll(() => php?.exit());
 
-const executar = (arquivos, req, banco) => sessao.executar(arquivos, req, banco);
+const executar = (arquivos, req, banco, opcoes) => sessao.executar(arquivos, req, banco, opcoes);
 const bancoDe = (item) => (item.banco ? { seed: item.banco } : undefined);
 const falhas = (r) =>
   r.relatorio.flatMap((t) => t.resultados.filter((x) => !x.ok).map((x) => `[${t.descricao ?? ''}] ${x.mensagem} (${x.detalhe ?? ''})`));
 
 describe('estrutura da trilha', () => {
-  it('segue a ordem HTML → W3.CSS → PHP → PDO', () => {
-    expect(modulos.map((m) => m.id)).toEqual(['html', 'w3css', 'php', 'pdo']);
+  it('segue a ordem HTML → W3.CSS → PHP → PDO, com Projetos como módulo extra', () => {
+    expect(modulos.map((m) => m.id)).toEqual(['html', 'w3css', 'php', 'pdo', 'projetos']);
   });
 
-  it('tem 10 problemas por módulo e ids únicos', () => {
-    for (const m of modulos) {
+  it('tem 10 problemas por módulo principal e ids únicos', () => {
+    for (const m of modulos.filter((x) => !x.extra)) {
       expect(m.itens.filter((i) => i.tipo === 'problema'), m.id).toHaveLength(10);
     }
     const ids = [...itens, LIVRE].map((i) => i.id);
@@ -35,6 +35,21 @@ describe('estrutura da trilha', () => {
     expect(p.enunciado).toBeTruthy();
     expect(p.dica).toBeTruthy();
     expect(p.testes.some((t) => !t.oculto), 'precisa de ao menos um caso visível').toBe(true);
+  });
+});
+
+describe('projetos', () => {
+  const etapas = problemas.filter((p) => p.projeto);
+
+  it('cada etapa parte da solução da etapa anterior', () => {
+    for (const etapa of etapas.filter((e) => e.etapaAnterior)) {
+      const anterior = problemas.find((p) => p.id === etapa.etapaAnterior);
+      expect(etapa.arquivos, etapa.id).toEqual(anterior.solucao);
+    }
+  });
+
+  it('index.php é sempre o primeiro arquivo', () => {
+    for (const etapa of etapas) expect(Object.keys(etapa.solucao)[0], etapa.id).toBe('index.php');
   });
 });
 

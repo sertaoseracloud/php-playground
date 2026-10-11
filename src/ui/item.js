@@ -40,7 +40,8 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     erros: $('erros'),
   };
 
-  const estado = { item: null, url: '/index.php', phpPronto: false, ocupado: false };
+  // previewAtivo: o preview já rodou para este item, então o banco do contexto 'preview' vale.
+  const estado = { item: null, url: '/index.php', phpPronto: false, ocupado: false, previewAtivo: false, origem: null };
 
   let salvarTimer;
   const editor = new EditorArquivos({
@@ -103,11 +104,11 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
       return;
     }
     try {
-      const tabelas = await motor.inspecionar(bancoAtual());
+      const tabelas = await motor.inspecionar(bancoAtual(), { contexto: 'preview', manterBanco: estado.previewAtivo });
       const valor = (v) => (v === null ? '<i>NULL</i>' : esc(v));
       el.banco.innerHTML = `
         <p>Conecte com <code>new PDO('sqlite:/banco/escola.sqlite')</code>.
-        ${ehLivre() ? 'No playground livre, as mudanças ficam salvas no seu navegador.' : 'O banco volta ao original a cada execução.'}</p>
+        ${ehLivre() ? 'No playground livre, as mudanças ficam salvas no seu navegador.' : 'O banco volta ao original quando você clica em ▶ Executar. Cliques em links e formulários do preview mantêm as mudanças.'}</p>
         ${tabelas.map((t) => `
           <div class="tabela-banco">
             <h3>${esc(t.nome)} <small>(${t.total} ${t.total === 1 ? 'linha' : 'linhas'})</small></h3>
@@ -129,14 +130,31 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
       el.enunciado.innerHTML = item.resumo;
       return;
     }
+    const etapa = item.projeto ? `
+      <div class="etapa-info">
+        <p><b>${esc(item.projeto.icone)} ${esc(item.projeto.titulo)}</b> · etapa ${item.etapa} de ${item.totalEtapas}</p>
+        ${estado.origem === 'aluno'
+          ? `<p>Você continua do <b>seu código</b> da etapa anterior.
+              <button class="btn btn-fantasma btn-pequeno" id="btn-referencia">Usar o código de referência</button></p>`
+          : item.etapaAnterior ? '<p>O código inicial é a solução de referência da etapa anterior.</p>' : ''}
+      </div>` : '';
     const exemplos = item.testes.filter((t) => !t.oculto && (t.url || t.metodo)).map((t) => `
       <div class="caso-exemplo"><span class="rotulo">Teste:</span> ${esc(t.descricao ?? `${t.metodo ?? 'GET'} ${t.url}`)}</div>`).join('');
     const ocultos = item.testes.filter((t) => t.oculto).length;
     el.enunciado.innerHTML = `
+      ${etapa}
       ${item.enunciado}
       ${exemplos ? `<h2>Casos de teste</h2>${exemplos}` : ''}
       ${ocultos ? `<p class="licao-chip">+ ${ocultos} caso(s) oculto(s) rodam quando você clica em Enviar.</p>` : ''}
       <details><summary>💡 Dica</summary><p><code>${esc(item.dica)}</code></p></details>`;
+    $('btn-referencia')?.addEventListener('click', () => {
+      if (!confirm('Trocar o seu código pelo código de referência desta etapa?')) return;
+      editor.carregar(item.arquivos);
+      gravarRascunho(item.id, item.arquivos);
+      estado.origem = 'referencia';
+      renderDescricao();
+      executar({ url: `/${editor.principal}` });
+    });
   }
 
   function renderSolucao() {
@@ -160,7 +178,9 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
   function renderCabecalho() {
     const item = estado.item;
     const modulo = modulos.find((m) => m.id === item.modulo);
-    el.modulo.textContent = modulo ? `${modulo.icone} ${modulo.titulo}` : '🧪 Livre';
+    el.modulo.textContent = item.projeto
+      ? `${item.projeto.icone} ${item.projeto.titulo} · ${item.etapa}/${item.totalEtapas}`
+      : modulo ? `${modulo.icone} ${modulo.titulo}` : '🧪 Livre';
     el.titulo.textContent = item.titulo;
     el.dificuldade.className = item.tipo === 'problema' ? `dificuldade ${item.dificuldade}` : 'licao-chip';
     el.dificuldade.textContent = item.tipo === 'problema' ? DIFICULDADES[item.dificuldade] : item.tipo === 'licao' ? 'Lição' : '';
@@ -183,8 +203,19 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     const item = buscarItem(id);
     if (!item) return false;
     estado.item = item;
-    const arquivos = arquivosCompartilhados ?? lerRascunho(id) ?? item.arquivos;
-    editor.carregar(arquivos);
+    estado.previewAtivo = false;
+    estado.origem = null;
+    let arquivos = arquivosCompartilhados ?? lerRascunho(id);
+    // Etapa de projeto: quem resolveu a etapa anterior continua do próprio código.
+    if (!arquivos && item.etapaAnterior && statusDe(item.etapaAnterior) === 'resolvido') {
+      const anterior = lerRascunho(item.etapaAnterior);
+      if (anterior) {
+        arquivos = anterior;
+        estado.origem = 'aluno';
+        gravarRascunho(id, anterior);
+      }
+    }
+    editor.carregar(arquivos ?? item.arquivos);
     estado.url = `/${editor.principal}`;
     el.url.value = estado.url;
 
@@ -224,18 +255,30 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     definirStatus('Erro ao executar');
   }
 
-  const executarNoMotor = (arquivos, req, banco) => motor.executar(arquivos, req, banco);
+  const executarNoMotor = (arquivos, req, banco, opcoes) => motor.executar(arquivos, req, banco, opcoes);
 
-  async function executar(req = { url: estado.url }) {
+  /**
+   * ▶ Executar começa do zero (banco recriado, sessão nova). Cliques em links e
+   * formulários do preview (`navegacao`) continuam com o mesmo banco e sessão,
+   * como num site de verdade: o post publicado continua lá no próximo clique.
+   */
+  async function executar(req = { url: estado.url }, { navegacao = false } = {}) {
     if (!estado.phpPronto || !estado.item) return;
     const item = estado.item;
     const arquivos = { ...editor.arquivos };
     definirStatus('Executando…');
     try {
       const banco = bancoAtual();
-      const r = await motor.executar(arquivos, req, ehLivre() && banco ? { ...banco, devolver: true } : banco);
+      const continuar = navegacao && estado.previewAtivo;
+      const r = await motor.executar(
+        arquivos,
+        req,
+        ehLivre() && banco ? { ...banco, devolver: true } : banco,
+        { contexto: 'preview', novaSessao: !continuar, manterBanco: continuar },
+      );
       if (estado.item !== item) return;
-      estado.url = req.url ?? `/${editor.principal}`;
+      estado.previewAtivo = true;
+      estado.url = r.url ?? req.url ?? `/${editor.principal}`;
       el.url.value = estado.url;
       el.resultado.srcdoc = r.html + SCRIPT_PONTE;
       el.fonte.textContent = r.html;
@@ -250,7 +293,8 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
         marcar(item.id, 'resolvido');
         aoMudarProgresso();
       }
-      if (item.tipo === 'problema') await rodarTestes({ incluirOcultos: false });
+      if (item.tipo === 'problema' && !navegacao) await rodarTestes({ incluirOcultos: false });
+      if (!el.banco.hidden) renderBanco();
     } catch (erro) {
       tratarErro(erro);
     }
@@ -361,12 +405,12 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
   // ---------- eventos ----------
   window.addEventListener('message', (e) => {
     if (e.source !== el.resultado.contentWindow || !e.data?.__phpPlayground) return;
-    executar(montarRequisicao(estado.url, e.data));
+    executar(montarRequisicao(estado.url, e.data), { navegacao: true });
   });
 
   el.barra.addEventListener('submit', (e) => {
     e.preventDefault();
-    executar({ url: normalizarUrl(el.url.value, editor.principal) });
+    executar({ url: normalizarUrl(el.url.value, editor.principal) }, { navegacao: true });
   });
 
   el.executar.onclick = () => executar();

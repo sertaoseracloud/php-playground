@@ -567,3 +567,21 @@ kbd {
   .tela-item { overflow: auto; }
   .area[data-modo="celular"] { flex: none; }
 }
+
+/* ---------- projetos ---------- */
+.grupo-cabecalho {
+  padding: 12px 16px 8px;
+  border-top: 2px solid var(--linha);
+  background: var(--fundo-escuro);
+}
+.grupo-cabecalho h3 { margin: 0; font-size: 1rem; color: var(--ciano); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.grupo-cabecalho p { margin: 4px 0 0; color: var(--suave); font-size: 0.85rem; }
+.etapa-info {
+  background: var(--fundo-escuro);
+  border-left: 3px solid var(--ciano);
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin-bottom: 12px;
+  font-size: 0.88rem;
+}
+.etapa-info p { margin: 3px 0; }

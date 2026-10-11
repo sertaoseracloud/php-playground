@@ -39,13 +39,13 @@ export class MotorPHP {
   }
 
   /** Grava os arquivos, prepara o banco e atende uma requisição HTTP simulada. */
-  executar(arquivos, req = {}, banco) {
-    return this.#enfileirar({ acao: 'executar', arquivos, req, banco });
+  executar(arquivos, req = {}, banco, opcoes) {
+    return this.#enfileirar({ acao: 'executar', arquivos, req, banco, opcoes });
   }
 
   /** Devolve as tabelas do banco (colunas e linhas) para a aba "Banco". */
-  async inspecionar(banco) {
-    return (await this.#enfileirar({ acao: 'inspecionar', banco })).tabelas;
+  async inspecionar(banco, opcoes) {
+    return (await this.#enfileirar({ acao: 'inspecionar', banco, opcoes })).tabelas;
   }
 
   #enfileirar(mensagem) {

@@ -1,13 +1,15 @@
-// A trilha completa, na ordem das aulas: HTML → W3.CSS → PHP → PHP + PDO.
+// A trilha completa, na ordem das aulas: HTML → W3.CSS → PHP → PHP + PDO,
+// mais o módulo extra de Projetos.
 // Cada módulo tem `itens`: lições (tipo 'licao') e problemas (tipo 'problema').
 import { moduloHtml } from './html.js';
 import { moduloW3 } from './w3css.js';
 import { moduloPhp } from './php.js';
 import { moduloPdo } from './pdo.js';
+import { moduloProjetos } from './projetos/index.js';
 import { BANCO_ESCOLA } from './bancos.js';
 import { documento, php } from './util.js';
 
-export const modulos = [moduloHtml, moduloW3, moduloPhp, moduloPdo];
+export const modulos = [moduloHtml, moduloW3, moduloPhp, moduloPdo, moduloProjetos];
 
 export const DIFICULDADES = {
   facil: 'Fácil',

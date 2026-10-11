@@ -33,7 +33,7 @@ export function renderInicio(el) {
     const doModulo = m.itens.filter((x) => x.tipo === 'problema');
     const feitos = doModulo.filter((p) => statusDe(p.id) === 'resolvido').length;
     const pct = Math.round((feitos / doModulo.length) * 100);
-    const linhas = m.itens.map((item) => {
+    const linha = (item) => {
       const direita = item.tipo === 'licao'
         ? '<span class="licao-chip">Lição</span>'
         : `<span class="dificuldade ${item.dificuldade}">${DIFICULDADES[item.dificuldade]}</span>`;
@@ -43,14 +43,28 @@ export function renderInicio(el) {
           <span class="titulo">${esc(item.titulo)}</span>
           ${direita}
         </a>`;
-    }).join('');
+    };
+    // Projetos: um bloco por projeto, com o progresso das etapas.
+    const linhas = m.grupos
+      ? m.grupos.map((g) => {
+        const doGrupo = m.itens.filter((x) => x.grupo === g.id);
+        const etapas = doGrupo.filter((x) => x.tipo === 'problema');
+        const prontas = etapas.filter((x) => statusDe(x.id) === 'resolvido').length;
+        return `
+          <div class="grupo-cabecalho" id="projeto-${g.id}">
+            <h3>${g.icone} ${esc(g.titulo)} <span class="contagem">${prontas}/${etapas.length} etapas</span></h3>
+            <p>${esc(g.descricao)}</p>
+          </div>
+          ${doGrupo.map(linha).join('')}`;
+      }).join('')
+      : m.itens.map(linha).join('');
     return `
       <section class="modulo" id="modulo-${m.id}">
         <div class="modulo-cabecalho">
-          <h2>${m.icone} ${esc(m.titulo)} <span class="passo">módulo ${i + 1}</span></h2>
+          <h2>${m.icone} ${esc(m.titulo)} <span class="passo">${m.extra ? 'módulo extra' : `módulo ${i + 1}`}</span></h2>
           <p>${esc(m.descricao)}</p>
           <div class="barra-progresso"><span style="width:${pct}%"></span></div>
-          <div class="contagem">${feitos}/${doModulo.length} problemas resolvidos</div>
+          <div class="contagem">${feitos}/${doModulo.length} ${m.extra ? 'etapas concluídas' : 'problemas resolvidos'}</div>
         </div>
         ${linhas}
       </section>`;

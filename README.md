@@ -15,6 +15,23 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
   3. **PHP**: variáveis, condicionais, laços (FizzBuzz, tabuada), arrays, funções, `$_GET`, `$_POST` e `include`.
   4. **PHP + PDO**: conectar, `COUNT`, `ORDER BY`, `prepare` contra SQL injection, `fetch`, `JOIN` + `GROUP BY`,
      `INSERT`, paginação com `LIMIT`/`OFFSET` e `LEFT JOIN`.
+- **🏗️ Módulo extra: Projetos** — 6 sistemas completos construídos em **etapas encadeadas** (33 etapas).
+  O código de partida de cada etapa é o **código do próprio aluno** na etapa anterior (ou a referência,
+  se ele não a resolveu):
+
+  | Projeto | Etapas | Destaques |
+  | --- | --- | --- |
+  | ✅ Lista de tarefas (CRUD) | 5 | criar, listar, concluir, editar, excluir |
+  | 📝 Blog | 6 | JOIN, comentários, login com `password_verify`, publicar, excluir só o que é seu |
+  | 🐦 Rede social | 6 | perfil, seguir, feed com subconsulta, curtidas, busca, "quem seguir" |
+  | 🛍️ Loja virtual | 6 | filtros, carrinho na sessão, checkout com **transação**, relatório de vendas |
+  | 📚 Biblioteca escolar | 5 | disponibilidade com LEFT JOIN, empréstimos, atrasos e multas com datas |
+  | 💬 Fórum de perguntas | 5 | respostas, votos com **upsert**, melhor resposta só pelo autor |
+
+  Os testes dos projetos simulam um usuário de verdade: um caso pode ter vários **passos** que
+  compartilham sessão e banco (login → publicar → ver o feed), e os redirecionamentos
+  (`header('Location: ...')`) são seguidos. No preview, clicar em links e enviar formulários mantém o
+  banco e a sessão; **▶ Executar** começa do zero.
 - **Como no LeetCode**: **▶ Executar** roda os casos visíveis; **⬆ Enviar** roda todos, inclusive os
   **casos ocultos**. Os ocultos usam outros valores e outro banco, então resposta fixa no código não passa.
   O resultado sai como "Aceito" ou "Resposta errada", mostrando o caso que falhou.
