@@ -21,7 +21,9 @@ ${corpo}
 export const exercicios = [
   {
     id: 'ex-apresentacao',
-    titulo: 'Exercício 1: Apresente-se',
+    tipo: 'problema',
+    dificuldade: 'facil',
+    titulo: 'Apresente-se',
     enunciado: `
       <p>Crie as variáveis <code>$nome</code> e <code>$idade</code> com os seus dados e mostre:</p>
       <ul>
@@ -60,7 +62,9 @@ $idade = 16;
   },
   {
     id: 'ex-par-impar',
-    titulo: 'Exercício 2: Par ou ímpar',
+    tipo: 'problema',
+    dificuldade: 'facil',
+    titulo: 'Par ou ímpar',
     enunciado: `
       <p>O número chega pela URL: <code>index.php?n=4</code>. Mostre:</p>
       <ul>
@@ -106,11 +110,15 @@ $n = (int) ($_GET['n'] ?? 7);
         ],
       },
       { regras: [{ codigo: '%', msg: 'Use o operador % (resto da divisão)' }, { semErros: true }] },
+      { descricao: 'index.php?n=0', url: '/index.php?n=0', oculto: true, regras: [{ contem: '0 é par' }] },
+      { descricao: 'index.php?n=-3', url: '/index.php?n=-3', oculto: true, regras: [{ contem: '-3 é ímpar' }] },
     ],
   },
   {
     id: 'ex-tabuada',
-    titulo: 'Exercício 3: Tabuada com laço',
+    tipo: 'problema',
+    dificuldade: 'medio',
+    titulo: 'Tabuada com laço',
     enunciado: `
       <p>Mostre a tabuada do número recebido em <code>?n=</code> (padrão 5) numa
       <code>&lt;table class="w3-table w3-striped"&gt;</code>.</p>
@@ -149,11 +157,19 @@ $n = (int) ($_GET['n'] ?? 5);
       },
       { descricao: 'index.php?n=9', url: '/index.php?n=9', regras: [{ contem: '9 x 7 = 63' }] },
       { regras: [{ codigo: '\\b(for|while)\\s*\\(', msg: 'Use um laço for ou while' }, { semErros: true }] },
+      {
+        descricao: 'index.php?n=12',
+        url: '/index.php?n=12',
+        oculto: true,
+        regras: [{ contem: '12 x 10 = 120' }, { seletor: 'table tr', min: 10 }],
+      },
     ],
   },
   {
     id: 'ex-lista-compras',
-    titulo: 'Exercício 4: Lista de compras',
+    tipo: 'problema',
+    dificuldade: 'facil',
+    titulo: 'Lista de compras',
     enunciado: `
       <p>Percorra o array <code>$itens</code> com <code>foreach</code> e mostre cada item
       num <code>&lt;li&gt;</code> dentro de <code>&lt;ul class="w3-ul w3-border"&gt;</code>.</p>
@@ -193,7 +209,9 @@ $itens = ['Arroz', 'Feijão', 'Macarrão', 'Leite', 'Café'];
   },
   {
     id: 'ex-cards',
-    titulo: 'Exercício 5: Cards de produtos',
+    tipo: 'problema',
+    dificuldade: 'medio',
+    titulo: 'Cards de produtos',
     enunciado: `
       <p>Para cada produto do array, crie um card <code>&lt;div class="w3-card"&gt;</code>
       com o nome num <code>&lt;h3&gt;</code> e o preço no formato brasileiro, por exemplo <b>R$ 12,50</b>.</p>
@@ -248,7 +266,9 @@ $produtos = [
   },
   {
     id: 'ex-saudacao',
-    titulo: 'Exercício 6: Formulário de saudação',
+    tipo: 'problema',
+    dificuldade: 'medio',
+    titulo: 'Formulário de saudação',
     enunciado: `
       <p>Crie um formulário com <code>method="get"</code> e um campo <code>name="nome"</code>.</p>
       <p>Quando o nome for enviado, mostre <b>Olá, Ana!</b> dentro de um
@@ -300,6 +320,12 @@ $nome = $_GET['nome'] ?? '';
           { seletor: '.w3-panel b', igual: 0, msg: 'Use htmlspecialchars(): o HTML digitado não pode virar tag' },
           { contem: 'Olá, <b>Bia</b>!' },
         ],
+      },
+      {
+        descricao: 'index.php?nome=José',
+        url: '/index.php?nome=Jos%C3%A9',
+        oculto: true,
+        regras: [{ contem: 'Olá, José!' }],
       },
     ],
   },

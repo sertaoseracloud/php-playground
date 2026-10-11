@@ -3,6 +3,7 @@
 //   { contem: 'texto' }              o texto visível da página contém 'texto'
 //   { naoContem: 'texto' }           o texto visível NÃO contém 'texto'
 //   { seletor: 'css', min, max, igual }  quantidade de elementos que casam com o seletor
+//   { seletor: 'css', texto: 'x' }   algum elemento do seletor contém o texto 'x'
 //   { codigo: 'regex' }              o código-fonte do aluno casa com a regex
 //   { semErros: true }               o PHP não emitiu erros nem avisos
 
@@ -32,6 +33,13 @@ export function verificarRegra(regra, { html, erros, codigo }) {
   if ('naoContem' in regra) {
     const ok = !textoVisivel(html).includes(normalizar(regra.naoContem));
     return resultado(ok, regra, `A página não deve mostrar "${regra.naoContem}"`, ok ? undefined : 'texto encontrado');
+  }
+  if ('seletor' in regra && 'texto' in regra) {
+    const esperado = normalizar(regra.texto);
+    const elementos = [...documento(html).querySelectorAll(regra.seletor)];
+    const ok = elementos.some((e) => normalizar(e.textContent).includes(esperado));
+    return resultado(ok, regra, `Um elemento "${regra.seletor}" deve conter "${regra.texto}"`,
+      ok ? undefined : `nenhum "${regra.seletor}" com esse texto`);
   }
   if ('seletor' in regra) {
     const qtd = documento(html).querySelectorAll(regra.seletor).length;

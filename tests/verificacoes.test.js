@@ -31,6 +31,15 @@ describe('verificarRegra', () => {
     expect(verificarRegra({ seletor: 'table' }, pagina(html)).ok).toBe(false);
   });
 
+  it('seletor com texto: algum elemento do seletor contém o texto', () => {
+    const html = '<head><title> Minha  página </title></head><ul><li>Arroz</li><li>Feijão preto</li></ul>';
+    expect(verificarRegra({ seletor: 'title', texto: 'Minha página' }, pagina(html)).ok).toBe(true);
+    expect(verificarRegra({ seletor: 'li', texto: 'Feijão' }, pagina(html)).ok).toBe(true);
+    const r = verificarRegra({ seletor: 'li', texto: 'Café' }, pagina(html));
+    expect(r).toEqual({ ok: false, mensagem: 'Um elemento "li" deve conter "Café"', detalhe: 'nenhum "li" com esse texto' });
+    expect(verificarRegra({ seletor: 'h1', texto: 'Oi' }, pagina(html)).detalhe).toBe('nenhum "h1" com esse texto');
+  });
+
   it('seletor sem limites exige pelo menos um elemento', () => {
     expect(verificarRegra({ seletor: 'h1' }, pagina('<h1>Oi</h1>')).ok).toBe(true);
   });

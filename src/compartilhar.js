@@ -1,4 +1,8 @@
-// Guarda o código no próprio link (depois do #), sem precisar de servidor.
+// Rotas do site (no hash da URL) e links de compartilhamento.
+//   #/            lista de problemas
+//   #/p/<id>      lição ou problema
+//   #/livre       playground livre
+//   #/s/<código>  código compartilhado (arquivos guardados no próprio link)
 
 function paraBase64Url(bytes) {
   let binario = '';
@@ -12,23 +16,29 @@ function deBase64Url(texto) {
 }
 
 export function codificar({ item, arquivos }) {
-  const json = JSON.stringify({ i: item, a: arquivos });
-  return 's=' + paraBase64Url(new TextEncoder().encode(json));
+  return paraBase64Url(new TextEncoder().encode(JSON.stringify({ i: item, a: arquivos })));
 }
 
-/**
- * Lê o hash da URL. Aceita "#s=<código>" (código compartilhado) ou "#<id>"
- * (link direto para um exemplo ou exercício). Devolve null se não houver nada.
- */
-export function decodificar(hash) {
-  const valor = hash.replace(/^#/, '');
-  if (!valor) return null;
-  if (!valor.startsWith('s=')) return { item: decodeURIComponent(valor) };
+export function decodificar(codigo) {
   try {
-    const { i, a } = JSON.parse(new TextDecoder().decode(deBase64Url(valor.slice(2))));
-    const valido = a && typeof a === 'object' && Object.values(a).every((v) => typeof v === 'string');
+    const { i, a } = JSON.parse(new TextDecoder().decode(deBase64Url(codigo)));
+    const valido = typeof i === 'string' && a && typeof a === 'object' && Object.values(a).every((v) => typeof v === 'string');
     return valido ? { item: i, arquivos: a } : null;
   } catch {
     return null;
   }
+}
+
+export const linkItem = (id) => (id === 'livre' ? '#/livre' : `#/p/${encodeURIComponent(id)}`);
+export const linkCompartilhado = (estado) => `#/s/${codificar(estado)}`;
+
+export function lerRota(hash) {
+  const caminho = hash.replace(/^#\/?/, '');
+  if (caminho === 'livre') return { tela: 'item', id: 'livre' };
+  if (caminho.startsWith('p/')) return { tela: 'item', id: decodeURIComponent(caminho.slice(2)) };
+  if (caminho.startsWith('s/')) {
+    const dados = decodificar(caminho.slice(2));
+    if (dados) return { tela: 'item', id: dados.item, arquivos: dados.arquivos };
+  }
+  return { tela: 'inicio' };
 }

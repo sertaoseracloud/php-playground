@@ -1,7 +1,7 @@
 export class TempoEsgotado extends Error {}
 
 /**
- * Cliente do worker PHP. Executa uma requisição por vez; se uma execução passar
+ * Cliente do worker PHP. Executa uma tarefa por vez; se uma execução passar
  * do limite (ex.: laço infinito), o worker é descartado e um novo é iniciado.
  */
 export class MotorPHP {
@@ -38,13 +38,23 @@ export class MotorPHP {
     });
   }
 
-  executar(arquivos, req = {}) {
-    const tarefa = this.fila.then(() => this.#rodar(arquivos, req));
+  /** Grava os arquivos, prepara o banco e atende uma requisição HTTP simulada. */
+  executar(arquivos, req = {}, banco) {
+    return this.#enfileirar({ acao: 'executar', arquivos, req, banco });
+  }
+
+  /** Devolve as tabelas do banco (colunas e linhas) para a aba "Banco". */
+  async inspecionar(banco) {
+    return (await this.#enfileirar({ acao: 'inspecionar', banco })).tabelas;
+  }
+
+  #enfileirar(mensagem) {
+    const tarefa = this.fila.then(() => this.#rodar(mensagem));
     this.fila = tarefa.catch(() => {});
     return tarefa;
   }
 
-  async #rodar(arquivos, req) {
+  async #rodar(mensagem) {
     await this.pronto;
     const id = this.proximoId++;
     const inicio = performance.now();
@@ -56,9 +66,10 @@ export class MotorPHP {
       }, this.limiteMs);
       this.pendentes.set(id, (resposta) => {
         clearTimeout(relogio);
-        resolve({ ...resposta, ms: Math.round(performance.now() - inicio) });
+        if (resposta.erroInterno) reject(new Error(resposta.erroInterno));
+        else resolve({ ...resposta, ms: Math.round(performance.now() - inicio) });
       });
-      this.worker.postMessage({ id, arquivos, req });
+      this.worker.postMessage({ id, ...mensagem });
     });
   }
 }

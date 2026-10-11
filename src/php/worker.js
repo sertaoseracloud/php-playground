@@ -2,21 +2,23 @@
 // que o playground encerra e recria (veja motor.js).
 import { PHP } from '@php-wasm/universal';
 import { loadWebRuntime } from '@php-wasm/web';
-import { criarExecutor } from './sessao.js';
+import { criarSessao } from './sessao.js';
 
-const executor = (async () => criarExecutor(new PHP(await loadWebRuntime('8.4'))))();
+const sessao = (async () => criarSessao(new PHP(await loadWebRuntime('8.4'))))();
 
-executor.then(
+sessao.then(
   () => postMessage({ tipo: 'pronto' }),
   (erro) => postMessage({ tipo: 'falha', erro: String(erro?.message ?? erro) }),
 );
 
 onmessage = async ({ data }) => {
-  const executar = await executor;
+  const { executar, inspecionar } = await sessao;
   try {
-    const resposta = await executar(data.arquivos, data.req);
-    postMessage({ tipo: 'resposta', id: data.id, ...resposta });
+    const resultado = data.acao === 'inspecionar'
+      ? { tabelas: await inspecionar(data.banco) }
+      : await executar(data.arquivos, data.req, data.banco);
+    postMessage({ tipo: 'resposta', id: data.id, ...resultado });
   } catch (erro) {
-    postMessage({ tipo: 'resposta', id: data.id, html: '', erros: String(erro?.message ?? erro), status: 500 });
+    postMessage({ tipo: 'resposta', id: data.id, erroInterno: String(erro?.message ?? erro) });
   }
 };

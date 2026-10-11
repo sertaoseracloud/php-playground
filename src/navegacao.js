@@ -24,10 +24,13 @@ export const SCRIPT_PONTE = `<script>(function () {
 
 const ORIGEM = 'http://localhost';
 
-/** Normaliza o que o aluno digita na barra de endereço: "?n=4", "index.php?n=4" ou "/index.php". */
-export function normalizarUrl(texto) {
-  const destino = new URL(texto.trim() || '/index.php', `${ORIGEM}/index.php`);
-  if (destino.pathname === '/') destino.pathname = '/index.php';
+/**
+ * Normaliza o que o aluno digita na barra de endereço: "?n=4", "index.php?n=4" ou "/index.php".
+ * `principal` é o arquivo aberto quando a URL é "/" (index.php ou index.html).
+ */
+export function normalizarUrl(texto, principal = 'index.php') {
+  const destino = new URL(texto.trim() || `/${principal}`, `${ORIGEM}/${principal}`);
+  if (destino.pathname === '/') destino.pathname = `/${principal}`;
   return destino.pathname + destino.search;
 }
 

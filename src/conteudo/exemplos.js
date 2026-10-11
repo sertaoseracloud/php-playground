@@ -1,4 +1,4 @@
-// Exemplos progressivos para a aula. Cada exemplo é um conjunto de arquivos;
+// Lições do módulo PHP (veja php.js). Cada lição é um conjunto de arquivos;
 // o primeiro é o que o navegador pede (index.php).
 // String.raw preserva as barras invertidas do PHP; evite escrever "${" no PHP.
 
@@ -8,8 +8,9 @@ const php = String.raw;
 
 export const exemplos = [
   {
+    tipo: 'licao',
     id: 'ola-mundo',
-    titulo: '1. Olá, mundo',
+    titulo: 'Olá, mundo',
     resumo: 'O PHP roda no servidor e devolve HTML. Compare as abas "Resultado" e "HTML gerado".',
     arquivos: {
       'index.php': php`<!DOCTYPE html>
@@ -36,8 +37,9 @@ export const exemplos = [
     },
   },
   {
+    tipo: 'licao',
     id: 'variaveis',
-    titulo: '2. Variáveis e tipos',
+    titulo: 'Variáveis e tipos',
     resumo: 'Variáveis começam com $. Aspas duplas interpolam variáveis; o ponto (.) concatena textos.',
     arquivos: {
       'index.php': php`<?php
@@ -72,8 +74,9 @@ $aprovada = true;        // bool
     },
   },
   {
+    tipo: 'licao',
     id: 'condicionais',
-    titulo: '3. if / elseif / else',
+    titulo: 'if / elseif / else',
     resumo: 'Mude o valor de $nota e veja a cor e a mensagem mudarem.',
     arquivos: {
       'index.php': php`<?php
@@ -108,8 +111,9 @@ if ($nota >= 7) {
     },
   },
   {
+    tipo: 'licao',
     id: 'lacos',
-    titulo: '4. Laços (for e while)',
+    titulo: 'Laços (for e while)',
     resumo: 'O laço for gera as linhas da tabela. Troque $numero para ver outra tabuada.',
     arquivos: {
       'index.php': php`<?php $numero = 7; ?>
@@ -149,8 +153,9 @@ if ($nota >= 7) {
     },
   },
   {
+    tipo: 'licao',
     id: 'arrays',
-    titulo: '5. Arrays e foreach',
+    titulo: 'Arrays e foreach',
     resumo: 'Arrays guardam listas. foreach percorre cada item. Arrays associativos usam chaves de texto.',
     arquivos: {
       'index.php': php`<?php
@@ -190,8 +195,9 @@ $aluno = [
     },
   },
   {
+    tipo: 'licao',
     id: 'funcoes',
-    titulo: '6. Funções',
+    titulo: 'Funções',
     resumo: 'Funções evitam repetir código. Recebem parâmetros e devolvem um valor com return.',
     arquivos: {
       'index.php': php`<?php
@@ -225,8 +231,9 @@ function saudacao(string $nome, string $periodo = 'dia'): string {
     },
   },
   {
+    tipo: 'licao',
     id: 'formulario-get',
-    titulo: '7. Formulário com GET',
+    titulo: 'Formulário com GET',
     resumo: 'Preencha e envie: os dados vão na URL (veja a barra de endereço) e chegam em $_GET.',
     arquivos: {
       'index.php': php`<?php
@@ -267,8 +274,9 @@ $idade = $_GET['idade'] ?? '';
     },
   },
   {
+    tipo: 'licao',
     id: 'formulario-post',
-    titulo: '8. Formulário com POST e validação',
+    titulo: 'Formulário com POST e validação',
     resumo: 'Com POST os dados não aparecem na URL. O PHP valida os campos e mostra os erros.',
     arquivos: {
       'index.php': php`<?php
@@ -330,66 +338,9 @@ if ($enviado) {
     },
   },
   {
-    id: 'w3css-layout',
-    titulo: '9. Layout com W3.CSS',
-    resumo: 'Só HTML e classes W3.CSS: barra de navegação, grade responsiva, cards e botões.',
-    arquivos: {
-      'index.php': php`<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  ${W3}
-</head>
-<body>
-
-  <div class="w3-bar w3-indigo">
-    <a href="#" class="w3-bar-item w3-button">Início</a>
-    <a href="#" class="w3-bar-item w3-button">Cursos</a>
-    <a href="#" class="w3-bar-item w3-button">Contato</a>
-  </div>
-
-  <header class="w3-container w3-center w3-padding-32 w3-light-grey">
-    <h1>Escola Técnica</h1>
-    <p>Grade com <code>w3-row-padding</code> e <code>w3-third</code>: diminua a janela para ver as colunas empilharem.</p>
-  </header>
-
-  <div class="w3-row-padding w3-margin-top">
-    <div class="w3-third">
-      <div class="w3-card w3-container w3-margin-bottom">
-        <h3>Informática</h3>
-        <p>Programação, redes e banco de dados.</p>
-        <button class="w3-button w3-blue w3-round w3-margin-bottom">Saiba mais</button>
-      </div>
-    </div>
-    <div class="w3-third">
-      <div class="w3-card w3-container w3-margin-bottom">
-        <h3>Eletrônica</h3>
-        <p>Circuitos, microcontroladores e automação.</p>
-        <button class="w3-button w3-green w3-round w3-margin-bottom">Saiba mais</button>
-      </div>
-    </div>
-    <div class="w3-third">
-      <div class="w3-card w3-container w3-margin-bottom">
-        <h3>Design</h3>
-        <p>Identidade visual, UI e prototipação.</p>
-        <button class="w3-button w3-deep-orange w3-round w3-margin-bottom">Saiba mais</button>
-      </div>
-    </div>
-  </div>
-
-  <footer class="w3-container w3-dark-grey w3-center w3-padding">
-    <p>Feito com W3.CSS</p>
-  </footer>
-
-</body>
-</html>
-`,
-    },
-  },
-  {
+    tipo: 'licao',
     id: 'produtos',
-    titulo: '10. PHP + W3.CSS: vitrine de produtos',
+    titulo: 'PHP + W3.CSS: vitrine de produtos',
     resumo: 'Juntando tudo: um array de produtos vira cards W3.CSS gerados por um foreach.',
     arquivos: {
       'index.php': php`<?php
@@ -439,8 +390,9 @@ function preco(float $valor): string {
     },
   },
   {
+    tipo: 'licao',
     id: 'include',
-    titulo: '11. include: reaproveitando partes',
+    titulo: 'include: reaproveitando partes',
     resumo: 'Cabeçalho e rodapé ficam em arquivos próprios (veja as abas acima do editor) e são incluídos com include.',
     arquivos: {
       'index.php': php`<?php

@@ -3,51 +3,89 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#21222c">
   <title>PHP Playground</title>
-  <meta name="description" content="Playground de PHP, HTML e W3.CSS que roda direto no navegador, para usar em aula.">
+  <meta name="description" content="Trilha de exercícios de HTML, W3.CSS, PHP e PDO que roda direto no navegador, para usar em aula.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐘</text></svg>">
 </head>
 <body>
-  <header class="topo w3-indigo">
-    <span class="marca">🐘 PHP Playground</span>
-    <label class="seletor">
-      <span class="sr">Escolha um exemplo ou exercício</span>
-      <select id="seletor" class="w3-select"></select>
-    </label>
-    <div class="acoes">
-      <button id="btn-executar" class="w3-button w3-green w3-round" title="Executar (Ctrl+Enter)" disabled>▶ Executar</button>
-      <button id="btn-verificar" class="w3-button w3-amber w3-round" hidden disabled>✔ Verificar</button>
-      <button id="btn-restaurar" class="w3-button w3-round w3-indigo w3-border" title="Voltar ao código original">↺ Restaurar</button>
-      <button id="btn-compartilhar" class="w3-button w3-round w3-indigo w3-border" title="Copiar link com o código">🔗 Compartilhar</button>
-    </div>
+  <header class="topo">
+    <a href="#/" class="marca">🐘 PHP Playground</a>
+    <nav class="menu">
+      <a href="#/" data-menu="inicio">Problemas</a>
+      <a href="#/livre" data-menu="livre">Playground livre</a>
+    </nav>
+    <span id="progresso-topo" class="progresso-topo"></span>
     <span id="status" class="status" role="status">Carregando o PHP…</span>
   </header>
 
-  <main class="area">
-    <section class="painel">
-      <div id="descricao" class="descricao"></div>
-      <div class="abas w3-light-grey" id="abas-arquivos" role="tablist" aria-label="Arquivos"></div>
-      <div id="editor" class="editor"></div>
-    </section>
+  <main id="tela-inicio" class="tela-inicio" hidden></main>
 
-    <section class="painel">
-      <div class="abas w3-light-grey" role="tablist" aria-label="Saída">
-        <button class="aba ativa" data-saida="resultado" role="tab">Resultado</button>
-        <button class="aba" data-saida="fonte" role="tab">HTML gerado</button>
-        <button class="aba" data-saida="verificacao" role="tab" id="aba-verificacao" hidden>Verificação</button>
+  <main id="tela-item" class="tela-item" hidden>
+    <div class="barra-item">
+      <a id="item-anterior" class="btn-icone" title="Anterior">‹</a>
+      <a id="item-proximo" class="btn-icone" title="Próximo">›</a>
+      <div class="titulo-item">
+        <span id="item-modulo" class="chip"></span>
+        <h1 id="item-titulo"></h1>
+        <span id="item-dificuldade"></span>
+        <span id="item-status"></span>
       </div>
-      <form id="barra-endereco" class="endereco" title="Edite a URL e tecle Enter para testar $_GET">
-        <span class="origem">localhost</span>
-        <input id="url" value="/index.php" spellcheck="false" autocomplete="off" aria-label="Endereço da página">
-        <button class="w3-button w3-small" title="Recarregar">⟳</button>
-      </form>
-      <div class="saidas">
-        <iframe id="saida-resultado" class="saida" title="Resultado" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
-        <pre id="saida-fonte" class="saida fonte" hidden></pre>
-        <div id="saida-verificacao" class="saida verificacao" hidden></div>
+      <div class="acoes">
+        <button id="btn-executar" class="btn btn-roxo" title="Executar (Ctrl+Enter)" disabled>▶ Executar</button>
+        <button id="btn-enviar" class="btn btn-verde" title="Rodar todos os casos de teste, inclusive os ocultos" disabled>⬆ Enviar</button>
+        <button id="btn-resetar-banco" class="btn btn-fantasma" title="Voltar o banco aos dados originais">⟲ Resetar banco</button>
+        <button id="btn-restaurar" class="btn btn-fantasma" title="Voltar ao código original">↺ Restaurar</button>
+        <button id="btn-compartilhar" class="btn btn-fantasma" title="Copiar link com o seu código">🔗 Compartilhar</button>
       </div>
-      <pre id="erros" class="erros" hidden></pre>
-    </section>
+    </div>
+
+    <div class="area">
+      <section class="painel painel-descricao">
+        <div class="abas" role="tablist">
+          <button class="aba ativa" data-desc="enunciado" role="tab">Descrição</button>
+          <button class="aba" data-desc="banco" id="aba-banco" role="tab">🗄️ Banco</button>
+          <button class="aba" data-desc="solucao" id="aba-solucao" role="tab">Solução</button>
+        </div>
+        <div class="conteudo-desc" id="desc-enunciado"></div>
+        <div class="conteudo-desc" id="desc-banco" hidden></div>
+        <div class="conteudo-desc" id="desc-solucao" hidden></div>
+      </section>
+
+      <div class="bancada" id="bancada">
+        <!-- Código e preview lado a lado, com o mesmo tamanho (como o "Try it" da W3Schools). -->
+        <section class="painel painel-codigo">
+          <div class="abas" id="abas-arquivos" role="tablist" aria-label="Arquivos"></div>
+          <div id="editor" class="editor"></div>
+        </section>
+
+        <section class="painel painel-preview">
+          <div class="abas" role="tablist">
+            <button class="aba ativa" data-saida="resultado" role="tab">👁 Resultado</button>
+            <button class="aba" data-saida="fonte" role="tab">HTML gerado</button>
+          </div>
+          <div class="saida-resultado" id="saida-resultado">
+            <form id="barra-endereco" class="endereco" title="Edite a URL e tecle Enter para testar $_GET">
+              <span class="origem">localhost</span>
+              <input id="url" spellcheck="false" autocomplete="off" aria-label="Endereço da página">
+              <button class="btn btn-fantasma btn-pequeno" title="Recarregar">⟳</button>
+            </form>
+            <iframe id="resultado" class="resultado" title="Resultado" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
+          </div>
+          <pre id="saida-fonte" class="saida fonte" hidden></pre>
+          <pre id="erros" class="erros" hidden></pre>
+        </section>
+
+        <!-- Testes funcionais: sempre visíveis nos problemas. -->
+        <section class="painel painel-testes" id="painel-testes">
+          <div class="cabecalho-testes">
+            <span class="titulo-testes">🧪 Testes funcionais</span>
+            <span id="resumo-testes" class="resumo-testes"></span>
+          </div>
+          <div id="saida-testes" class="saida testes"></div>
+        </section>
+      </div>
+    </div>
   </main>
 
   <script type="module" src="/src/main.js"></script>

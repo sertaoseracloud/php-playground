@@ -1,16 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { montarRequisicao, normalizarUrl } from '../src/navegacao.js';
-import { codificar, decodificar } from '../src/compartilhar.js';
+import { codificar, decodificar, lerRota, linkItem, linkCompartilhado } from '../src/compartilhar.js';
 
 describe('normalizarUrl', () => {
   it.each([
-    ['', '/index.php'],
-    ['/', '/index.php'],
-    ['?n=4', '/index.php?n=4'],
-    ['index.php?n=4', '/index.php?n=4'],
-    ['/outra.php', '/outra.php'],
-  ])('"%s" vira "%s"', (entrada, saida) => {
-    expect(normalizarUrl(entrada)).toBe(saida);
+    ['', '/index.php', 'index.php'],
+    ['/', '/index.php', 'index.php'],
+    ['?n=4', '/index.php?n=4', 'index.php'],
+    ['index.php?n=4', '/index.php?n=4', 'index.php'],
+    ['/outra.php', '/outra.php', 'index.php'],
+    ['', '/index.html', 'index.html'],
+    ['?x=1', '/index.html?x=1', 'index.html'],
+  ])('"%s" vira "%s" (arquivo principal %s)', (entrada, saida, principal) => {
+    expect(normalizarUrl(entrada, principal)).toBe(saida);
   });
 });
 
@@ -40,16 +42,30 @@ describe('montarRequisicao', () => {
 describe('compartilhar', () => {
   it('codifica e decodifica arquivos com acentos e símbolos', () => {
     const estado = { item: 'livre', arquivos: { 'index.php': '<?php echo "Olá, ção! & <b>"; ?>' } };
-    expect(decodificar('#' + codificar(estado))).toEqual(estado);
+    expect(decodificar(codificar(estado))).toEqual(estado);
   });
 
-  it('hash simples aponta para um item', () => {
-    expect(decodificar('#ex-tabuada')).toEqual({ item: 'ex-tabuada' });
-    expect(decodificar('')).toBeNull();
+  it('ignora códigos corrompidos', () => {
+    expect(decodificar('@@@')).toBeNull();
+    expect(decodificar(btoa('{"a":{"x":1}}'))).toBeNull();
+  });
+});
+
+describe('rotas', () => {
+  it('início', () => {
+    expect(lerRota('')).toEqual({ tela: 'inicio' });
+    expect(lerRota('#/')).toEqual({ tela: 'inicio' });
+    expect(lerRota('#/qualquer-coisa')).toEqual({ tela: 'inicio' });
   });
 
-  it('ignora links corrompidos', () => {
-    expect(decodificar('#s=@@@')).toBeNull();
-    expect(decodificar('#s=' + btoa('{"a":{"x":1}}'))).toBeNull();
+  it('item da trilha e playground livre', () => {
+    expect(lerRota(linkItem('pdo-contar'))).toEqual({ tela: 'item', id: 'pdo-contar' });
+    expect(lerRota('#/livre')).toEqual({ tela: 'item', id: 'livre' });
+  });
+
+  it('código compartilhado', () => {
+    const estado = { item: 'html-links', arquivos: { 'index.html': '<a href="#">x</a>' } };
+    expect(lerRota(linkCompartilhado(estado))).toEqual({ tela: 'item', id: 'html-links', arquivos: estado.arquivos });
+    expect(lerRota('#/s/@@@')).toEqual({ tela: 'inicio' });
   });
 });

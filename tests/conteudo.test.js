@@ -1,83 +1,98 @@
-// Roda todos os exemplos e exercícios no PHP 8.4 (WebAssembly para Node),
-// o mesmo motor que o navegador usa.
+// Roda toda a trilha no PHP 8.4 (WebAssembly para Node), o mesmo motor do navegador.
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { Window } from 'happy-dom';
-import { PHP } from '@php-wasm/universal';
-import { loadNodeRuntime } from '@php-wasm/node';
-import { criarExecutor } from '../src/php/sessao.js';
+import { iniciarPhp } from './php-node.js';
 import { corrigir } from '../src/corrigir.js';
-import { exemplos } from '../src/conteudo/exemplos.js';
-import { exercicios } from '../src/conteudo/exercicios.js';
+import { modulos, itens, problemas, LIVRE, DIFICULDADES } from '../src/conteudo/trilha.js';
 
 globalThis.DOMParser = new Window().DOMParser;
 
 let php;
-let executar;
-
-beforeAll(async () => {
-  php = new PHP(await loadNodeRuntime('8.4', { emscriptenOptions: { processId: 1 } }));
-  executar = await criarExecutor(php);
-});
-
+let sessao;
+beforeAll(async () => ({ php, sessao } = await iniciarPhp()));
 afterAll(() => php?.exit());
 
+const executar = (arquivos, req, banco) => sessao.executar(arquivos, req, banco);
+const bancoDe = (item) => (item.banco ? { seed: item.banco } : undefined);
 const falhas = (r) =>
-  r.relatorio.flatMap((t) => t.resultados.filter((x) => !x.ok).map((x) => `${t.descricao ?? ''} ${x.mensagem} (${x.detalhe ?? ''})`));
+  r.relatorio.flatMap((t) => t.resultados.filter((x) => !x.ok).map((x) => `[${t.descricao ?? ''}] ${x.mensagem} (${x.detalhe ?? ''})`));
 
-describe('exemplos', () => {
-  it('têm ids únicos', () => {
-    const ids = [...exemplos, ...exercicios].map((e) => e.id);
+describe('estrutura da trilha', () => {
+  it('segue a ordem HTML → W3.CSS → PHP → PDO', () => {
+    expect(modulos.map((m) => m.id)).toEqual(['html', 'w3css', 'php', 'pdo']);
+  });
+
+  it('tem 10 problemas por módulo e ids únicos', () => {
+    for (const m of modulos) {
+      expect(m.itens.filter((i) => i.tipo === 'problema'), m.id).toHaveLength(10);
+    }
+    const ids = [...itens, LIVRE].map((i) => i.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it.each(exemplos.map((e) => [e.id, e]))('%s roda sem erros', async (_id, exemplo) => {
-    const r = await executar(exemplo.arquivos, {});
+  it.each(problemas.map((p) => [p.id, p]))('%s tem os campos obrigatórios', (_id, p) => {
+    expect(Object.keys(DIFICULDADES)).toContain(p.dificuldade);
+    expect(p.enunciado).toBeTruthy();
+    expect(p.dica).toBeTruthy();
+    expect(p.testes.some((t) => !t.oculto), 'precisa de ao menos um caso visível').toBe(true);
+  });
+});
+
+describe('lições e playground livre', () => {
+  it.each([...itens.filter((i) => i.tipo === 'licao'), LIVRE].map((l) => [l.id, l]))('%s roda sem erros', async (_id, licao) => {
+    const r = await executar(licao.arquivos, {}, bancoDe(licao));
     expect(r.erros).toBe('');
     expect(r.status).toBe(200);
     expect(r.html).not.toMatch(/<b>(Warning|Fatal error|Parse error|Deprecated|Notice)<\/b>/);
     // Código PHP vazando para o HTML (ex.: "?>" dentro de um comentário //).
     expect(r.html).not.toMatch(/<\?php|\?>|\becho\b/);
   });
-
-  it('formulário POST valida e aceita campos repetidos (assuntos[])', async () => {
-    const exemplo = exemplos.find((e) => e.id === 'formulario-post');
-    const invalido = await executar(exemplo.arquivos, { metodo: 'POST', corpo: 'email=x&mensagem=oi' });
-    expect(invalido.html).toContain('Informe um e-mail válido.');
-    const valido = await executar(exemplo.arquivos, {
-      metodo: 'POST',
-      corpo: 'email=a%40b.com&mensagem=mensagem+longa&assuntos%5B%5D=D%C3%BAvida&assuntos%5B%5D=Elogio',
-    });
-    expect(valido.html).toContain('Mensagem recebida! Assuntos: Dúvida, Elogio.');
-  });
-
-  it('formulário GET lê $_GET', async () => {
-    const exemplo = exemplos.find((e) => e.id === 'formulario-get');
-    const r = await executar(exemplo.arquivos, { url: '/index.php?nome=Ana&idade=20' });
-    expect(r.html).toContain('Você é maior');
-  });
 });
 
-describe('exercícios', () => {
-  it.each(exercicios.map((e) => [e.id, e]))('%s: a solução passa', async (_id, exercicio) => {
-    const r = await corrigir(exercicio, exercicio.solucao, executar);
+describe('problemas', () => {
+  it.each(problemas.map((p) => [p.id, p]))('%s: a solução passa em todos os casos', async (_id, problema) => {
+    const r = await corrigir(problema, problema.solucao, executar);
     expect(falhas(r)).toEqual([]);
     expect(r.aprovado).toBe(true);
   });
 
-  it.each(exercicios.map((e) => [e.id, e]))('%s: o código inicial roda, mas ainda não passa', async (_id, exercicio) => {
-    const inicial = await executar(exercicio.arquivos, {});
+  it.each(problemas.map((p) => [p.id, p]))('%s: o código inicial roda, mas não passa', async (_id, problema) => {
+    const inicial = await executar(problema.arquivos, {}, bancoDe(problema));
     expect(inicial.erros).toBe('');
-    const r = await corrigir(exercicio, exercicio.arquivos, executar);
+    const r = await corrigir(problema, problema.arquivos, executar);
     expect(r.aprovado).toBe(false);
   });
 
-  it('exercício 6 reprova quem esquece htmlspecialchars', async () => {
-    const exercicio = exercicios.find((e) => e.id === 'ex-saudacao');
-    const semEscape = {
-      'index.php': exercicio.solucao['index.php'].replace('htmlspecialchars($nome)', '$nome'),
+  it('casos ocultos ficam de fora quando incluirOcultos é false', async () => {
+    const p = problemas.find((x) => x.id === 'pdo-contar');
+    const visiveis = await corrigir(p, p.solucao, executar, { incluirOcultos: false });
+    expect(visiveis.relatorio.every((t) => !t.oculto)).toBe(true);
+    const todos = await corrigir(p, p.solucao, executar);
+    expect(todos.relatorio.some((t) => t.oculto)).toBe(true);
+  });
+
+  it('pdo-contar reprova quem escreve o número fixo no código', async () => {
+    const p = problemas.find((x) => x.id === 'pdo-contar');
+    const fixo = { 'index.php': p.solucao['index.php'].replace('<?= $total ?>', '8') };
+    const r = await corrigir(p, fixo, executar);
+    expect(r.relatorio.find((t) => t.oculto).ok).toBe(false);
+  });
+
+  it('pdo-filtro-curso reprova SQL concatenado (SQL injection)', async () => {
+    const p = problemas.find((x) => x.id === 'pdo-filtro-curso');
+    const vulneravel = {
+      'index.php': p.solucao['index.php']
+        .replace('WHERE cursos.nome = ? ORDER BY alunos.nome', "WHERE cursos.nome = '$curso' ORDER BY alunos.nome")
+        .replace('$stmt->execute([$curso]);', '$stmt->execute();'),
     };
-    const r = await corrigir(exercicio, semEscape, executar);
-    expect(r.aprovado).toBe(false);
+    const r = await corrigir(p, vulneravel, executar);
+    expect(falhas(r).join()).toMatch(/SQL injection/);
+  });
+
+  it('ex-saudacao reprova quem esquece htmlspecialchars', async () => {
+    const p = problemas.find((x) => x.id === 'ex-saudacao');
+    const semEscape = { 'index.php': p.solucao['index.php'].replace('htmlspecialchars($nome)', '$nome') };
+    const r = await corrigir(p, semEscape, executar);
     expect(falhas(r).join()).toMatch(/htmlspecialchars/);
   });
 });
