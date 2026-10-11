@@ -1,0 +1,121 @@
+// Tutorial passo a passo em modal (<dialog>), com destaque no elemento explicado.
+// Abre sozinho na primeira visita e pelo botão "❓ Tutorial".
+import { PASSOS, PROBLEMA_DO_TUTORIAL } from './tutorial-passos.js';
+import { linkItem } from '../compartilhar.js';
+import { lerPreferencia, gravarPreferencia } from '../progresso.js';
+import { $ } from './util.js';
+
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+
+export function iniciarTutorial({ telaAtual }) {
+  const dialogo = $('tutorial');
+  const el = {
+    passo: $('tutorial-passo'),
+    titulo: $('tutorial-titulo'),
+    texto: $('tutorial-texto'),
+    pontos: $('tutorial-pontos'),
+    voltar: $('tutorial-voltar'),
+    avancar: $('tutorial-avancar'),
+    pular: $('tutorial-pular'),
+  };
+  let indice = 0;
+  let destacado = null;
+  let hashAntes = '';
+
+  function limparDestaque() {
+    destacado?.classList.remove('tutorial-destaque');
+    destacado = null;
+  }
+
+  async function irParaTela(tela) {
+    if (!tela || tela === telaAtual()) return;
+    location.hash = tela === 'inicio' ? '#/' : linkItem(PROBLEMA_DO_TUTORIAL);
+    for (let i = 0; i < 20 && telaAtual() !== tela; i++) await esperar(50);
+    await esperar(150);
+  }
+
+  function posicionar(alvo) {
+    dialogo.classList.remove('centro', 'acima', 'abaixo');
+    if (!alvo || window.innerWidth < 700) {
+      dialogo.classList.add('centro');
+      dialogo.style.removeProperty('top');
+      return;
+    }
+    const r = alvo.getBoundingClientRect();
+    const alturaDialogo = dialogo.offsetHeight || 260;
+    const cabeAbaixo = r.bottom + 16 + alturaDialogo < window.innerHeight;
+    const cabeAcima = r.top - 16 - alturaDialogo > 0;
+    if (cabeAbaixo) {
+      dialogo.classList.add('abaixo');
+      dialogo.style.top = `${r.bottom + 16}px`;
+    } else if (cabeAcima) {
+      dialogo.classList.add('acima');
+      dialogo.style.top = `${r.top - 16 - alturaDialogo}px`;
+    } else {
+      dialogo.classList.add('centro');
+      dialogo.style.removeProperty('top');
+    }
+  }
+
+  async function mostrar(i) {
+    indice = i;
+    const passo = PASSOS[i];
+    limparDestaque();
+    await irParaTela(passo.tela);
+
+    const alvo = passo.alvo ? document.querySelector(passo.alvo) : null;
+    const visivel = alvo && alvo.offsetParent !== null;
+    if (visivel) {
+      alvo.scrollIntoView({ block: 'nearest' });
+      alvo.classList.add('tutorial-destaque');
+      destacado = alvo;
+    }
+
+    el.passo.textContent = `Passo ${i + 1} de ${PASSOS.length}`;
+    el.titulo.textContent = passo.titulo;
+    el.texto.innerHTML = passo.texto;
+    el.pontos.innerHTML = PASSOS.map((_, j) => `<span class="${j === i ? 'atual' : j < i ? 'feito' : ''}"></span>`).join('');
+    el.voltar.disabled = i === 0;
+    el.avancar.textContent = i === PASSOS.length - 1 ? 'Começar ✓' : 'Próximo ›';
+
+    if (!dialogo.open) dialogo.showModal();
+    posicionar(visivel ? alvo : null);
+    el.avancar.focus();
+  }
+
+  function fechar() {
+    limparDestaque();
+    if (dialogo.open) dialogo.close();
+    gravarPreferencia('tutorial-visto', true);
+  }
+
+  el.avancar.onclick = () => {
+    if (indice === PASSOS.length - 1) {
+      fechar();
+      // Termina no primeiro problema, ou volta para onde o aluno estava.
+      if (!hashAntes || hashAntes === '#/' || hashAntes === '') location.hash = linkItem(PROBLEMA_DO_TUTORIAL);
+      return;
+    }
+    mostrar(indice + 1);
+  };
+  el.voltar.onclick = () => indice > 0 && mostrar(indice - 1);
+  el.pular.onclick = fechar;
+  dialogo.addEventListener('close', limparDestaque);
+  dialogo.addEventListener('cancel', () => gravarPreferencia('tutorial-visto', true));
+  dialogo.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') el.avancar.click();
+    if (e.key === 'ArrowLeft') el.voltar.click();
+  });
+  window.addEventListener('resize', () => dialogo.open && posicionar(destacado));
+
+  const abrir = () => {
+    hashAntes = location.hash;
+    mostrar(0);
+  };
+  $('btn-tutorial').onclick = abrir;
+
+  // Primeira visita: abre sozinho (exceto quando o aluno chega por um link compartilhado).
+  if (!lerPreferencia('tutorial-visto') && !location.hash.startsWith('#/s/')) abrir();
+
+  return { abrir };
+}

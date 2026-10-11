@@ -55,3 +55,7 @@ export function gravarBancoLivre(bytes) {
 }
 
 export const apagarBancoLivre = () => remover('banco:livre');
+
+// ---------- preferências (layout, acessibilidade, tutorial) ----------
+export const lerPreferencia = (chave, padrao = null) => ler(`pref:${chave}`, padrao);
+export const gravarPreferencia = (chave, valor) => gravar(`pref:${chave}`, valor);

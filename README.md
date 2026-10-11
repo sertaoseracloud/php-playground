@@ -18,9 +18,18 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
 - **Como no LeetCode**: **▶ Executar** roda os casos visíveis; **⬆ Enviar** roda todos, inclusive os
   **casos ocultos**. Os ocultos usam outros valores e outro banco, então resposta fixa no código não passa.
   O resultado sai como "Aceito" ou "Resposta errada", mostrando o caso que falhou.
-- **Tela do problema**: descrição à esquerda; **código e preview lado a lado, com o mesmo tamanho**
-  (como o "Try it" da W3Schools); embaixo, o painel **🧪 Testes funcionais** com cada caso de teste
-  (⏳ pendente, ✅ passou, ❌ falhou e o motivo), para o aluno saber se acertou a questão.
+- **Tela do problema**: descrição, código, preview e o painel **🧪 Testes funcionais** com cada caso de
+  teste (⏳ pendente, ✅ passou, ❌ falhou e o motivo), para o aluno saber se acertou a questão.
+- **Posição do código e do preview**: a W3.CSS muda o layout em 601px e 993px, então o modo
+  **Auto** só põe código e preview lado a lado quando o preview passa de 600px (ex.: telas de 1920px).
+  Em telas menores (1366px, projetores) o código fica em cima e o preview embaixo, ambos na largura toda.
+  Há botões para fixar ⇆/⇅, ocultar a descrição, recolher os testes e um divisor arrastável
+  (mouse ou setas do teclado). O **📐 medidor** mostra a largura do preview e a faixa da W3.CSS.
+- **♿ Acessibilidade**: temas Dracula, Alto contraste e Claro; tamanho do texto (87,5% a 175%,
+  editor incluído); fonte Atkinson Hyperlegible; mais espaçamento; links sublinhados e foco reforçado;
+  reduzir animações; **🔊 Ouvir** o enunciado; atalhos de teclado; link "Pular para o conteúdo";
+  rótulos e regiões `aria-live` para leitores de tela.
+- **❓ Tutorial** em modal, passo a passo, destacando cada parte da tela. Abre sozinho na primeira visita.
 - **Progresso** por módulo e por dificuldade (✅ resolvido, ◐ tentado), salvo no navegador do aluno.
 - **Aba Banco**: mostra as tabelas e os dados do problema. O banco é recriado a cada execução.
 - **Playground livre** com banco SQLite que **fica salvo no navegador** e botão "Resetar banco".

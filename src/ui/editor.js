@@ -3,12 +3,12 @@ import { EditorView, basicSetup } from 'codemirror';
 import { EditorState, Prec } from '@codemirror/state';
 import { keymap } from '@codemirror/view';
 import { php as linguagemPhp } from '@codemirror/lang-php';
-import { temaDracula } from './tema-dracula.js';
+import { temaEditor } from './tema-editor.js';
 
 const NOME_VALIDO = /^[\w-]+\.(php|html|css|js|txt|json)$/;
 
 export class EditorArquivos {
-  constructor({ abas, editor, aoMudar = () => {}, aoExecutar = () => {} }) {
+  constructor({ abas, editor, aoMudar = () => {}, aoExecutar = () => {}, aoEnviar = () => {} }) {
     this.elAbas = abas;
     this.aoMudar = aoMudar;
     this.arquivos = {};
@@ -17,9 +17,13 @@ export class EditorArquivos {
     this.extensoes = [
       basicSetup,
       linguagemPhp(),
-      temaDracula,
+      temaEditor,
       EditorView.lineWrapping,
-      Prec.highest(keymap.of([{ key: 'Mod-Enter', run: () => { aoExecutar(); return true; } }])),
+      Prec.highest(keymap.of([
+        { key: 'Mod-Enter', run: () => { aoExecutar(); return true; } },
+        { key: 'Mod-Shift-Enter', run: () => { aoEnviar(); return true; } },
+      ])),
+      EditorView.contentAttributes.of({ 'aria-label': 'Editor de código' }),
       EditorView.updateListener.of((u) => {
         if (u.docChanged) {
           this.arquivos[this.atual] = u.state.doc.toString();

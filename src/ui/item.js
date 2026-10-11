@@ -9,9 +9,10 @@ import {
   lerBancoLivre, gravarBancoLivre, apagarBancoLivre,
 } from '../progresso.js';
 import { EditorArquivos } from './editor.js';
+import { iniciarLeitura } from './acessibilidade.js';
 import { $, esc } from './util.js';
 
-export function criarTelaItem({ motor, definirStatus, aoMudarProgresso }) {
+export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }) {
   const el = {
     anterior: $('item-anterior'),
     proximo: $('item-proximo'),
@@ -28,7 +29,6 @@ export function criarTelaItem({ motor, definirStatus, aoMudarProgresso }) {
     abaSolucao: $('aba-solucao'),
     painelTestes: $('painel-testes'),
     resumoTestes: $('resumo-testes'),
-    bancada: $('bancada'),
     enunciado: $('desc-enunciado'),
     banco: $('desc-banco'),
     solucao: $('desc-solucao'),
@@ -47,12 +47,18 @@ export function criarTelaItem({ motor, definirStatus, aoMudarProgresso }) {
     abas: $('abas-arquivos'),
     editor: $('editor'),
     aoExecutar: () => executar(),
+    aoEnviar: () => enviar(),
     aoMudar: (arquivos) => {
       clearTimeout(salvarTimer);
       const id = estado.item.id;
       salvarTimer = setTimeout(() => gravarRascunho(id, arquivos), 300);
     },
   });
+
+  // 🔊 Ouvir: lê a aba visível do painel de descrição.
+  const leitura = iniciarLeitura($('btn-ouvir'), () =>
+    [el.titulo.textContent, ...Object.values(paineisDescricao()).filter((p) => !p.hidden).map((p) => p.innerText)].join('. '));
+  const paineisDescricao = () => ({ enunciado: el.enunciado, banco: el.banco, solucao: el.solucao });
 
   const ehProblema = () => estado.item?.tipo === 'problema';
   const ehLivre = () => estado.item?.tipo === 'livre';
@@ -61,7 +67,10 @@ export function criarTelaItem({ motor, definirStatus, aoMudarProgresso }) {
   const paineisDesc = { enunciado: el.enunciado, banco: el.banco, solucao: el.solucao };
   function mostrarDesc(nome) {
     for (const [chave, painel] of Object.entries(paineisDesc)) painel.hidden = chave !== nome;
-    document.querySelectorAll('[data-desc]').forEach((b) => b.classList.toggle('ativa', b.dataset.desc === nome));
+    document.querySelectorAll('[data-desc]').forEach((b) => {
+      b.classList.toggle('ativa', b.dataset.desc === nome);
+      b.setAttribute('aria-selected', String(b.dataset.desc === nome));
+    });
     if (nome === 'banco') renderBanco();
   }
   document.querySelectorAll('[data-desc]').forEach((b) => { b.onclick = () => mostrarDesc(b.dataset.desc); });
@@ -69,7 +78,10 @@ export function criarTelaItem({ motor, definirStatus, aoMudarProgresso }) {
   const saidas = { resultado: $('saida-resultado'), fonte: el.fonte };
   function mostrarSaida(nome) {
     for (const [chave, painel] of Object.entries(saidas)) painel.hidden = chave !== nome;
-    document.querySelectorAll('[data-saida]').forEach((b) => b.classList.toggle('ativa', b.dataset.saida === nome));
+    document.querySelectorAll('[data-saida]').forEach((b) => {
+      b.classList.toggle('ativa', b.dataset.saida === nome);
+      b.setAttribute('aria-selected', String(b.dataset.saida === nome));
+    });
   }
   document.querySelectorAll('[data-saida]').forEach((b) => { b.onclick = () => mostrarSaida(b.dataset.saida); });
 
@@ -182,8 +194,8 @@ export function criarTelaItem({ motor, definirStatus, aoMudarProgresso }) {
     el.resetarBanco.hidden = !ehLivre();
     el.abaBanco.hidden = !item.banco;
     el.abaSolucao.hidden = !ehProblema();
-    el.painelTestes.hidden = !ehProblema();
-    el.bancada.classList.toggle('sem-testes', !ehProblema());
+    layout.configurar({ comTestes: ehProblema() });
+    leitura.parar();
     if (ehProblema()) {
       renderSolucao();
       renderTestesPendentes();

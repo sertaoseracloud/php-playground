@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-br">
+<html lang="pt-br" data-tema="dracula">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,84 +9,160 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐘</text></svg>">
 </head>
 <body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
   <header class="topo">
     <a href="#/" class="marca">🐘 PHP Playground</a>
-    <nav class="menu">
+    <nav class="menu" aria-label="Principal">
       <a href="#/" data-menu="inicio">Problemas</a>
       <a href="#/livre" data-menu="livre">Playground livre</a>
     </nav>
-    <span id="progresso-topo" class="progresso-topo"></span>
+    <span id="progresso-topo" class="progresso-topo" aria-label="Problemas resolvidos"></span>
     <span id="status" class="status" role="status">Carregando o PHP…</span>
+    <div class="ferramentas">
+      <button id="btn-tutorial" class="btn btn-fantasma btn-pequeno" aria-haspopup="dialog">❓ Tutorial</button>
+      <button id="btn-acessibilidade" class="btn btn-fantasma btn-pequeno" aria-haspopup="dialog">♿ Acessibilidade</button>
+    </div>
   </header>
 
-  <main id="tela-inicio" class="tela-inicio" hidden></main>
+  <div id="conteudo" class="conteudo" tabindex="-1">
+    <main id="tela-inicio" class="tela-inicio" hidden></main>
 
-  <main id="tela-item" class="tela-item" hidden>
-    <div class="barra-item">
-      <a id="item-anterior" class="btn-icone" title="Anterior">‹</a>
-      <a id="item-proximo" class="btn-icone" title="Próximo">›</a>
-      <div class="titulo-item">
-        <span id="item-modulo" class="chip"></span>
-        <h1 id="item-titulo"></h1>
-        <span id="item-dificuldade"></span>
-        <span id="item-status"></span>
-      </div>
-      <div class="acoes">
-        <button id="btn-executar" class="btn btn-roxo" title="Executar (Ctrl+Enter)" disabled>▶ Executar</button>
-        <button id="btn-enviar" class="btn btn-verde" title="Rodar todos os casos de teste, inclusive os ocultos" disabled>⬆ Enviar</button>
-        <button id="btn-resetar-banco" class="btn btn-fantasma" title="Voltar o banco aos dados originais">⟲ Resetar banco</button>
-        <button id="btn-restaurar" class="btn btn-fantasma" title="Voltar ao código original">↺ Restaurar</button>
-        <button id="btn-compartilhar" class="btn btn-fantasma" title="Copiar link com o seu código">🔗 Compartilhar</button>
-      </div>
-    </div>
-
-    <div class="area">
-      <section class="painel painel-descricao">
-        <div class="abas" role="tablist">
-          <button class="aba ativa" data-desc="enunciado" role="tab">Descrição</button>
-          <button class="aba" data-desc="banco" id="aba-banco" role="tab">🗄️ Banco</button>
-          <button class="aba" data-desc="solucao" id="aba-solucao" role="tab">Solução</button>
+    <main id="tela-item" class="tela-item" hidden>
+      <div class="barra-item">
+        <a id="item-anterior" class="btn-icone" aria-label="Item anterior">‹</a>
+        <a id="item-proximo" class="btn-icone" aria-label="Próximo item">›</a>
+        <div class="titulo-item">
+          <span id="item-modulo" class="chip"></span>
+          <h1 id="item-titulo"></h1>
+          <span id="item-dificuldade"></span>
+          <span id="item-status"></span>
         </div>
-        <div class="conteudo-desc" id="desc-enunciado"></div>
-        <div class="conteudo-desc" id="desc-banco" hidden></div>
-        <div class="conteudo-desc" id="desc-solucao" hidden></div>
-      </section>
+        <div class="acoes">
+          <button id="btn-executar" class="btn btn-roxo" title="Executar (Ctrl+Enter)" aria-keyshortcuts="Control+Enter" disabled>▶ Executar</button>
+          <button id="btn-enviar" class="btn btn-verde" title="Rodar todos os casos de teste, inclusive os ocultos (Ctrl+Shift+Enter)" aria-keyshortcuts="Control+Shift+Enter" disabled>⬆ Enviar</button>
+          <button id="btn-resetar-banco" class="btn btn-fantasma" title="Voltar o banco aos dados originais">⟲ Resetar banco</button>
+          <button id="btn-restaurar" class="btn btn-fantasma" title="Voltar ao código original">↺ Restaurar</button>
+          <button id="btn-compartilhar" class="btn btn-fantasma" title="Copiar link com o seu código">🔗 Compartilhar</button>
+        </div>
+        <div class="grupo-layout" id="grupo-layout" role="group" aria-label="Posição do código e do preview">
+          <button class="btn-layout" data-layout="auto" title="Automático: lado a lado só quando o preview passa de 600px">Auto</button>
+          <button class="btn-layout" data-layout="lado" title="Código e preview lado a lado" aria-label="Lado a lado">⇆</button>
+          <button class="btn-layout" data-layout="empilhado" title="Código em cima, preview embaixo" aria-label="Empilhado">⇅</button>
+          <button class="btn-layout" id="btn-descricao" title="Mostrar ou ocultar a descrição" aria-label="Mostrar descrição">📄</button>
+        </div>
+      </div>
 
-      <div class="bancada" id="bancada">
-        <!-- Código e preview lado a lado, com o mesmo tamanho (como o "Try it" da W3Schools). -->
-        <section class="painel painel-codigo">
+      <div class="area" id="area">
+        <section class="painel painel-descricao" id="painel-descricao" aria-label="Descrição">
+          <div class="abas" role="tablist" aria-label="Descrição">
+            <button class="aba ativa" data-desc="enunciado" role="tab" aria-selected="true">Descrição</button>
+            <button class="aba" data-desc="banco" id="aba-banco" role="tab" aria-selected="false">🗄️ Banco</button>
+            <button class="aba" data-desc="solucao" id="aba-solucao" role="tab" aria-selected="false">Solução</button>
+            <button class="aba aba-direita" id="btn-ouvir" title="Ler a descrição em voz alta" aria-pressed="false">🔊 Ouvir</button>
+          </div>
+          <div class="conteudo-desc" id="desc-enunciado" role="tabpanel"></div>
+          <div class="conteudo-desc" id="desc-banco" role="tabpanel" hidden></div>
+          <div class="conteudo-desc" id="desc-solucao" role="tabpanel" hidden></div>
+        </section>
+
+        <section class="painel painel-codigo" aria-label="Código">
           <div class="abas" id="abas-arquivos" role="tablist" aria-label="Arquivos"></div>
           <div id="editor" class="editor"></div>
         </section>
 
-        <section class="painel painel-preview">
-          <div class="abas" role="tablist">
-            <button class="aba ativa" data-saida="resultado" role="tab">👁 Resultado</button>
-            <button class="aba" data-saida="fonte" role="tab">HTML gerado</button>
+        <div class="divisor" id="divisor" role="separator" tabindex="0" aria-label="Redimensionar código e preview"
+             aria-valuemin="20" aria-valuemax="80" aria-valuenow="50"></div>
+
+        <section class="painel painel-preview" aria-label="Preview">
+          <div class="abas" role="tablist" aria-label="Saída">
+            <button class="aba ativa" data-saida="resultado" role="tab" aria-selected="true">👁 Resultado</button>
+            <button class="aba" data-saida="fonte" role="tab" aria-selected="false">HTML gerado</button>
           </div>
           <div class="saida-resultado" id="saida-resultado">
             <form id="barra-endereco" class="endereco" title="Edite a URL e tecle Enter para testar $_GET">
               <span class="origem">localhost</span>
               <input id="url" spellcheck="false" autocomplete="off" aria-label="Endereço da página">
-              <button class="btn btn-fantasma btn-pequeno" title="Recarregar">⟳</button>
+              <button class="btn btn-fantasma btn-pequeno" aria-label="Recarregar">⟳</button>
+              <span id="medidor" class="medidor" title="Largura do preview. A W3.CSS muda o layout em 601px e 993px."></span>
             </form>
-            <iframe id="resultado" class="resultado" title="Resultado" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
+            <iframe id="resultado" class="resultado" title="Resultado da sua página" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
           </div>
-          <pre id="saida-fonte" class="saida fonte" hidden></pre>
-          <pre id="erros" class="erros" hidden></pre>
+          <pre id="saida-fonte" class="saida fonte" hidden tabindex="0" aria-label="HTML gerado pelo PHP"></pre>
+          <pre id="erros" class="erros" hidden role="alert"></pre>
         </section>
 
-        <!-- Testes funcionais: sempre visíveis nos problemas. -->
-        <section class="painel painel-testes" id="painel-testes">
+        <section class="painel painel-testes" id="painel-testes" aria-label="Testes funcionais">
           <div class="cabecalho-testes">
-            <span class="titulo-testes">🧪 Testes funcionais</span>
-            <span id="resumo-testes" class="resumo-testes"></span>
+            <button id="btn-recolher-testes" class="btn-recolher" aria-expanded="true" aria-controls="saida-testes">
+              <span aria-hidden="true">▾</span> 🧪 Testes funcionais
+            </button>
+            <span id="resumo-testes" class="resumo-testes" aria-live="polite"></span>
           </div>
           <div id="saida-testes" class="saida testes"></div>
         </section>
       </div>
+    </main>
+  </div>
+
+  <!-- Tutorial (passo a passo em modal) -->
+  <dialog id="tutorial" class="dialogo tutorial" aria-labelledby="tutorial-titulo" aria-describedby="tutorial-texto">
+    <p class="tutorial-passo" id="tutorial-passo"></p>
+    <h2 id="tutorial-titulo"></h2>
+    <div id="tutorial-texto" class="tutorial-texto"></div>
+    <div class="tutorial-pontos" id="tutorial-pontos" aria-hidden="true"></div>
+    <div class="tutorial-botoes">
+      <button class="btn btn-fantasma btn-pequeno" id="tutorial-pular">Pular tutorial</button>
+      <span class="espaco"></span>
+      <button class="btn btn-fantasma" id="tutorial-voltar">‹ Voltar</button>
+      <button class="btn btn-roxo" id="tutorial-avancar">Próximo ›</button>
     </div>
-  </main>
+  </dialog>
+
+  <!-- Ferramentas de acessibilidade -->
+  <dialog id="dialogo-a11y" class="dialogo" aria-labelledby="a11y-titulo">
+    <form method="dialog" class="form-a11y" id="form-a11y">
+      <div class="dialogo-cabecalho">
+        <h2 id="a11y-titulo">♿ Acessibilidade</h2>
+        <button class="btn btn-fantasma btn-pequeno" value="fechar" aria-label="Fechar">✕</button>
+      </div>
+
+      <fieldset>
+        <legend>Tema de cores</legend>
+        <div id="a11y-temas" class="opcoes-tema"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Tamanho do texto</legend>
+        <div class="controle-tamanho">
+          <button type="button" class="btn" id="a11y-menor" aria-label="Diminuir texto">A−</button>
+          <output id="a11y-tamanho" aria-live="polite">100%</output>
+          <button type="button" class="btn" id="a11y-maior" aria-label="Aumentar texto">A+</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Leitura</legend>
+        <div id="a11y-opcoes" class="opcoes-check"></div>
+      </fieldset>
+
+      <details class="atalhos">
+        <summary>⌨️ Atalhos de teclado</summary>
+        <dl>
+          <dt><kbd>Ctrl</kbd> + <kbd>Enter</kbd></dt><dd>Executar</dd>
+          <dt><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd></dt><dd>Enviar (todos os testes)</dd>
+          <dt><kbd>Tab</kbd></dt><dd>Ir para a próxima área (o editor não prende o Tab)</dd>
+          <dt><kbd>←</kbd> <kbd>→</kbd> no divisor</dt><dd>Redimensionar código e preview</dd>
+          <dt><kbd>Esc</kbd></dt><dd>Fechar janelas como esta</dd>
+        </dl>
+      </details>
+
+      <div class="dialogo-rodape">
+        <button type="button" class="btn btn-fantasma" id="a11y-padrao">Restaurar padrão</button>
+        <button class="btn btn-roxo" value="fechar">Pronto</button>
+      </div>
+    </form>
+  </dialog>
 
   <script type="module" src="/src/main.js"></script>
 </body>
