@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PHP Playground</title>
+  <meta name="description" content="Playground de PHP, HTML e W3.CSS que roda direto no navegador, para usar em aula.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐘</text></svg>">
+</head>
+<body>
+  <header class="topo w3-indigo">
+    <span class="marca">🐘 PHP Playground</span>
+    <label class="seletor">
+      <span class="sr">Escolha um exemplo ou exercício</span>
+      <select id="seletor" class="w3-select"></select>
+    </label>
+    <div class="acoes">
+      <button id="btn-executar" class="w3-button w3-green w3-round" title="Executar (Ctrl+Enter)" disabled>▶ Executar</button>
+      <button id="btn-verificar" class="w3-button w3-amber w3-round" hidden disabled>✔ Verificar</button>
+      <button id="btn-restaurar" class="w3-button w3-round w3-indigo w3-border" title="Voltar ao código original">↺ Restaurar</button>
+      <button id="btn-compartilhar" class="w3-button w3-round w3-indigo w3-border" title="Copiar link com o código">🔗 Compartilhar</button>
+    </div>
+    <span id="status" class="status" role="status">Carregando o PHP…</span>
+  </header>
+
+  <main class="area">
+    <section class="painel">
+      <div id="descricao" class="descricao"></div>
+      <div class="abas w3-light-grey" id="abas-arquivos" role="tablist" aria-label="Arquivos"></div>
+      <div id="editor" class="editor"></div>
+    </section>
+
+    <section class="painel">
+      <div class="abas w3-light-grey" role="tablist" aria-label="Saída">
+        <button class="aba ativa" data-saida="resultado" role="tab">Resultado</button>
+        <button class="aba" data-saida="fonte" role="tab">HTML gerado</button>
+        <button class="aba" data-saida="verificacao" role="tab" id="aba-verificacao" hidden>Verificação</button>
+      </div>
+      <form id="barra-endereco" class="endereco" title="Edite a URL e tecle Enter para testar $_GET">
+        <span class="origem">localhost</span>
+        <input id="url" value="/index.php" spellcheck="false" autocomplete="off" aria-label="Endereço da página">
+        <button class="w3-button w3-small" title="Recarregar">⟳</button>
+      </form>
+      <div class="saidas">
+        <iframe id="saida-resultado" class="saida" title="Resultado" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>
+        <pre id="saida-fonte" class="saida fonte" hidden></pre>
+        <div id="saida-verificacao" class="saida verificacao" hidden></div>
+      </div>
+      <pre id="erros" class="erros" hidden></pre>
+    </section>
+  </main>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
