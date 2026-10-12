@@ -16,7 +16,7 @@ import { renderPrivacidade, iniciarAvisoPrivacidade } from './ui/privacidade.js'
 import { renderLanding } from './ui/landing.js';
 import { renderValidador } from './ui/validador.js';
 import { renderLicenca, renderTermos } from './ui/paginas-legais.js';
-import { iniciarMenu } from './ui/menu.js';
+import { iniciarMenu, iniciarFlutuantes } from './ui/menu.js';
 import { renderInicio, resumoProgresso } from './ui/inicio.js';
 import { criarTelaItem } from './ui/item.js';
 import { renderCertificado } from './ui/certificado.js';
@@ -29,6 +29,7 @@ import { buscarItem, modulos } from './conteudo/trilha.js';
 // Antes de tudo: tema e tamanho de texto escolhidos pelo aluno.
 const acessibilidade = iniciarAcessibilidade();
 iniciarMenu();
+iniciarFlutuantes();
 iniciarRegua();
 iniciarPausa({ ativo: () => acessibilidade.atuais().lembretePausa });
 

@@ -60,3 +60,19 @@ describe('menu ☰', () => {
     expect(botao.getAttribute('aria-label')).toBe('Abrir menu');
   });
 });
+
+describe('botões flutuantes', () => {
+  it('recolhem ao rolar para baixo e voltam ao rolar para cima', async () => {
+    const { iniciarFlutuantes } = await import('../src/ui/menu.js');
+    iniciarFlutuantes();
+    const grupo = document.getElementById('flutuantes');
+    const pagina = document.getElementById('tela-inicio');
+    Object.defineProperty(pagina, 'scrollHeight', { value: 3000, configurable: true });
+    Object.defineProperty(pagina, 'clientHeight', { value: 600, configurable: true });
+    const rolar = (y) => { pagina.scrollTop = y; pagina.dispatchEvent(new Event('scroll')); };
+    rolar(0); rolar(400);
+    expect(grupo.classList.contains('recolhidos')).toBe(true);
+    rolar(200);
+    expect(grupo.classList.contains('recolhidos')).toBe(false);
+  });
+});

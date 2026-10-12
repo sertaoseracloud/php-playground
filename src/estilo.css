@@ -804,8 +804,13 @@ kbd {
 /* o que também fica no canto direito sobe para a esquerda dos botões */
 .ir-passo-atual { right: 80px !important; }
 .lembrete-pausa { right: 80px !important; }
+/* Ao rolar para baixo (lendo), os botões saem da frente do texto; ao subir, voltam. */
+.flutuantes { transition: transform 0.25s, opacity 0.25s; }
+.flutuantes.recolhidos { transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; }
 @media (max-width: 760px) {
   .flutuantes { right: 10px; bottom: 10px; gap: 8px; }
+  /* espaço no fim das páginas para o último trecho não ficar embaixo dos botões */
+  .pagina-texto, .landing, .caminho-pagina { padding-bottom: 180px; }
   .flutuante { width: 44px; height: 44px; font-size: 1.2rem; }
   .flutuante::after { display: none; }
   .ir-passo-atual, .lembrete-pausa { right: 64px !important; }

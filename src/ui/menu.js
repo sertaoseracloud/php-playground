@@ -2,6 +2,27 @@
 // Fecha ao escolher uma opção, ao tocar fora, com Esc e ao mudar de página.
 import { $ } from './util.js';
 
+/**
+ * Botões flutuantes: recolhem quando a pessoa rola a página para baixo (lendo) e
+ * voltam quando rola para cima ou chega ao fim. Com foco num deles, nunca somem.
+ */
+export function iniciarFlutuantes() {
+  const grupo = $('flutuantes');
+  const ultimo = new WeakMap();
+  document.addEventListener('scroll', (e) => {
+    const alvo = e.target === document ? document.scrollingElement : e.target;
+    if (!(alvo instanceof Element) || grupo.contains(document.activeElement)) return;
+    const antes = ultimo.get(alvo) ?? 0;
+    const agora = alvo.scrollTop;
+    ultimo.set(alvo, agora);
+    const noFim = agora + alvo.clientHeight >= alvo.scrollHeight - 4;
+    if (Math.abs(agora - antes) < 6) return;
+    grupo.classList.toggle('recolhidos', agora > antes && agora > 80 && !noFim);
+  }, { capture: true, passive: true });
+  window.addEventListener('hashchange', () => grupo.classList.remove('recolhidos'));
+  grupo.addEventListener('focusin', () => grupo.classList.remove('recolhidos'));
+}
+
 export function iniciarMenu() {
   const botao = $('btn-menu');
   const painel = $('menu-topo');
