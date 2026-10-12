@@ -586,6 +586,8 @@ kbd {
 .veredito { font-size: 1.15rem; font-weight: 700; margin: 0 0 4px; }
 .veredito.ok { color: var(--verde); }
 .veredito.falha { color: var(--vermelho); }
+/* sem pressão: o erro não aparece em vermelho, para não soar como bronca */
+:root.a11y-sem-pressao .veredito.falha { color: var(--laranja); }
 .veredito-sub { color: var(--suave); margin: 0 0 10px; font-size: 0.85rem; }
 .caso { border: 1px solid var(--linha); border-radius: 6px; background: var(--fundo-escuro); }
 .caso summary { cursor: pointer; padding: 7px 12px; list-style: none; }
