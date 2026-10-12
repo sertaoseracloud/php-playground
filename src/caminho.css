@@ -104,7 +104,13 @@
   background: conic-gradient(var(--cor) calc(var(--pct) * 1%), var(--linha) 0);
 }
 .anel b { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--fundo); font-size: 0.78rem; }
-.unidade-contagem { font-size: 0.75rem; color: var(--suave); }
+.unidade-contagem { font-size: 0.75rem; color: var(--suave); white-space: nowrap; }
+/* lição lida: 📖 em ciano, diferente do ✔ verde dos exercícios */
+.no.licao.estado-concluido .circulo { background: var(--ciano); border-bottom-color: color-mix(in srgb, var(--ciano) 55%, black); }
+.legenda-caminho { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: -6px 0 16px; font-size: 0.78rem; color: var(--suave); }
+.legenda-caminho .mini { font-style: normal; display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font-size: 0.7rem; background: var(--linha); }
+.legenda-caminho .mini.ok { background: var(--verde); color: var(--sobre-cor); font-weight: 700; }
+.legenda-caminho .mini.lida { background: var(--ciano); }
 
 .trilha { list-style: none; margin: 0; padding: 18px 0 0; display: flex; flex-direction: column; align-items: center; gap: 18px; }
 .no { transform: translateX(var(--d)); }

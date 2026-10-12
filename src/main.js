@@ -43,8 +43,11 @@ function mostrarTela(tela) {
 const definirStatus = (texto) => { $('status').textContent = texto; };
 
 function atualizarProgressoTopo() {
-  const { resolvidos, total } = resumoProgresso();
-  $('progresso-topo').textContent = `✅ ${resolvidos}/${total}`;
+  const { resolvidos, total, licoesLidas, totalLicoes } = resumoProgresso();
+  const topo = $('progresso-topo');
+  topo.textContent = `✅ ${resolvidos}/${total} exercícios`;
+  topo.title = `${resolvidos} de ${total} exercícios resolvidos · ${licoesLidas} de ${totalLicoes} lições lidas`;
+  topo.setAttribute('aria-label', topo.title);
 }
 
 // Declarado antes do motor: ele avisa "carregando" já no construtor.

@@ -1,7 +1,7 @@
 // Tela inicial em formato de caminho (gamificação): painel do jogador com nível,
 // XP, sequência de dias e certificados; e a trilha em zigue-zague, com unidades
 // que desbloqueiam aos 70% e um troféu (certificado) no fim de cada módulo.
-import { modulos, problemas, DIFICULDADES } from '../conteudo/trilha.js';
+import { modulos, problemas, itens, DIFICULDADES } from '../conteudo/trilha.js';
 import { linkItem } from '../compartilhar.js';
 import { calcularJornada, sequenciaDeDias, LIMITE_DESBLOQUEIO, NIVEIS } from '../gamificacao.js';
 import { CERTIFICADOS, linkCertificado } from '../certificados.js';
@@ -18,9 +18,17 @@ export function jornadaAtual() {
   return calcularJornada({ modulos, statusDe, dataDe });
 }
 
+/** Exercícios resolvidos e lições lidas (contados separados: o caminho mostra os dois). */
 export function resumoProgresso() {
   const resolvidos = problemas.filter((p) => statusDe(p.id) === 'resolvido');
-  return { resolvidos: resolvidos.length, total: problemas.length, lista: resolvidos };
+  const licoes = itens.filter((i) => i.tipo === 'licao');
+  return {
+    resolvidos: resolvidos.length,
+    total: problemas.length,
+    lista: resolvidos,
+    licoesLidas: licoes.filter((l) => statusDe(l.id) === 'resolvido').length,
+    totalLicoes: licoes.length,
+  };
 }
 
 // ---------- nome do aluno (para os certificados) ----------
@@ -55,9 +63,15 @@ async function abrirCertificado(modulo, data) {
 
 function no(item, i) {
   const deslocamento = ZIGUEZAGUE[i % ZIGUEZAGUE.length];
-  const icone = item.estado === 'concluido' ? '✔' : item.estado === 'bloqueado' ? '🔒' : ICONE[item.tipo === 'licao' ? 'licao' : item.dificuldade];
+  // ✔ verde só para exercício resolvido; lição lida continua com 📖 (em outra cor), para a
+  // contagem "x/73 exercícios" bater com os ✔ do caminho.
+  const licao = item.tipo === 'licao';
+  const icone = item.estado === 'bloqueado' ? '🔒'
+    : item.estado === 'concluido' ? (licao ? '📖' : '✔')
+      : ICONE[licao ? 'licao' : item.dificuldade];
   const tipo = item.tipo === 'licao' ? 'Lição' : DIFICULDADES[item.dificuldade];
-  const rotulo = `${item.titulo} · ${tipo} · ${item.xp} XP${item.estado === 'concluido' ? ' · concluído' : item.estado === 'bloqueado' ? ' · bloqueado' : ''}`;
+  const situacao = { concluido: licao ? ' · lição lida' : ' · exercício resolvido', bloqueado: ' · bloqueado' }[item.estado] ?? '';
+  const rotulo = `${item.titulo} · ${tipo} · ${item.xp} XP${situacao}`;
   const conteudo = `
       <span class="circulo" aria-hidden="true">${icone}</span>
       ${item.ehProximo ? `<span class="balao" aria-hidden="true">${item.estado === 'tentado' ? 'CONTINUAR' : 'COMEÇAR'}</span>` : ''}
@@ -95,7 +109,12 @@ function unidade(m, anterior, atual) {
       </div>
       <div class="unidade-progresso" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${m.pct}" aria-label="Progresso em ${esc(m.titulo)}">
         <span class="anel" style="--pct:${m.pct}"><b>${m.pct}%</b></span>
-        <span class="unidade-contagem">${m.resolvidos}/${m.total}</span>
+        <span class="unidade-contagem">${m.resolvidos}/${m.total} ${m.grupos ? 'etapas' : 'exercícios'}</span>
+        ${(() => {
+          const licoes = m.itens.filter((i) => i.tipo === 'licao');
+          const lidas = licoes.filter((i) => i.estado === 'concluido').length;
+          return licoes.length ? `<span class="unidade-contagem">📖 ${lidas}/${licoes.length} ${licoes.length === 1 ? 'lição' : 'lições'}</span>` : '';
+        })()}
       </div>
     </header>`;
 
@@ -193,6 +212,12 @@ export function renderInicio(el) {
       ${painelJogador(j)}
       <div class="caminho">
         <h1 class="caminho-titulo">Trilha: do HTML ao banco de dados</h1>
+        <p class="legenda-caminho">
+          <span><i class="mini ok">✔</i> exercício resolvido</span>
+          <span><i class="mini lida">📖</i> lição lida</span>
+          <span><i class="mini">⭐</i> fácil · <i class="mini">🔥</i> médio · <i class="mini">💎</i> difícil</span>
+          <span>O módulo seguinte abre com ${LIMITE_DESBLOQUEIO}% dos exercícios.</span>
+        </p>
         ${j.modulos.map((m, i) => unidade(m, j.modulos[i - 1], m.id === atual)).join('')}
         ${diploma(j)}
       </div>

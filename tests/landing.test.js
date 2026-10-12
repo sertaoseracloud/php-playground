@@ -30,3 +30,17 @@ describe('landing page', () => {
     expect(el.querySelector('.hero-acoes a').textContent).toContain('Continuar');
   });
 });
+
+describe('contagem do progresso', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('conta exercícios e lições separados, como o caminho mostra', async () => {
+    const { resumoProgresso } = await import('../src/ui/inicio.js');
+    const { itens } = await import('../src/conteudo/trilha.js');
+    const licao = itens.find((i) => i.tipo === 'licao');
+    const exercicios = itens.filter((i) => i.tipo === 'problema').slice(0, 2);
+    const prog = Object.fromEntries([licao, ...exercicios].map((i) => [i.id, 'resolvido']));
+    localStorage.setItem('php-playground:progresso', JSON.stringify(prog));
+    expect(resumoProgresso()).toMatchObject({ resolvidos: 2, licoesLidas: 1 });
+  });
+});
