@@ -80,7 +80,7 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
 
 ### Trilha gamificada e certificados
 
-- A tela inicial é um **caminho** em zigue-zague. Cada item vale **XP**: lição 5, fácil 10, médio 20 e difícil 40.
+- A trilha (`#/trilha`) é um **caminho** em zigue-zague. Cada item vale **XP**: lição 5, fácil 10, médio 20 e difícil 40.
   O aluno sobe de **nível** (Iniciante → Mestre do PHP) e ganha uma **sequência de dias** 🔥.
 - O próximo módulo **desbloqueia quando o atual chega a 70%**.
 - Ao concluir 100% de um módulo, o 🏆 libera o **certificado do módulo**. Com todos os módulos

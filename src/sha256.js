@@ -52,7 +52,6 @@ export function sha256Bytes(dado) {
 }
 
 export const paraHex = (b) => [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
-export const deHex = (hex) => Uint8Array.from(hex.match(/../g) ?? [], (x) => parseInt(x, 16));
 
 export const sha256 = (dado) => paraHex(sha256Bytes(dado));
 

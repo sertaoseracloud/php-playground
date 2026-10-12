@@ -5,6 +5,8 @@ import { resolve } from 'node:path';
 import { PASSOS, PROBLEMA_DO_TUTORIAL } from '../src/ui/tutorial-passos.js';
 import { renderInicio } from '../src/ui/inicio.js';
 import { buscarItem } from '../src/conteudo/trilha.js';
+import { passosAtivos } from '../src/ui/tutorial.js';
+import { iniciarMenu } from '../src/ui/menu.js';
 
 beforeAll(() => {
   const html = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
@@ -19,6 +21,17 @@ describe('tutorial', () => {
     expect(document.querySelector(alvo)).not.toBeNull();
   });
 
+  it.each(PASSOS.filter((p) => p.alvoCelular).map((p) => [p.titulo, p.alvoCelular]))('no celular, o alvo do passo "%s" existe (%s)', (_t, alvo) => {
+    expect(document.querySelector(alvo)).not.toBeNull();
+  });
+
+  it('no celular, pula os passos que só existem no desktop', () => {
+    expect(passosAtivos(false)).toHaveLength(PASSOS.length);
+    const celular = passosAtivos(true);
+    expect(celular.length).toBeLessThan(PASSOS.length);
+    expect(celular.some((p) => p.alvo === '#grupo-layout')).toBe(false);
+  });
+
   it('todo passo tem título e texto', () => {
     for (const p of PASSOS) {
       expect(p.titulo).toBeTruthy();
@@ -28,5 +41,22 @@ describe('tutorial', () => {
 
   it('o problema usado no tutorial existe', () => {
     expect(buscarItem(PROBLEMA_DO_TUTORIAL)?.tipo).toBe('problema');
+  });
+});
+
+describe('menu ☰', () => {
+  it('abre, fecha ao escolher uma opção e com Esc', () => {
+    iniciarMenu();
+    const botao = document.getElementById('btn-menu');
+    const painel = document.getElementById('menu-topo');
+    botao.click();
+    expect(painel.classList.contains('aberto')).toBe(true);
+    expect(botao.getAttribute('aria-expanded')).toBe('true');
+    painel.querySelector('a').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(painel.classList.contains('aberto')).toBe(false);
+    botao.click();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(botao.getAttribute('aria-expanded')).toBe('false');
+    expect(botao.getAttribute('aria-label')).toBe('Abrir menu');
   });
 });

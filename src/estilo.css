@@ -358,42 +358,6 @@ kbd {
 
 /* ---------- tela inicial ---------- */
 .tela-inicio { flex: 1; overflow: auto; padding: 24px 16px 48px; }
-.inicio { max-width: 960px; margin: 0 auto; }
-.inicio h1 { font-size: 1.6rem; margin: 0 0 4px; color: var(--roxo); }
-.inicio .sub { color: var(--suave); margin: 0 0 20px; }
-.resumo-geral {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  margin-bottom: 28px;
-}
-.cartao-numero { background: var(--fundo); border: 1px solid var(--linha); border-radius: var(--raio); padding: 12px 16px; }
-.cartao-numero .valor { font-size: 1.5rem; font-weight: 700; }
-.cartao-numero .rotulo { color: var(--suave); font-size: 0.82rem; }
-
-.modulo { background: var(--fundo); border: 1px solid var(--linha); border-radius: var(--raio); margin-bottom: 20px; overflow: hidden; }
-.modulo-cabecalho { padding: 14px 16px; border-bottom: 1px solid var(--linha); }
-.modulo-cabecalho h2 { margin: 0; font-size: 1.15rem; display: flex; gap: 10px; align-items: center; }
-.modulo-cabecalho h2 .passo { color: var(--suave); font-weight: 400; font-size: 0.9rem; }
-.modulo-cabecalho p { margin: 6px 0 10px; color: var(--suave); }
-.barra-progresso { height: 6px; background: var(--linha); border-radius: 3px; overflow: hidden; }
-.barra-progresso > span { display: block; height: 100%; background: var(--verde); transition: width 0.3s; }
-.contagem { font-size: 0.8rem; color: var(--suave); margin-top: 6px; }
-
-.linha-item {
-  display: grid;
-  grid-template-columns: 28px 1fr auto;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 16px;
-  color: var(--texto);
-  text-decoration: none;
-  border-top: 1px solid var(--linha);
-}
-.linha-item:nth-child(even) { background: var(--fundo-escuro); }
-.linha-item:hover { background: var(--linha); }
-.linha-item .icone-status { text-align: center; }
-.linha-item.licao .titulo { color: var(--ciano); }
 
 /* ---------- tela do problema ---------- */
 .tela-item { flex: 1; min-height: 0; display: flex; flex-direction: column; }
@@ -683,6 +647,8 @@ kbd {
 }
 #dialogo-a11y { width: min(660px, calc(100vw - 32px)); }
 .dialogo::backdrop { background: rgb(0 0 0 / 0.55); }
+.so-celular { display: none; }
+@media (max-width: 760px) { .so-celular { display: block; } }
 .dialogo h2 { margin: 0 0 10px; color: var(--roxo); font-size: 1.15rem; }
 .dialogo-cabecalho { display: flex; justify-content: space-between; align-items: center; }
 .dialogo-rodape { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; }
@@ -764,13 +730,6 @@ kbd {
 }
 
 /* ---------- projetos ---------- */
-.grupo-cabecalho {
-  padding: 12px 16px 8px;
-  border-top: 2px solid var(--linha);
-  background: var(--fundo-escuro);
-}
-.grupo-cabecalho h3 { margin: 0; font-size: 1rem; color: var(--ciano); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
-.grupo-cabecalho p { margin: 4px 0 0; color: var(--suave); font-size: 0.85rem; }
 .etapa-info {
   background: var(--fundo-escuro);
   border-left: 3px solid var(--ciano);

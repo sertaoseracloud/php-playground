@@ -6,6 +6,10 @@ import { lerPreferencia, gravarPreferencia } from '../progresso.js';
 import { $ } from './util.js';
 
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+const celular = () => window.matchMedia?.('(max-width: 760px)').matches ?? false;
+
+/** Passos que valem para esta tela: no celular, pula os que só existem no desktop. */
+export const passosAtivos = (ehCelular = celular()) => PASSOS.filter((p) => !(p.soDesktop && ehCelular));
 
 export function iniciarTutorial({ telaAtual }) {
   const dialogo = $('tutorial');
@@ -19,6 +23,7 @@ export function iniciarTutorial({ telaAtual }) {
     pular: $('tutorial-pular'),
   };
   let indice = 0;
+  let passos = PASSOS;
   let destacado = null;
   let hashAntes = '';
 
@@ -59,11 +64,13 @@ export function iniciarTutorial({ telaAtual }) {
 
   async function mostrar(i) {
     indice = i;
-    const passo = PASSOS[i];
+    const passo = passos[i];
     limparDestaque();
     await irParaTela(passo.tela);
 
-    const alvo = passo.alvo ? document.querySelector(passo.alvo) : null;
+    // No celular, menu e ferramentas ficam no painel ☰: o destaque vai para o botão do menu.
+    const seletor = celular() && passo.alvoCelular ? passo.alvoCelular : passo.alvo;
+    const alvo = seletor ? document.querySelector(seletor) : null;
     const visivel = alvo && alvo.offsetParent !== null;
     if (visivel) {
       alvo.scrollIntoView({ block: 'nearest' });
@@ -71,12 +78,12 @@ export function iniciarTutorial({ telaAtual }) {
       destacado = alvo;
     }
 
-    el.passo.textContent = `Passo ${i + 1} de ${PASSOS.length}`;
+    el.passo.textContent = `Passo ${i + 1} de ${passos.length}`;
     el.titulo.textContent = passo.titulo;
     el.texto.innerHTML = passo.texto;
-    el.pontos.innerHTML = PASSOS.map((_, j) => `<span class="${j === i ? 'atual' : j < i ? 'feito' : ''}"></span>`).join('');
+    el.pontos.innerHTML = passos.map((_, j) => `<span class="${j === i ? 'atual' : j < i ? 'feito' : ''}"></span>`).join('');
     el.voltar.disabled = i === 0;
-    el.avancar.textContent = i === PASSOS.length - 1 ? 'Começar ✓' : 'Próximo ›';
+    el.avancar.textContent = i === passos.length - 1 ? 'Começar ✓' : 'Próximo ›';
 
     if (!dialogo.open) dialogo.showModal();
     posicionar(visivel ? alvo : null);
@@ -90,7 +97,7 @@ export function iniciarTutorial({ telaAtual }) {
   }
 
   el.avancar.onclick = () => {
-    if (indice === PASSOS.length - 1) {
+    if (indice === passos.length - 1) {
       fechar();
       // Termina no primeiro problema, ou volta para onde o aluno estava.
       if (/^(#\/?|#\/trilha)?$/.test(hashAntes)) location.hash = linkItem(PROBLEMA_DO_TUTORIAL);
@@ -110,6 +117,7 @@ export function iniciarTutorial({ telaAtual }) {
 
   const abrir = () => {
     hashAntes = location.hash;
+    passos = passosAtivos();
     mostrar(0);
   };
   $('btn-tutorial').onclick = abrir;

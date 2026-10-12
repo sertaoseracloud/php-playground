@@ -35,9 +35,11 @@ export const PASSOS = [
   {
     tela: 'inicio',
     alvo: '.menu',
+    alvoCelular: '#btn-menu',
     titulo: 'Trilha e Playground livre',
     texto: `<p><b>Trilha</b> volta para este caminho. O <b>Playground livre</b> é para experimentar
-      à vontade, com um banco de dados que fica salvo.</p>`,
+      à vontade, com um banco de dados que fica salvo.</p>
+      <p class="so-celular">No celular, eles ficam no menu <b>☰</b>, no canto de cima.</p>`,
   },
   {
     tela: 'item',
@@ -87,6 +89,7 @@ export const PASSOS = [
   {
     tela: 'item',
     alvo: '#grupo-layout',
+    soDesktop: true, // no celular o código e o preview sempre ficam empilhados
     titulo: 'Posição do código e do preview',
     texto: `<p><b>Auto</b> escolhe sozinho: lado a lado quando o preview fica com mais de 600px,
       senão o código fica em cima e o preview embaixo.</p>
@@ -95,6 +98,7 @@ export const PASSOS = [
   },
   {
     alvo: '#btn-acessibilidade',
+    alvoCelular: '#btn-menu',
     titulo: '♿ Acessibilidade',
     texto: `<p>Mude o <b>tema</b>, o <b>tamanho do texto</b>, a fonte e o espaçamento.</p>
       <p>Há <b>perfis rápidos</b> para estudar do seu jeito: <b>🎯 Foco</b> (menos distrações, tarefas
@@ -103,8 +107,9 @@ export const PASSOS = [
   },
   {
     alvo: '#btn-tutorial',
+    alvoCelular: '#btn-menu',
     titulo: 'Pronto! 🚀',
-    texto: `<p>Você pode rever este tutorial quando quiser neste botão.</p>
+    texto: `<p>Você pode rever este tutorial quando quiser neste botão (no celular, dentro do menu <b>☰</b>).</p>
       <p>Comece pelo primeiro problema de HTML. Bons estudos!</p>`,
   },
 ];
