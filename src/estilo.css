@@ -305,7 +305,7 @@ kbd {
   .ferramentas { flex-wrap: wrap; gap: 8px; padding-top: 10px; border-top: 1px solid var(--linha); }
   .ferramentas .btn { flex: 1 1 140px; justify-content: center; padding: 10px; font-size: 0.95rem; }
 }
-@media (max-width: 380px) {
+@media (max-width: 340px) {
   .marca { font-size: 0; }
   .marca span { font-size: 1.4rem; }
 }
@@ -780,3 +780,32 @@ kbd {
   font-size: 0.88rem;
 }
 .etapa-info p { margin: 3px 0; }
+
+/* =========================================================
+   Celular: tela do exercício e painel do jogador mais compactos
+   ========================================================= */
+@media (max-width: 760px) {
+  /* barra do exercício presa no topo: ▶ Executar e ⬆ Enviar sempre à mão */
+  .barra-item {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    gap: 6px 8px;
+    padding: 8px 10px;
+  }
+  .titulo-item { flex: 1 1 0; flex-wrap: nowrap; gap: 6px; }
+  .titulo-item h1 { font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  #item-modulo, #item-status:empty { display: none; }
+  .barra-item .acoes { width: 100%; flex-wrap: nowrap; }
+  .barra-item .acoes .btn { padding: 8px 10px; }
+  #btn-executar, #btn-enviar { flex: 1; justify-content: center; }
+  .rotulo-btn { display: none; }
+  .grupo-layout { display: none; }
+
+  /* roteiro do enunciado numa linha só, com rolagem lateral */
+  .roteiro { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+  .roteiro li { white-space: nowrap; }
+
+  /* painel do jogador da trilha */
+  .nota-niveis { display: none; }
+}

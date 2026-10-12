@@ -67,6 +67,11 @@
 .certificado-slot.emitido { color: var(--texto); border: 1px solid var(--amarelo); cursor: pointer; }
 .certificado-slot.emitido:hover { background: var(--linha); }
 .mini-badge { width: 28px; height: 28px; flex-shrink: 0; display: inline-grid; place-items: center; }
+.bloco-certificados > summary { cursor: pointer; list-style: none; }
+.bloco-certificados > summary::-webkit-details-marker { display: none; }
+.bloco-certificados > summary::after { content: " ▾"; color: var(--suave); }
+.bloco-certificados:not([open]) > summary::after { content: " ▸"; }
+.bloco-certificados > summary small { color: var(--suave); font-weight: 400; }
 .nota-niveis { font-size: 0.72rem; color: var(--suave); margin: 14px 0 0; }
 
 /* trilha */

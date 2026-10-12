@@ -9,6 +9,9 @@ import { svgBadge } from '../badges.js';
 import { statusDe, dataDe, diasAtivos, hoje, lerNome, gravarNome } from '../progresso.js';
 import { esc, $ } from './util.js';
 
+// No celular, a lista de certificados começa fechada para o caminho aparecer logo.
+const MOSTRAR_CERTIFICADOS = () => !window.matchMedia?.('(max-width: 760px)').matches;
+
 // Deslocamento horizontal dos nós, para o caminho serpentear.
 const ZIGUEZAGUE = [0, 44, 76, 44, 0, -44, -76, -44];
 
@@ -172,7 +175,8 @@ function painelJogador(j) {
         ? `<a class="btn btn-verde btn-continuar" href="${linkItem(j.proximo.id)}">▶ Continuar<small>${esc(j.proximo.titulo)}</small></a>`
         : '<p class="tudo-feito">🎓 Você concluiu tudo!</p>'}
 
-      <h2 class="titulo-certificados">Certificados</h2>
+      <details class="bloco-certificados" ${MOSTRAR_CERTIFICADOS() ? 'open' : ''}>
+      <summary class="titulo-certificados">Certificados <small>${emitidos}/${certificados.length}</small></summary>
       <ul class="lista-certificados">
         ${certificados.map((c) => `
           <li>
@@ -183,6 +187,7 @@ function painelJogador(j) {
             </button>
           </li>`).join('')}
       </ul>
+      </details>
       <p class="nota-niveis">Níveis: ${NIVEIS.map((n) => esc(n.nome)).join(' → ')}</p>
     </aside>`;
 }
