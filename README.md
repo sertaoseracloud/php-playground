@@ -8,6 +8,10 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
 
 ## O que tem
 
+- **Landing page** (`#/`): apresenta o projeto, a trilha, os certificados e os recursos de
+  acessibilidade. Os números (exercícios, módulos, projetos) vêm do próprio conteúdo. A trilha fica
+  em `#/trilha`, e quem já começou vê "▶ Continuar" no topo.
+
 - **40 problemas** (10 por módulo) com dificuldade Fácil/Médio/Difícil, mais **lições** de conceito
   no começo de cada assunto:
   1. **HTML**: estrutura, títulos, ênfase, links, imagens, listas, tabelas, formulários e semântica.
@@ -88,9 +92,18 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
 - **Publicar no LinkedIn** abre a caixa de post com o texto pronto e o link do badge. O LinkedIn monta
   a prévia com a imagem do badge, como nos posts da Credly. **Adicionar ao perfil** preenche a seção
   Licenças e certificados.
-- O certificado é gerado no navegador e codificado no link, com um código `SSC-AAAA-XXXXXX`.
-  Não há servidor que valide o código: ele serve de registro da conclusão, não de prova contra
-  falsificação.
+- **Selo de verificação**: cada certificado leva um **HMAC-SHA256** da data de obtenção, do emissor
+  (Cláudio Raposo), da empresa (Sertão será cloud), do aluno e do módulo, calculado com uma
+  **palavra secreta**. O selo vai no link, aparece no certificado (com o código `SSC-AAAA-XXXX-XXXX`
+  tirado dele) e a página confere: se alguém editar o nome ou a data no link, aparece
+  "⚠️ O selo não confere" e os botões de compartilhar somem.
+- **A palavra secreta nunca entra no código nem no site.** Ela fica no secret
+  `CERTIFICADO_SEGREDO` do GitHub Actions; o build injeta só um SHA-256 derivado dela
+  (`vite.config.js`), e falha se o secret não existir. Para gerar o build localmente:
+  `CERTIFICADO_SEGREDO='...' npm run build`. Trocar a palavra invalida os selos já emitidos.
+- **Limite:** sem servidor, a chave derivada vai no JavaScript do site. O selo pega alterações no
+  link, mas quem estudar o código publicado consegue gerar selos. Para impedir isso de verdade
+  seria preciso um servidor assinando os certificados.
 
 #### Como a prévia do LinkedIn funciona
 
@@ -131,7 +144,8 @@ O texto é informativo e vale uma revisão jurídica antes de uso institucional.
 
 ### Links diretos para a aula
 
-- Trilha: `https://sertaoseracloud.github.io/php-playground/`
+- Landing: `https://sertaoseracloud.github.io/php-playground/`
+- Trilha: `.../php-playground/#/trilha`
 - Um problema: `.../php-playground/#/p/pdo-filtro-curso`
 - Playground livre: `.../php-playground/#/livre`
 

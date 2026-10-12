@@ -3,7 +3,14 @@
 // O site não tem servidor: o certificado é montado no navegador a partir do
 // progresso salvo ali, e o link compartilhável guarda nome, módulo e data.
 // Por isso ele é um comprovante de participação, não um documento verificável.
+//
+// Selo: cada certificado leva um HMAC-SHA256 da data de obtenção, do emissor, da
+// empresa, do aluno e do módulo, com uma chave derivada de uma palavra secreta
+// (veja vite.config.js). O selo vai no link e a página confere: quem editar o nome
+// ou a data no link vê "não confere". Como não há servidor, a chave derivada está
+// no JavaScript do site; o selo impede alterações casuais, não falsificação dedicada.
 import { paraBase64Url, deBase64Url } from './compartilhar.js';
+import { hmacSha256 } from './sha256.js';
 
 /** Endereço público do site: os links compartilhados apontam para cá. */
 export const SITE = 'https://sertaoseracloud.github.io/php-playground/';
@@ -57,32 +64,39 @@ export const CERTIFICADOS = {
 
 const DATA = /^\d{4}-\d{2}-\d{2}$/;
 
-/** Hash FNV-1a de 32 bits: só para dar um número curto e estável a cada certificado. */
-function fnv1a(texto) {
-  let h = 0x811c9dc5;
-  for (const ch of new TextEncoder().encode(texto)) {
-    h ^= ch;
-    h = Math.imul(h, 0x01000193) >>> 0;
-  }
-  return h;
+// Injetada no build (vite.config.js). Fora do Vite (ex.: scripts/gerar-badges.mjs) não existe.
+const CHAVE = typeof __CHAVE_CERTIFICADO__ === 'undefined' ? null : __CHAVE_CERTIFICADO__;
+
+/** Selo do certificado: HMAC-SHA256 (64 caracteres hexadecimais). */
+export function hashCertificado({ nome, modulo, data }) {
+  if (!CHAVE) throw new Error('Chave do certificado indisponível fora do build do site.');
+  const campos = [data, EMISSOR.responsavel, EMISSOR.organizacao, nome.trim(), modulo];
+  return hmacSha256(CHAVE, JSON.stringify(campos));
 }
 
-export function idCertificado({ nome, modulo, data }) {
-  const numero = fnv1a(`${nome.trim()}|${modulo}|${data}`).toString(36).toUpperCase().padStart(6, '0').slice(-6);
-  return `SSC-${data.slice(0, 4)}-${numero}`;
-}
+/** Código curto para mostrar e para o LinkedIn: SSC-AAAA-XXXX-XXXX, tirado do selo. */
+export const idDoHash = (data, hash) => `SSC-${data.slice(0, 4)}-${hash.slice(0, 4)}-${hash.slice(4, 8)}`.toUpperCase();
+export const idCertificado = (cert) => idDoHash(cert.data, hashCertificado(cert));
 
 export function codificarCertificado({ nome, modulo, data }) {
-  return paraBase64Url(new TextEncoder().encode(JSON.stringify({ n: nome, m: modulo, d: data })));
+  const h = hashCertificado({ nome, modulo, data });
+  return paraBase64Url(new TextEncoder().encode(JSON.stringify({ n: nome, m: modulo, d: data, h })));
 }
 
+/**
+ * Lê o código do link. Devolve null se for ilegível; senão, o certificado com
+ * `selo`: 'confere', 'nao-confere' (link alterado) ou 'ausente' (link antigo, sem selo).
+ */
 export function decodificarCertificado(codigo) {
   try {
-    const { n, m, d } = JSON.parse(new TextDecoder().decode(deBase64Url(codigo)));
+    const { n, m, d, h } = JSON.parse(new TextDecoder().decode(deBase64Url(codigo)));
     const nome = typeof n === 'string' ? n.trim() : '';
     if (!nome || nome.length > 80 || !(m in CERTIFICADOS) || !DATA.test(d)) return null;
     const cert = { nome, modulo: m, data: d };
-    return { ...cert, id: idCertificado(cert) };
+    const esperado = hashCertificado(cert);
+    const selo = typeof h !== 'string' ? 'ausente' : h === esperado ? 'confere' : 'nao-confere';
+    const hash = selo === 'nao-confere' ? h : esperado;
+    return { ...cert, hash, id: idDoHash(d, hash), selo };
   } catch {
     return null;
   }

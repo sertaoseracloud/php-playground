@@ -247,7 +247,7 @@ export const GLOSSARIO = [
   {
     id: 'hash', termo: 'Hash de senha', padroes: ['password_hash', 'password_verify', 'hash'],
     definicao: 'Transforma a senha num código que não dá para desfazer. O site guarda o código, nunca a senha.',
-    analogia: 'Moer café: dá para comparar o pó, mas não dá para voltar ao grão.',
+    analogia: 'Fazer suco de laranja: dá para comparar dois sucos, mas não dá para voltar à laranja.',
     exemplo: '$hash = password_hash($senha, PASSWORD_DEFAULT);\npassword_verify($senha, $hash); // true',
   },
 

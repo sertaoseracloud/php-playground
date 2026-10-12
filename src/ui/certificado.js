@@ -13,18 +13,29 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
     el.innerHTML = `
       <div class="certificado-pagina">
         <div class="w3-panel aviso-certificado"><p>Este link de certificado não é válido.</p>
-        <p><a href="#/">← Voltar para a trilha</a></p></div>
+        <p><a href="#/trilha">← Voltar para a trilha</a></p></div>
       </div>`;
     return null;
   }
 
   const def = CERTIFICADOS[cert.modulo];
   const final = cert.modulo === 'final';
-  const url = linkPublico(cert);
+  const confere = cert.selo === 'confere';
+  // Só um certificado com selo válido pode ser compartilhado: gerar o link de novo
+  // a partir de dados alterados criaria um selo válido para eles.
+  const url = confere ? linkPublico(cert) : '';
+  const hashEmGrupos = cert.hash.match(/.{1,16}/g).join(' ');
+  const avisoSelo = {
+    'nao-confere': `<div class="aviso-selo erro" role="alert">⚠️ <b>O selo não confere.</b> Os dados deste link foram
+      alterados depois da emissão: este certificado não é válido.</div>`,
+    ausente: `<div class="aviso-selo" role="status">ℹ️ <b>Link de uma versão antiga, sem selo de verificação.</b>
+      Se o certificado é seu, abra-o de novo pela trilha para gerar um link com selo.</div>`,
+  }[cert.selo] ?? '';
 
   el.innerHTML = `
     <div class="certificado-pagina">
-      <p class="voltar-trilha"><a href="#/">← Voltar à trilha</a></p>
+      <p class="voltar-trilha"><a href="#/trilha">← Voltar à trilha</a></p>
+      ${avisoSelo}
 
       <!-- Página do badge, no estilo da Credly -->
       <section class="badge-credly" aria-labelledby="badge-titulo">
@@ -41,8 +52,16 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
             <div><dt>Emissor</dt><dd>${esc(EMISSOR.organizacao)}</dd></div>
             <div><dt>Responsável</dt><dd>${esc(EMISSOR.responsavel)}</dd></div>
             <div><dt>Código</dt><dd class="cert-codigo-dd">${esc(cert.id)}</dd></div>
+            <div><dt>Selo</dt><dd class="selo-${cert.selo}">${confere ? '✅ confere' : cert.selo === 'ausente' ? 'ℹ️ sem selo' : '⚠️ não confere'}</dd></div>
           </dl>
-          <div class="acoes-certificado">
+          <details class="selo-detalhes">
+            <summary>🔐 Selo de verificação (HMAC-SHA256)</summary>
+            <p class="selo-hash"><code>${esc(hashEmGrupos)}</code></p>
+            <p>O selo é calculado a partir da <b>data de obtenção</b>, do <b>emissor</b> (${esc(EMISSOR.responsavel)}),
+              da <b>empresa</b> (${esc(EMISSOR.organizacao)}), do <b>aluno</b> e do módulo, com uma chave secreta da
+              ${esc(EMISSOR.organizacao)}. Se qualquer um desses dados mudar no link, o selo deixa de conferir.</p>
+          </details>
+          <div class="acoes-certificado" ${confere ? '' : 'hidden'}>
             <a class="btn btn-linkedin" href="${esc(linkLinkedInPublicar(cert, url))}" target="_blank" rel="noopener">in Publicar no LinkedIn</a>
             <a class="btn btn-linkedin-contorno" href="${esc(linkLinkedInPerfil(cert, url))}" target="_blank" rel="noopener">＋ Adicionar ao perfil</a>
             <button type="button" class="btn btn-fantasma" id="btn-copiar-certificado">🔗 Copiar link</button>
@@ -85,6 +104,7 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
               <span>Concluído em</span>
               <b>${dataPorExtenso(cert.data)}</b>
               <span class="cert-codigo">Código: ${esc(cert.id)}</span>
+              <span class="cert-hash" title="Selo de verificação (HMAC-SHA256)">Selo: ${esc(hashEmGrupos)}</span>
             </div>
             <div class="cert-assinatura">
               <span class="linha-assinatura" aria-hidden="true"></span>
@@ -106,6 +126,7 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
       prompt('Copie:', texto);
     }
   };
+  if (!confere) return cert;
   el.querySelector('#btn-copiar-certificado').onclick = () => copiar(url, '🔗 Link do badge copiado!');
   el.querySelector('#btn-copiar-texto').onclick = () => copiar(textoPublicacao(cert, url), '📝 Texto do post copiado!');
   return cert;

@@ -28,6 +28,9 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npm run build
+        env:
+          # Palavra secreta do selo dos certificados (Settings > Secrets > Actions).
+          CERTIFICADO_SEGREDO: ${{ secrets.CERTIFICADO_SEGREDO }}
       - uses: actions/configure-pages@v5
         if: github.event_name != 'pull_request'
       - uses: actions/upload-pages-artifact@v3

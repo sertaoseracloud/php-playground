@@ -452,7 +452,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
         el.testes.insertAdjacentHTML('afterbegin', `
           <div class="comemoracao" role="status">🏆 Você concluiu o módulo <b>${esc(modulo.titulo)}</b>!
             Seu certificado da Sertão será cloud está liberado.
-            <a class="btn btn-roxo btn-pequeno" href="#/">Ver no caminho</a></div>`);
+            <a class="btn btn-roxo btn-pequeno" href="#/trilha">Ver no caminho</a></div>`);
       }
       definirStatus(aprovado ? 'Aceito! 🎉' : semPressao() ? 'Ainda não passou: veja o que falta' : 'Resposta errada');
     } catch (erro) {

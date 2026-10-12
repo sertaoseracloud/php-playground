@@ -1,5 +1,6 @@
 // Rotas do site (no hash da URL) e links de compartilhamento.
-//   #/            lista de problemas
+//   #/            landing page
+//   #/trilha      trilha (caminho com os módulos)
 //   #/p/<id>      lição ou problema
 //   #/livre       playground livre
 //   #/s/<código>  código compartilhado (arquivos guardados no próprio link)
@@ -37,6 +38,7 @@ export const linkCompartilhado = (estado) => `#/s/${codificar(estado)}`;
 export function lerRota(hash) {
   const caminho = hash.replace(/^#\/?/, '');
   if (caminho === 'livre') return { tela: 'item', id: 'livre' };
+  if (caminho === 'trilha') return { tela: 'inicio' };
   if (caminho === 'privacidade') return { tela: 'privacidade' };
   if (caminho.startsWith('p/')) return { tela: 'item', id: decodeURIComponent(caminho.slice(2)) };
   if (caminho.startsWith('certificado/')) return { tela: 'certificado', codigo: caminho.slice(12) };
@@ -44,5 +46,5 @@ export function lerRota(hash) {
     const dados = decodificar(caminho.slice(2));
     if (dados) return { tela: 'item', id: dados.item, arquivos: dados.arquivos };
   }
-  return { tela: 'inicio' };
+  return { tela: 'landing' };
 }

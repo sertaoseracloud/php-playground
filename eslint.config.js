@@ -10,7 +10,8 @@ export default [
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module',
-      globals: { ...globals.browser },
+      // __CHAVE_CERTIFICADO__ é injetada pelo Vite (vite.config.js).
+      globals: { ...globals.browser, __CHAVE_CERTIFICADO__: 'readonly' },
     },
     rules: {
       'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none' }],

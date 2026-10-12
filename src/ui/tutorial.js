@@ -29,7 +29,7 @@ export function iniciarTutorial({ telaAtual }) {
 
   async function irParaTela(tela) {
     if (!tela || tela === telaAtual()) return;
-    location.hash = tela === 'inicio' ? '#/' : linkItem(PROBLEMA_DO_TUTORIAL);
+    location.hash = tela === 'inicio' ? '#/trilha' : linkItem(PROBLEMA_DO_TUTORIAL);
     for (let i = 0; i < 20 && telaAtual() !== tela; i++) await esperar(50);
     await esperar(150);
   }
@@ -93,7 +93,7 @@ export function iniciarTutorial({ telaAtual }) {
     if (indice === PASSOS.length - 1) {
       fechar();
       // Termina no primeiro problema, ou volta para onde o aluno estava.
-      if (!hashAntes || hashAntes === '#/' || hashAntes === '') location.hash = linkItem(PROBLEMA_DO_TUTORIAL);
+      if (/^(#\/?|#\/trilha)?$/.test(hashAntes)) location.hash = linkItem(PROBLEMA_DO_TUTORIAL);
       return;
     }
     mostrar(indice + 1);
@@ -114,8 +114,13 @@ export function iniciarTutorial({ telaAtual }) {
   };
   $('btn-tutorial').onclick = abrir;
 
-  // Primeira visita: abre sozinho (exceto para quem chega por link de código ou de certificado).
-  if (!lerPreferencia('tutorial-visto') && !/^#\/(s\/|certificado\/|privacidade)/.test(location.hash)) abrir();
+  // Primeira visita: abre sozinho quando a pessoa entra na trilha ou num exercício
+  // (não na landing, na privacidade nem em links de código compartilhado ou de certificado).
+  const talvezAbrir = () => {
+    if (!dialogo.open && !lerPreferencia('tutorial-visto') && /^#\/(trilha|p\/|livre)/.test(location.hash)) abrir();
+  };
+  talvezAbrir();
+  window.addEventListener('hashchange', talvezAbrir);
 
   return { abrir };
 }

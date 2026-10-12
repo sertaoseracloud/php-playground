@@ -1,10 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import {
-  CERTIFICADOS, EMISSOR, codificarCertificado, decodificarCertificado, idCertificado,
+  CERTIFICADOS, EMISSOR, codificarCertificado, decodificarCertificado, idCertificado, hashCertificado,
   linkLinkedInPerfil, linkLinkedInPublicar, linkPublico, textoPublicacao, SITE,
 } from '../src/certificados.js';
 import { modulos } from '../src/conteudo/trilha.js';
-import { lerRota } from '../src/compartilhar.js';
+import { lerRota, paraBase64Url, deBase64Url } from '../src/compartilhar.js';
+
+const lerCodigo = (codigo) => JSON.parse(new TextDecoder().decode(deBase64Url(codigo)));
+const escreverCodigo = (obj) => paraBase64Url(new TextEncoder().encode(JSON.stringify(obj)));
 
 const CERT = { nome: 'Maria da Conceição', modulo: 'php', data: '2026-10-11' };
 
@@ -24,14 +27,41 @@ describe('certificados', () => {
 
   it('o código guarda nome, módulo e data (com acentos)', () => {
     const codigo = codificarCertificado(CERT);
-    expect(decodificarCertificado(codigo)).toEqual({ ...CERT, id: idCertificado(CERT) });
+    expect(decodificarCertificado(codigo)).toEqual({
+      ...CERT, hash: hashCertificado(CERT), id: idCertificado(CERT), selo: 'confere',
+    });
     expect(lerRota(`#/certificado/${codigo}`)).toEqual({ tela: 'certificado', codigo });
   });
 
-  it('id estável no formato SSC-AAAA-XXXXXX', () => {
-    expect(idCertificado(CERT)).toMatch(/^SSC-2026-[0-9A-Z]{6}$/);
+  it('id estável no formato SSC-AAAA-XXXX-XXXX, tirado do selo', () => {
+    expect(idCertificado(CERT)).toMatch(/^SSC-2026-[0-9A-F]{4}-[0-9A-F]{4}$/);
+    expect(idCertificado(CERT).replace(/-/g, '').slice(7).toLowerCase()).toBe(hashCertificado(CERT).slice(0, 8));
     expect(idCertificado(CERT)).toBe(idCertificado({ ...CERT }));
     expect(idCertificado(CERT)).not.toBe(idCertificado({ ...CERT, modulo: 'html' }));
+  });
+
+  it('selo HMAC-SHA256: muda com data, emissor, empresa, aluno e módulo', () => {
+    const hash = hashCertificado(CERT);
+    expect(hash).toMatch(/^[0-9a-f]{64}$/);
+    for (const mudanca of [{ data: '2026-10-12' }, { nome: 'Maria da Conceicao' }, { modulo: 'html' }]) {
+      expect(hashCertificado({ ...CERT, ...mudanca })).not.toBe(hash);
+    }
+    expect(hashCertificado({ ...CERT, nome: '  Maria da Conceição ' })).toBe(hash); // espaços nas pontas não contam
+  });
+
+  it('o link leva o selo, e a palavra secreta nunca aparece', () => {
+    const dados = lerCodigo(codificarCertificado(CERT));
+    expect(dados.h).toBe(hashCertificado(CERT));
+    expect(JSON.stringify(dados).toLowerCase()).not.toMatch(/caf[eé]/);
+  });
+
+  it('detecta link alterado e link antigo sem selo', () => {
+    const dados = lerCodigo(codificarCertificado(CERT));
+    const alterado = decodificarCertificado(escreverCodigo({ ...dados, n: 'Outra Pessoa' }));
+    expect(alterado.selo).toBe('nao-confere');
+    expect(alterado.hash).toBe(dados.h);
+    const antigo = decodificarCertificado(escreverCodigo({ n: CERT.nome, m: CERT.modulo, d: CERT.data }));
+    expect(antigo.selo).toBe('ausente');
   });
 
   it('rejeita códigos inválidos', () => {

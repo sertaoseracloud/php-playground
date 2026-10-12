@@ -11,7 +11,7 @@ const linkExterno = (url, texto = url) => `<a href="${esc(url)}" target="_blank"
 export function renderPrivacidade(el, { definirStatus = () => {} } = {}) {
   el.innerHTML = `
     <article class="pagina-texto">
-      <p class="voltar-trilha"><a href="#/">← Voltar à trilha</a></p>
+      <p class="voltar-trilha"><a href="#/trilha">← Voltar à trilha</a></p>
       <h1>🔒 Privacidade e cookies</h1>
       <p class="atualizada">Última atualização: ${dataPorExtenso(ATUALIZADA_EM)}</p>
 

@@ -53,9 +53,10 @@ describe('compartilhar', () => {
 
 describe('rotas', () => {
   it('início', () => {
-    expect(lerRota('')).toEqual({ tela: 'inicio' });
-    expect(lerRota('#/')).toEqual({ tela: 'inicio' });
-    expect(lerRota('#/qualquer-coisa')).toEqual({ tela: 'inicio' });
+    expect(lerRota('')).toEqual({ tela: 'landing' });
+    expect(lerRota('#/')).toEqual({ tela: 'landing' });
+    expect(lerRota('#/trilha')).toEqual({ tela: 'inicio' });
+    expect(lerRota('#/qualquer-coisa')).toEqual({ tela: 'landing' });
   });
 
   it('item da trilha e playground livre', () => {
@@ -66,6 +67,6 @@ describe('rotas', () => {
   it('código compartilhado', () => {
     const estado = { item: 'html-links', arquivos: { 'index.html': '<a href="#">x</a>' } };
     expect(lerRota(linkCompartilhado(estado))).toEqual({ tela: 'item', id: 'html-links', arquivos: estado.arquivos });
-    expect(lerRota('#/s/@@@')).toEqual({ tela: 'inicio' });
+    expect(lerRota('#/s/@@@')).toEqual({ tela: 'landing' });
   });
 });
