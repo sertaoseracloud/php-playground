@@ -260,7 +260,6 @@ kbd {
 .menu a.ativo { background: var(--linha); color: var(--rosa); }
 .progresso-topo { order: 2; color: var(--verde); white-space: nowrap; }
 .status { order: 3; margin-left: auto; color: var(--suave); font-size: 0.85rem; white-space: nowrap; }
-.ferramentas { order: 4; display: flex; gap: 6px; }
 .btn-menu { display: none; }
 
 /* Celular: uma linha só (marca, status, progresso, ☰); o resto abre num painel. */
@@ -302,8 +301,6 @@ kbd {
   .menu-topo.aberto { display: flex; }
   .menu { flex-direction: column; gap: 2px; }
   .menu a { padding: 12px 14px; font-size: 1rem; border-radius: 8px; }
-  .ferramentas { flex-wrap: wrap; gap: 8px; padding-top: 10px; border-top: 1px solid var(--linha); }
-  .ferramentas .btn { flex: 1 1 140px; justify-content: center; padding: 10px; font-size: 0.95rem; }
 }
 @media (max-width: 340px) {
   .marca { font-size: 0; }
@@ -739,3 +736,67 @@ kbd {
   /* painel do jogador da trilha */
   .nota-niveis { display: none; }
 }
+
+/* =========================================================
+   Botões flutuantes: ❓ Tutorial, ♿ Acessibilidade e 🔒 Privacidade
+   ========================================================= */
+.flutuantes {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.flutuante {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  font-size: 1.35rem;
+  line-height: 1;
+  text-decoration: none;
+  color: var(--texto);
+  background: var(--fundo-escuro);
+  border: 2px solid var(--roxo);
+  border-radius: 50%;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.4);
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+.flutuante:hover, .flutuante:focus-visible { transform: scale(1.08); background: var(--linha); }
+.flutuante.ativo { background: var(--roxo); }
+/* rótulo à esquerda do botão, ao passar o mouse ou focar pelo teclado */
+.flutuante::after {
+  content: attr(data-rotulo);
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-family: var(--fonte-texto);
+  font-size: calc(13px * var(--escala));
+  color: var(--texto);
+  background: var(--fundo-mais-escuro);
+  border: 1px solid var(--linha);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+.flutuante:hover::after, .flutuante:focus-visible::after { opacity: 1; }
+/* o que também fica no canto direito sobe para a esquerda dos botões */
+.ir-passo-atual { right: 80px !important; }
+.lembrete-pausa { right: 80px !important; }
+@media (max-width: 760px) {
+  .flutuantes { right: 10px; bottom: 10px; gap: 8px; }
+  .flutuante { width: 44px; height: 44px; font-size: 1.2rem; }
+  .flutuante::after { display: none; }
+  .ir-passo-atual, .lembrete-pausa { right: 64px !important; }
+  .lembrete-pausa { max-width: calc(100vw - 80px); }
+}
+@media print { .flutuantes { display: none !important; } }

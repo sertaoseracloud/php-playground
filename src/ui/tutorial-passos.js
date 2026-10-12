@@ -100,7 +100,6 @@ export const PASSOS = [
   },
   {
     alvo: '#btn-acessibilidade',
-    alvoCelular: '#btn-menu',
     titulo: '♿ Acessibilidade',
     texto: `<p>Mude o <b>tema</b>, o <b>tamanho do texto</b>, a fonte e o espaçamento.</p>
       <p>Há <b>perfis rápidos</b> para estudar do seu jeito: <b>🎯 Foco</b> (menos distrações, tarefas
@@ -109,9 +108,9 @@ export const PASSOS = [
   },
   {
     alvo: '#btn-tutorial',
-    alvoCelular: '#btn-menu',
     titulo: 'Pronto! 🚀',
-    texto: `<p>Você pode rever este tutorial quando quiser neste botão (no celular, dentro do menu <b>☰</b>).</p>
+    texto: `<p>Você pode rever este tutorial quando quiser no botão <b>❓</b>, no canto de baixo à direita.
+      Ali também ficam <b>♿ Acessibilidade</b> e <b>🔒 Privacidade</b>.</p>
       <p>Comece pelo primeiro problema de HTML. Bons estudos!</p>`,
   },
 ];

@@ -68,7 +68,7 @@ export function iniciarTutorial({ telaAtual }) {
     limparDestaque();
     await irParaTela(passo.tela);
 
-    // No celular, menu e ferramentas ficam no painel ☰: o destaque vai para o botão do menu.
+    // No celular, a navegação fica no painel ☰: o destaque vai para o botão do menu.
     const seletor = celular() && passo.alvoCelular ? passo.alvoCelular : passo.alvo;
     const alvo = seletor ? document.querySelector(seletor) : null;
     const visivel = alvo && alvo.offsetParent !== null;

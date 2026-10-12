@@ -22,7 +22,7 @@
 
   <header class="topo">
     <a href="#/" class="marca"><span aria-hidden="true">🐘</span> PHP Playground</a>
-    <!-- No celular, menu e ferramentas ficam no painel do botão ☰; no desktop, em linha. -->
+    <!-- No celular, a navegação fica no painel do botão ☰; no desktop, em linha. Ajuda e preferências ficam nos botões flutuantes. -->
     <button type="button" id="btn-menu" class="btn-menu" aria-expanded="false" aria-controls="menu-topo" aria-label="Abrir menu">
       <span aria-hidden="true">☰</span>
     </button>
@@ -30,12 +30,7 @@
       <nav class="menu" aria-label="Principal">
         <a href="#/trilha" data-menu="inicio">🗺️ Trilha</a>
         <a href="#/livre" data-menu="livre">🧪 Playground livre</a>
-        <a href="#/privacidade" data-menu="privacidade">🔒 Privacidade</a>
       </nav>
-      <div class="ferramentas">
-        <button id="btn-tutorial" class="btn btn-fantasma btn-pequeno" aria-haspopup="dialog">❓ Tutorial</button>
-        <button id="btn-acessibilidade" class="btn btn-fantasma btn-pequeno" aria-haspopup="dialog">♿ Acessibilidade</button>
-      </div>
     </div>
     <span id="progresso-topo" class="progresso-topo"></span>
     <span id="status" class="status" role="status">Carregando o PHP…</span>
@@ -199,6 +194,16 @@
       </div>
     </form>
   </dialog>
+
+  <!-- Botões flutuantes (canto inferior direito): ajuda e preferências, em qualquer tela -->
+  <div class="flutuantes" role="group" aria-label="Ajuda e preferências">
+    <button type="button" id="btn-tutorial" class="flutuante" aria-haspopup="dialog" aria-label="Tutorial" data-rotulo="Tutorial">
+      <span aria-hidden="true">❓</span></button>
+    <button type="button" id="btn-acessibilidade" class="flutuante" aria-haspopup="dialog" aria-label="Acessibilidade" data-rotulo="Acessibilidade">
+      <span aria-hidden="true">♿</span></button>
+    <a href="#/privacidade" class="flutuante" data-menu="privacidade" aria-label="Privacidade e cookies" data-rotulo="Privacidade e cookies">
+      <span aria-hidden="true">🔒</span></a>
+  </div>
 
   <!-- Régua de leitura (opção do painel de acessibilidade) -->
   <div id="regua-leitura" class="regua-leitura" aria-hidden="true"></div>

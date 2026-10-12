@@ -1,4 +1,4 @@
-// Menu ☰ do cabeçalho no celular: abre um painel com a navegação e as ferramentas.
+// Menu ☰ do cabeçalho no celular: abre um painel com a navegação (Trilha, Playground livre).
 // Fecha ao escolher uma opção, ao tocar fora, com Esc e ao mudar de página.
 import { $ } from './util.js';
 
