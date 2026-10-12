@@ -39,6 +39,13 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
 - **Como no LeetCode**: **▶ Executar** roda os casos visíveis; **⬆ Enviar** roda todos, inclusive os
   **casos ocultos**. Os ocultos usam outros valores e outro banco, então resposta fixa no código não passa.
   O resultado sai como "Aceito" ou "Resposta errada", mostrando o caso que falhou.
+- **Casos de teste detalhados** (aba 🧪 Testes): cada caso mostra o **cenário** como requisições HTTP
+  (`GET /index.php?pagina=2`, `POST /login.php` com os campos do corpo, banco diferente do exemplo, passos
+  com a mesma sessão), o placar e o tempo; cada verificação mostra a **categoria** (Texto da página,
+  Elemento HTML, Código, Execução), o que a página tinha de fato (**obtido**: o trecho do texto, quantos
+  elementos e quais textos, a linha do código) e, quando falha, o **motivo** e uma **💡 dica**. Antes de
+  rodar, o caso lista o que vai conferir. Nos ocultos, os valores ficam escondidos e só aparece o que
+  falhou. Os detalhes saem de `detalharRegra` em `src/verificacoes.js`.
 - **Tela do problema**: descrição, código e preview. Os **🧪 Testes funcionais** ficam numa aba ao lado
   de Descrição, Banco e Solução, com cada caso de teste (⏳ pendente, ✅ passou, ❌ falhou e o motivo).
   A aba abre sozinha ao clicar em ▶ Executar ou ⬆ Enviar, e o resultado aparece no nome dela (✅ 3/3).
