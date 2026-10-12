@@ -350,7 +350,7 @@
 .cert-data { display: flex; flex-direction: column; align-items: center; font-size: 1.2cqw; color: #5c5870; }
 .cert-data b { font-size: 1.5cqw; color: var(--tinta); }
 .cert-codigo { margin-top: 0.6cqw; font-family: "Fira Code", monospace; font-size: 1cqw; }
-.cert-hash { margin-top: 0.2cqw; font-family: "Fira Code", monospace; font-size: 0.75cqw; letter-spacing: 0.02em; color: #8a86a0; max-width: 34cqw; overflow-wrap: anywhere; text-align: center; }
+.cert-hash { margin-top: 0.3cqw; font-family: "Fira Code", monospace; font-size: 0.95cqw; letter-spacing: 0.02em; color: #6f6a86; max-width: 36cqw; overflow-wrap: anywhere; text-align: center; }
 
 /* selo de verificação na página do certificado */
 .aviso-selo { margin: 0 0 14px; padding: 12px 14px; border-radius: 10px; border: 2px solid var(--ciano); background: color-mix(in srgb, var(--ciano) 10%, var(--fundo)); }
