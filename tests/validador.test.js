@@ -155,3 +155,17 @@ describe('XML do certificado', () => {
     expect(resultadoDoXml('<html></html>')).toContain('XML inválido');
   });
 });
+
+describe('certificado impresso', () => {
+  it('tem a rubrica da instituição e não cita o instrutor', async () => {
+    const { renderCertificado } = await import('../src/ui/certificado.js');
+    document.body.innerHTML = '<main id="tela"></main>';
+    renderCertificado(document.getElementById('tela'), codificarCertificado(HTML));
+    const impresso = document.querySelector('article.certificado');
+    expect(impresso.querySelector('.cert-assinatura svg.rubrica')).not.toBeNull();
+    expect(impresso.textContent).toContain('Sertão será cloud');
+    expect(impresso.textContent).not.toContain('Cláudio Raposo');
+    expect(impresso.textContent).not.toContain('Instrutor responsável');
+    expect(impresso.querySelectorAll('.cert-assinatura')).toHaveLength(1);
+  });
+});

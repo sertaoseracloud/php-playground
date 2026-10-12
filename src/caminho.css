@@ -353,7 +353,18 @@
 .cert-texto b { color: var(--acento); }
 .cert-conteudos { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6cqw; margin: 1.6cqw 0 0; padding: 0; max-width: 80cqw; }
 .cert-conteudos li { font-size: 1.15cqw; padding: 0.3cqw 1cqw; border: 1px solid rgb(107 79 216 / 0.4); border-radius: 2cqw; color: #4a4560; }
-.cert-rodape { margin-top: auto; width: 100%; display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 3cqw; }
+.cert-rodape { margin-top: auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 6cqw; }
+/* rubrica decorativa da instituição, "escrita à tinta" sobre a linha */
+.cert-assinatura .rubrica {
+  width: 62%;
+  height: auto;
+  margin-bottom: -1.4cqw;
+  fill: none;
+  stroke: #1f2d6b;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .cert-assinatura { display: flex; flex-direction: column; align-items: center; font-size: 1.3cqw; }
 .cert-assinatura b { font-size: 1.5cqw; }
 .cert-assinatura span:last-child { color: #5c5870; }

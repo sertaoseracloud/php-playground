@@ -117,11 +117,6 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
           </ul>
 
           <footer class="cert-rodape">
-            <div class="cert-assinatura">
-              <span class="linha-assinatura" aria-hidden="true"></span>
-              <b>${esc(EMISSOR.responsavel)}</b>
-              <span>${esc(EMISSOR.cargo)}</span>
-            </div>
             <div class="cert-data">
               <span>Concluído em</span>
               <b>${dataPorExtenso(cert.data)}</b>
@@ -130,6 +125,13 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
               ${cert.anterior ? `<span class="cert-hash" title="Hash do certificado anterior da cadeia">Anterior: ${esc(grupos(cert.anterior))}</span>` : ''}
             </div>
             <div class="cert-assinatura">
+              <!-- Rubrica ilustrativa (decorativa) da instituição, desenhada em SVG -->
+              <svg class="rubrica" viewBox="0 0 240 72" aria-hidden="true" focusable="false">
+                <path d="M10 50 C 18 22, 32 14, 38 30 S 34 60, 26 54 S 44 22, 58 26 S 62 52, 70 46
+                         S 82 26, 92 30 S 96 50, 104 46 C 112 42, 116 22, 126 26 S 128 52, 138 48
+                         S 150 24, 162 30 C 170 34, 168 52, 178 48 C 190 42, 202 30, 232 34" />
+                <path d="M52 62 C 100 55, 168 57, 226 52" />
+              </svg>
               <span class="linha-assinatura" aria-hidden="true"></span>
               <b>${esc(EMISSOR.organizacao)}</b>
               <span>Instituição emissora</span>
