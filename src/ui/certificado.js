@@ -1,7 +1,7 @@
 // Tela do certificado: o documento (pronto para imprimir/salvar em PDF) e os
 // botões para compartilhar no LinkedIn. Abre por link (#/certificado/<código>),
 // então quem recebe o link vê o mesmo certificado.
-import { CERTIFICADOS, EMISSOR, URL_CHAVE_PUBLICA, assinaturaDoCertificado, certificadoXml, decodificarCertificado, linkLinkedInPerfil, linkLinkedInPublicar, linkPublico, textoPublicacao } from '../certificados.js';
+import { CERTIFICADOS, EMISSOR, certificadoXml, decodificarCertificado, linkLinkedInPerfil, linkLinkedInPublicar, linkPublico, textoPublicacao } from '../certificados.js';
 import { svgBadge } from '../badges.js';
 import { esc } from './util.js';
 
@@ -26,15 +26,14 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
   const url = confere ? linkPublico(cert) : '';
   const grupos = (hash) => (hash.match(/.{1,16}/g) ?? []).join(' ');
   const hashEmGrupos = grupos(cert.hash);
-  const curto = (hash) => `${hash.slice(0, 8)}…${hash.slice(-4)}`;
   const dataCurta = (data) => new Date(`${data}T12:00:00`).toLocaleDateString('pt-BR');
-  // A cadeia, do primeiro certificado até este: cada bloco aponta para o hash do anterior.
-  const blocos = confere ? [...cert.cadeia, { modulo: cert.modulo, data: cert.data, hash: cert.hash, anterior: cert.anterior }] : [];
+  // Certificados anteriores da trilha (só nome e data; os detalhes técnicos ficam no validador e no XML).
+  const anteriores = confere ? cert.cadeia : [];
   const avisoSelo = {
     'nao-confere': `<div class="aviso-selo erro" role="alert">⚠️ <b>O selo não confere.</b> Os dados deste link foram
       alterados depois da emissão: este certificado não é válido.</div>`,
-    ausente: `<div class="aviso-selo" role="status">ℹ️ <b>Link de uma versão antiga, sem selo ou sem a cadeia de certificados.</b>
-      Se o certificado é seu, abra-o de novo pela trilha para gerar um link novo.</div>`,
+    ausente: `<div class="aviso-selo" role="status">ℹ️ <b>Este link é de uma versão antiga do site.</b>
+      Se o certificado é seu, abra-o de novo pela trilha para gerar um link atualizado.</div>`,
   }[cert.selo] ?? '';
 
   el.innerHTML = `
@@ -55,31 +54,20 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
           <ul class="badge-habilidades">${def.conteudos.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
           <dl class="badge-dados">
             <div><dt>Emissor</dt><dd>${esc(EMISSOR.organizacao)}</dd></div>
-            <div><dt>Responsável</dt><dd>${esc(EMISSOR.responsavel)}</dd></div>
             <div><dt>Código</dt><dd class="cert-codigo-dd">${esc(cert.id)}</dd></div>
             <div><dt>Selo</dt><dd class="selo-${cert.selo}">${confere ? '✅ confere' : cert.selo === 'ausente' ? 'ℹ️ sem selo' : '⚠️ não confere'}</dd></div>
           </dl>
           <details class="selo-detalhes">
-            <summary>🔐 Selo de verificação (HMAC-SHA256)</summary>
-            <p class="selo-hash"><code>${esc(hashEmGrupos)}</code></p>
-            <p>O selo é calculado a partir da <b>data de obtenção</b>, do <b>emissor</b> (${esc(EMISSOR.responsavel)}),
-              da <b>empresa</b> (${esc(EMISSOR.organizacao)}), do <b>aluno</b> e do módulo, com uma chave secreta da
-              ${esc(EMISSOR.organizacao)}. Se qualquer um desses dados mudar no link, o selo deixa de conferir.</p>
-            ${confere ? `<p><b>✍️ Assinatura digital Ed25519</b> (confere com a
-              <a href="${URL_CHAVE_PUBLICA}" target="_blank" rel="noopener">chave pública publicada</a>, sem segredo):</p>
-              <p class="selo-hash"><code>${esc(grupos(assinaturaDoCertificado(cert)))}</code></p>` : ''}
-            ${blocos.length > 1 ? `
-              <p><b>🔗 Cadeia de certificados.</b> Como num blockchain, cada certificado leva no selo o hash do
-                anterior. Para alterar este, seria preciso alterar todos os anteriores também.</p>
-              <ol class="cadeia">
-                ${blocos.map((b) => `
-                  <li class="${b.modulo === cert.modulo ? 'atual' : ''}">
-                    <b>${esc(CERTIFICADOS[b.modulo].titulo)}</b>
-                    <span>${dataCurta(b.data)}</span>
-                    <code title="${esc(b.hash)}">${esc(curto(b.hash))}</code>
-                    <small>${b.anterior ? `anterior: <code>${esc(curto(b.anterior))}</code>` : 'primeiro da cadeia'}</small>
-                  </li>`).join('')}
-              </ol>` : ''}
+            <summary>🔐 Como sei que este certificado é verdadeiro?</summary>
+            <p>Todo certificado da ${esc(EMISSOR.organizacao)} tem um <b>selo de autenticidade</b>. Se alguém mudar
+              qualquer informação, como o nome, a data ou o módulo, o selo deixa de valer.</p>
+            <p>Os certificados são liberados na ordem da trilha, e cada um fica ligado aos anteriores.</p>
+            <p>Para conferir, use o botão <b>🔎 Validar</b> ou envie o link do certificado para quem precisa conferir.</p>
+            ${anteriores.length ? `
+              <p><b>Certificados anteriores desta trilha:</b></p>
+              <ul class="anteriores">
+                ${anteriores.map((a) => `<li>✔ ${esc(CERTIFICADOS[a.modulo].titulo)} <span>${dataCurta(a.data)}</span></li>`).join('')}
+              </ul>` : ''}
           </details>
           <div class="acoes-certificado" ${confere ? '' : 'hidden'}>
             <a class="btn btn-linkedin" href="${esc(linkLinkedInPublicar(cert, url))}" target="_blank" rel="noopener">in Publicar no LinkedIn</a>
@@ -88,7 +76,7 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
             <button type="button" class="btn btn-fantasma" id="btn-copiar-texto">📝 Copiar texto do post</button>
             <button type="button" class="btn btn-fantasma" id="btn-imprimir">🖨️ Imprimir / PDF</button>
             <a class="btn btn-fantasma" href="#/validar/${esc(codigo)}">🔎 Validar</a>
-            <button type="button" class="btn btn-fantasma" id="btn-xml" title="Arquivo com os dados para conferir o certificado em outras páginas (sem o segredo)">📄 Baixar XML</button>
+            <button type="button" class="btn btn-fantasma" id="btn-xml" title="Arquivo para conferir o certificado em outros sistemas">📄 Baixar XML</button>
           </div>
         </div>
       </section>
@@ -121,8 +109,8 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
               <span>Concluído em</span>
               <b>${dataPorExtenso(cert.data)}</b>
               <span class="cert-codigo">Código: ${esc(cert.id)}</span>
-              <span class="cert-hash" title="Selo de verificação (HMAC-SHA256)">Selo: ${esc(hashEmGrupos)}</span>
-              ${cert.anterior ? `<span class="cert-hash" title="Hash do certificado anterior da cadeia">Anterior: ${esc(grupos(cert.anterior))}</span>` : ''}
+              <span class="cert-hash" title="Selo de autenticidade">Selo: ${esc(hashEmGrupos)}</span>
+              ${cert.anterior ? `<span class="cert-hash" title="Ligação com o certificado anterior">Anterior: ${esc(grupos(cert.anterior))}</span>` : ''}
             </div>
             <div class="cert-assinatura">
               <!-- Rubrica ilustrativa (decorativa) da instituição, desenhada em SVG -->

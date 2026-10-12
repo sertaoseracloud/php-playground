@@ -474,7 +474,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
         const cert = certificadosDaJornada(jornada).find((c) => c.id === modulo.id);
         const aviso = cert?.liberado
           ? 'Seu certificado da Sertão será cloud está liberado.'
-          : `Seu certificado sai quando você concluir também <b>${esc(CERTIFICADOS[cert?.falta]?.titulo ?? '')}</b>: cada certificado leva o selo do anterior.`;
+          : `Os certificados são liberados na ordem da trilha: conclua também <b>${esc(CERTIFICADOS[cert?.falta]?.titulo ?? '')}</b> para receber o seu.`;
         el.testes.insertAdjacentHTML('afterbegin', `
           <div class="comemoracao" role="status">🏆 Você concluiu o módulo <b>${esc(modulo.titulo)}</b>!
             ${aviso}

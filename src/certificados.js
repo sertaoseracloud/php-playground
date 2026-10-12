@@ -305,7 +305,6 @@ ${elos.map(bloco).join('\n')}
     <regras>
       <regra>A assinatura Ed25519 de cada bloco é sobre a mensagemAssinada (texto UTF-8) e se confere com a chave pública, sem segredo.</regra>
       <regra>Use a chave pública publicada em ${escXml(URL_CHAVE_PUBLICA)}: se a chave deste arquivo for diferente, ele não foi emitido pela ${escXml(EMISSOR.organizacao)}.</regra>
-      <regra>O selo é o HMAC-SHA256 da mensagemAssinada com a chave da ${escXml(EMISSOR.organizacao)}, que não está neste arquivo.</regra>
       <regra>Na cadeia, o primeiro bloco tem anterior vazio e cada bloco seguinte tem anterior igual ao selo do bloco anterior.</regra>
       <regra>A conferência completa (com a chave) é feita em: ${escXml(url)}</regra>
     </regras>
@@ -363,9 +362,3 @@ export function conferirAssinaturas(xml, chaveOficial = CHAVE_PUBLICA) {
   const blocos = xml.blocos.map((b) => verificar(b.mensagem, b.assinatura, chaveOficial));
   return { chaveConfere, blocos, todas: chaveConfere && blocos.length > 0 && blocos.every(Boolean) };
 }
-
-/** Assinatura Ed25519 do certificado (para mostrar na página). */
-export const assinaturaDoCertificado = (cert) => {
-  const atual = montarCadeia(cert).at(-1);
-  return assinar(mensagemAssinada(cert, atual.anterior));
-};

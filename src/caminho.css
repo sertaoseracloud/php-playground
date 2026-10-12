@@ -525,3 +525,8 @@
 .hash-longo { font-family: var(--fonte-codigo); font-size: 0.8rem; color: var(--amarelo); overflow-wrap: anywhere; font-weight: 400; }
 .nota-validacao { font-size: 0.85rem; color: var(--suave); }
 .validador h3 { margin: 14px 0 0; font-size: 0.95rem; }
+
+/* lista simples de certificados anteriores (página do certificado e validador) */
+.anteriores { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
+.anteriores li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; border-radius: 6px; background: var(--fundo-escuro); }
+.anteriores li span { color: var(--suave); }

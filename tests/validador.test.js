@@ -169,3 +169,30 @@ describe('certificado impresso', () => {
     expect(impresso.querySelectorAll('.cert-assinatura')).toHaveLength(1);
   });
 });
+
+describe('textos para o aluno: simples e sem detalhes da validação', () => {
+  const TECNICO = /HMAC|SHA-?256|Ed25519|blockchain|segredo|chave (secreta|pública)|Cláudio Raposo/i;
+
+  it('página do certificado (cartão, explicação e impresso)', async () => {
+    const { renderCertificado } = await import('../src/ui/certificado.js');
+    document.body.innerHTML = '<main id="tela"></main>';
+    renderCertificado(document.getElementById('tela'), codificarCertificado(PHP));
+    const texto = document.getElementById('tela').textContent;
+    expect(texto).toContain('Como sei que este certificado é verdadeiro?');
+    expect(texto).not.toMatch(TECNICO);
+  });
+
+  it('resultados do validador', () => {
+    const codigo = codificarCertificado(PHP);
+    for (const html of [resultadoDoLink(codigo), resultadoDoXml(certificadoXml(decodificarCertificado(codigo), codigo))]) {
+      expect(html.replace(/<[^>]+>/g, ' ')).not.toMatch(TECNICO);
+    }
+  });
+
+  it('landing page', async () => {
+    const { renderLanding } = await import('../src/ui/landing.js');
+    const el = { innerHTML: '' };
+    renderLanding(el);
+    expect(el.innerHTML.replace(/<[^>]+>/g, ' ')).not.toMatch(TECNICO);
+  });
+});

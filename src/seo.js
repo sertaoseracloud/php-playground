@@ -5,7 +5,6 @@
 // As rotas ficam depois do # (GitHub Pages não tem servidor), então para os
 // buscadores o site é uma página só: a landing, que o build já entrega em HTML.
 import { SITE, EMISSOR, CERTIFICADOS } from './certificados.js';
-import { CONTROLADOR } from './privacidade.js';
 import { modulos, problemas, itens } from './conteudo/trilha.js';
 
 export const NOME = 'PHP Playground';
@@ -59,7 +58,6 @@ export function dadosEstruturados() {
         educationalLevel: 'Iniciante',
         teaches: Object.values(CERTIFICADOS).filter((c) => c !== CERTIFICADOS.final).map((c) => c.titulo),
         provider: { '@id': `${SITE}#organizacao` },
-        instructor: { '@type': 'Person', name: CONTROLADOR.responsavel },
         offers: { '@type': 'Offer', price: 0, priceCurrency: 'BRL', category: 'Free', availability: 'https://schema.org/InStock' },
         hasCourseInstance: {
           '@type': 'CourseInstance',

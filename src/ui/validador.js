@@ -4,18 +4,17 @@
 // A conferência acontece no navegador de quem valida; nada é enviado a servidor.
 import {
   CERTIFICADOS, EMISSOR, ORDEM, anteriores, decodificarCertificado, extrairCodigo, validarImpresso, linkCertificado,
-  lerCertificadoXml, cadeiaCoerente, conferirAssinaturas, mensagemAssinada, URL_CHAVE_PUBLICA,
+  lerCertificadoXml, cadeiaCoerente, conferirAssinaturas, mensagemAssinada,
 } from '../certificados.js';
 import { esc, $ } from './util.js';
 
 const dataPorExtenso = (data) => new Date(`${data}T12:00:00`).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
 const dataCurta = (data) => new Date(`${data}T12:00:00`).toLocaleDateString('pt-BR');
-const curto = (hash) => `${hash.slice(0, 8)}…${hash.slice(-4)}`;
 
 const SITUACAO = {
-  confere: { classe: 'valido', titulo: '✅ Certificado válido', texto: 'O selo confere e a cadeia de certificados está completa e íntegra.' },
-  'nao-confere': { classe: 'invalido', titulo: '⚠️ Certificado inválido', texto: 'O selo não confere: os dados do link foram alterados depois da emissão, ou a cadeia está incompleta.' },
-  ausente: { classe: 'antigo', titulo: 'ℹ️ Link de versão antiga', texto: 'Este link é de antes do selo ou da cadeia de certificados e não pode ser verificado. Peça ao aluno um link novo, gerado pela trilha.' },
+  confere: { classe: 'valido', titulo: '✅ Certificado válido', texto: 'Este certificado foi emitido pela Sertão será cloud e não foi alterado.' },
+  'nao-confere': { classe: 'invalido', titulo: '⚠️ Certificado inválido', texto: 'As informações deste certificado foram alteradas depois da emissão.' },
+  ausente: { classe: 'antigo', titulo: 'ℹ️ Link de versão antiga', texto: 'Este link é de uma versão antiga do site e não pode ser conferido. Peça ao aluno um link atualizado.' },
 };
 
 /** Resultado da validação por link, em HTML. */
@@ -42,21 +41,14 @@ export function resultadoDoLink(texto) {
         <div><dt>Aluno</dt><dd>${esc(cert.nome)}</dd></div>
         <div><dt>Certificado</dt><dd>${esc(def.titulo)}</dd></div>
         <div><dt>Concluído em</dt><dd>${dataPorExtenso(cert.data)}</dd></div>
-        <div><dt>Emissor</dt><dd>${esc(EMISSOR.organizacao)} · ${esc(EMISSOR.responsavel)}</dd></div>
-        ${cert.selo !== 'ausente' ? `<div><dt>Código</dt><dd><code>${esc(cert.id)}</code></dd></div>
-        <div class="largo"><dt>Selo</dt><dd><code class="hash-longo">${esc(cert.hash)}</code></dd></div>` : ''}
+        <div><dt>Emitido por</dt><dd>${esc(EMISSOR.organizacao)}</dd></div>
+        ${cert.selo !== 'ausente' ? `<div><dt>Código</dt><dd><code>${esc(cert.id)}</code></dd></div>` : ''}
       </dl>
       ${blocos.length > 1 ? `
-        <h3>🔗 Cadeia de certificados</h3>
-        <ol class="cadeia">
-          ${blocos.map((b) => `
-            <li class="${b.modulo === cert.modulo ? 'atual' : ''}">
-              <b>${esc(CERTIFICADOS[b.modulo].titulo)}</b>
-              <span>${dataCurta(b.data)}</span>
-              <code title="${esc(b.hash)}">${esc(curto(b.hash))}</code>
-              <small>${b.anterior ? `anterior: <code>${esc(curto(b.anterior))}</code>` : 'primeiro da cadeia'}</small>
-            </li>`).join('')}
-        </ol>` : ''}
+        <h3>Certificados da trilha</h3>
+        <ul class="anteriores">
+          ${blocos.map((b) => `<li>✔ ${esc(CERTIFICADOS[b.modulo].titulo)} <span>${dataCurta(b.data)}</span></li>`).join('')}
+        </ul>` : ''}
       ${cert.selo === 'confere' ? `<p><a class="btn btn-roxo btn-pequeno" href="${linkCertificado(cert)}">Abrir o certificado</a></p>` : ''}
     </div>`;
 }
@@ -91,15 +83,12 @@ export function resultadoDoXml(texto) {
       return elo ? { ...b, mensagem: mensagemAssinada({ nome: cert.nome, modulo: elo.modulo, data: elo.data }, elo.anterior) } : b;
     }),
   });
-  if (!chaveConfere) divergencias.push(`chave pública (não é a publicada em ${URL_CHAVE_PUBLICA})`);
-  else if (!todas) divergencias.push('assinatura Ed25519 de algum bloco');
+  if (!chaveConfere || !todas) divergencias.push('assinatura');
   if (divergencias.length) {
     return `<div class="resultado-validacao invalido" role="status"><h2>⚠️ XML alterado</h2>
-      <p>O selo do certificado confere, mas o arquivo foi editado: ${esc(divergencias.join(', '))} não bate(m) com o certificado emitido.</p></div>`;
+      <p>O arquivo foi modificado depois de baixado e não vale como comprovante. Baixe de novo na página do certificado.</p></div>`;
   }
-  return resultadoDoLink(lido.codigo)
-    .replace('✅ Certificado válido', '✅ XML e certificado válidos')
-    .replace('</p>', ` As assinaturas Ed25519 dos ${xml.blocos.length} bloco(s) conferem com a chave pública publicada.</p>`);
+  return resultadoDoLink(lido.codigo).replace('✅ Certificado válido', '✅ XML e certificado válidos');
 }
 
 /** Resultado da validação de um certificado impresso, em HTML. */
@@ -109,8 +98,8 @@ export function resultadoDoImpresso(dados) {
     <div class="resultado-validacao ${valido ? 'valido' : 'invalido'}" role="status">
       <h2>${valido ? '✅ Selo confere' : '⚠️ Não confere'}</h2>
       <p>${esc(motivo)}</p>
-      ${valido && anteriores(dados.modulo).length ? `<p class="nota-validacao">Este é o ${ORDEM.indexOf(dados.modulo) + 1}º certificado da
-        cadeia. Para conferir também os anteriores, peça o link do certificado e use a opção "Colar o link".</p>` : ''}
+      ${valido && anteriores(dados.modulo).length ? `<p class="nota-validacao">Para conferir também os certificados
+        anteriores da trilha, use o link do certificado na opção "Colar o link".</p>` : ''}
     </div>`;
 }
 
@@ -133,8 +122,8 @@ export function renderValidador(el, codigoInicial = '') {
 
       <section class="cartao-validacao" aria-labelledby="val-impresso">
         <h2 id="val-impresso">2. Certificado impresso ou em PDF</h2>
-        <p class="a11y-ajuda">Digite os dados exatamente como aparecem no certificado (inclusive acentos). O selo e o
-          "Anterior" ficam no rodapé, embaixo da data.</p>
+        <p class="a11y-ajuda">Digite os dados exatamente como aparecem no certificado, inclusive acentos.
+          O "Selo" e o "Anterior" ficam no rodapé, embaixo da data.</p>
         <form id="form-impresso" class="form-validacao grade-validacao">
           <label>Nome do aluno <input name="nome" autocomplete="off" required></label>
           <label>Certificado
@@ -152,8 +141,7 @@ export function renderValidador(el, codigoInicial = '') {
 
       <section class="cartao-validacao" aria-labelledby="val-xml">
         <h2 id="val-xml">3. Arquivo XML</h2>
-        <p class="a11y-ajuda">O XML é baixado na página do certificado ("📄 Baixar XML"). Ele traz os dados, o selo e a
-          cadeia, sem o segredo: outras páginas conferem a cadeia sozinhas, e aqui conferimos também o selo.</p>
+        <p class="a11y-ajuda">Use o arquivo baixado na página do certificado, no botão "📄 Baixar XML".</p>
         <form id="form-xml" class="form-validacao">
           <label>Escolher arquivo <input type="file" id="arquivo-xml" accept=".xml,application/xml,text/xml"></label>
           <label for="campo-xml">ou colar o conteúdo</label>
@@ -163,8 +151,7 @@ export function renderValidador(el, codigoInicial = '') {
         <div id="saida-xml" aria-live="polite"></div>
       </section>
 
-      <p class="nota-validacao">A conferência acontece no seu navegador, sem enviar nada a servidor. Ela detecta
-        certificados alterados; como o site não tem servidor, ela não substitui um registro oficial de emissão.</p>
+      <p class="nota-validacao">A conferência é feita aqui mesmo, sem enviar os dados para nenhum lugar.</p>
     </article>`;
 
   const campoLink = $('campo-link');

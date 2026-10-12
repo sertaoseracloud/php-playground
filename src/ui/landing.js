@@ -2,7 +2,6 @@
 // Os números e os módulos vêm do conteúdo da trilha, então nunca ficam desatualizados.
 import { modulos, itens, problemas } from '../conteudo/trilha.js';
 import { CERTIFICADOS, EMISSOR } from '../certificados.js';
-import { CONTROLADOR } from '../privacidade.js';
 import { svgBadge } from '../badges.js';
 import { linkItem } from '../compartilhar.js';
 import { jornadaAtual } from './inicio.js';
@@ -104,12 +103,12 @@ export function renderLanding(el) {
         <div>
           <h2 id="cert-titulo">Certificados e badges</h2>
           <p>Cada módulo concluído vale um <b>badge digital</b>, e a trilha completa vale o certificado final,
-            emitidos pela <b>${esc(EMISSOR.organizacao)}</b> e assinados por <b>${esc(EMISSOR.responsavel)}</b>.</p>
+            emitidos pela <b>${esc(EMISSOR.organizacao)}</b>.</p>
           <ul class="lista-check">
             <li>Publique no <b>LinkedIn</b> com a imagem do badge, como na Credly.</li>
             <li>Adicione em <b>Licenças e certificados</b> do seu perfil.</li>
             <li>Imprima ou salve em <b>PDF</b> (A4 paisagem).</li>
-            <li>Cada certificado tem um <b>selo de verificação</b>: se alguém alterar o nome ou a data, o selo deixa de conferir.</li>
+            <li>Cada certificado tem um <b>selo de autenticidade</b> e pode ser conferido na página <a href="#/validar">Validar certificado</a>.</li>
           </ul>
         </div>
         <div class="vitrine-badges" aria-label="Badges da trilha">
@@ -134,7 +133,7 @@ export function renderLanding(el) {
       </section>
 
       <footer class="rodape-landing">
-        <p><b>${esc(EMISSOR.organizacao)}</b> · ${esc(EMISSOR.curso)} · Responsável: ${esc(CONTROLADOR.responsavel)}</p>
+        <p><b>${esc(EMISSOR.organizacao)}</b> · ${esc(EMISSOR.curso)}</p>
         <p><a href="#/validar">Validar certificado</a> · <a href="#/privacidade">Privacidade e cookies</a> · <a href="${REPOSITORIO}" target="_blank" rel="noopener noreferrer">Código no GitHub</a></p>
       </footer>
     </div>`;
