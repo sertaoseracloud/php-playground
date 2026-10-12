@@ -800,3 +800,8 @@ kbd {
   .lembrete-pausa { max-width: calc(100vw - 80px); }
 }
 @media print { .flutuantes { display: none !important; } }
+
+/* Abas da descrição (Descrição, Banco, Solução, 🧪 Testes, 🔊): quebram em duas
+   linhas quando a coluna é estreita, em vez de esconder abas numa rolagem lateral. */
+#painel-descricao .abas { flex-wrap: wrap; overflow-x: visible; }
+#painel-descricao .aba { padding: 7px 10px; }
