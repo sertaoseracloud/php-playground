@@ -98,6 +98,13 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
   **palavra secreta**. O selo vai no link, aparece no certificado (com o código `SSC-AAAA-XXXX-XXXX`
   tirado dele) e a página confere: se alguém editar o nome ou a data no link, aparece
   "⚠️ O selo não confere" e os botões de compartilhar somem.
+- **Cadeia de certificados (como num blockchain)**: os certificados seguem a ordem HTML → W3.CSS →
+  PHP → PDO → Projetos → Final, e cada um, menos o primeiro, inclui no selo o **hash do anterior**.
+  O link leva as datas dos anteriores, e a página recalcula a cadeia inteira: mudar uma data ou um
+  nome em qualquer ponto quebra o selo de todos os seguintes, e não dá para pular um módulo. Por
+  isso um certificado só é liberado quando todos os anteriores também foram conquistados (na trilha
+  aparece "🔗 Falta o certificado de …"). Links de módulos seguintes emitidos antes da cadeia
+  aparecem como antigos, com orientação para gerar de novo; os de HTML continuam valendo.
 - **A palavra secreta nunca entra no código nem no site.** Ela fica no secret
   `CERTIFICADO_SEGREDO` do GitHub Actions; o build injeta só um SHA-256 derivado dela
   (`vite.config.js`), e falha se o secret não existir. Para gerar o build localmente:

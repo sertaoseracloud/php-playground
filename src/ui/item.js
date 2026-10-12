@@ -13,7 +13,8 @@ import { iniciarLeitura } from './acessibilidade.js';
 import { aplicarChecklist } from './neuro.js';
 import { termosDoTexto } from '../conteudo/glossario.js';
 import { descreverRegra } from '../verificacoes.js';
-import { jornadaAtual } from './inicio.js';
+import { jornadaAtual, certificadosDaJornada } from './inicio.js';
+import { CERTIFICADOS } from '../certificados.js';
 import { LIMITE_DESBLOQUEIO } from '../gamificacao.js';
 import { $, esc } from './util.js';
 
@@ -466,11 +467,17 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
       marcar(estado.item.id, aprovado ? 'resolvido' : 'tentado');
       renderCabecalho();
       aoMudarProgresso();
-      const modulo = jornadaAtual().modulos.find((m) => m.id === estado.item.modulo);
+      const jornada = jornadaAtual();
+      const modulo = jornada.modulos.find((m) => m.id === estado.item.modulo);
       if (aprovado && modulo?.concluido) {
+        // O certificado só sai se a cadeia até aqui estiver completa (o selo leva o hash do anterior).
+        const cert = certificadosDaJornada(jornada).find((c) => c.id === modulo.id);
+        const aviso = cert?.liberado
+          ? 'Seu certificado da Sertão será cloud está liberado.'
+          : `Seu certificado sai quando você concluir também <b>${esc(CERTIFICADOS[cert?.falta]?.titulo ?? '')}</b>: cada certificado leva o selo do anterior.`;
         el.testes.insertAdjacentHTML('afterbegin', `
           <div class="comemoracao" role="status">🏆 Você concluiu o módulo <b>${esc(modulo.titulo)}</b>!
-            Seu certificado da Sertão será cloud está liberado.
+            ${aviso}
             <a class="btn btn-roxo btn-pequeno" href="#/trilha">Ver no caminho</a></div>`);
       }
       definirStatus(aprovado ? 'Aceito! 🎉' : semPressao() ? 'Ainda não passou: veja o que falta' : 'Resposta errada');

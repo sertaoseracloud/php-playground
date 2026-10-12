@@ -44,3 +44,32 @@ describe('contagem do progresso', () => {
     expect(resumoProgresso()).toMatchObject({ resolvidos: 2, licoesLidas: 1 });
   });
 });
+
+describe('certificados na trilha (regra da cadeia)', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('módulo concluído sem o certificado anterior fica em espera', async () => {
+    const { certificadosDaJornada } = await import('../src/ui/inicio.js');
+    const { modulos } = await import('../src/conteudo/trilha.js');
+    // W3.CSS completo, HTML não: o certificado de W3.CSS espera o de HTML.
+    const w3 = modulos.find((m) => m.id === 'w3css');
+    const prog = Object.fromEntries(w3.itens.filter((i) => i.tipo === 'problema').map((i) => [i.id, 'resolvido']));
+    localStorage.setItem('php-playground:progresso', JSON.stringify(prog));
+    const certs = certificadosDaJornada();
+    const cw3 = certs.find((c) => c.id === 'w3css');
+    expect(cw3).toMatchObject({ concluido: true, liberado: false, falta: 'html' });
+    expect(certs.find((c) => c.id === 'html').liberado).toBe(false);
+  });
+
+  it('com HTML e W3.CSS concluídos, os dois saem, e o de W3.CSS leva a data do de HTML', async () => {
+    const { certificadosDaJornada } = await import('../src/ui/inicio.js');
+    const { modulos } = await import('../src/conteudo/trilha.js');
+    const ids = modulos.filter((m) => ['html', 'w3css'].includes(m.id))
+      .flatMap((m) => m.itens.filter((i) => i.tipo === 'problema').map((i) => i.id));
+    localStorage.setItem('php-playground:progresso', JSON.stringify(Object.fromEntries(ids.map((id) => [id, 'resolvido']))));
+    const certs = certificadosDaJornada();
+    const [html, w3] = certs;
+    expect(html.liberado && w3.liberado).toBe(true);
+    expect(w3.cadeia).toEqual([html.data]);
+  });
+});

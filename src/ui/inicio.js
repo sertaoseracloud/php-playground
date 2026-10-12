@@ -4,7 +4,7 @@
 import { modulos, problemas, itens, DIFICULDADES } from '../conteudo/trilha.js';
 import { linkItem } from '../compartilhar.js';
 import { calcularJornada, sequenciaDeDias, LIMITE_DESBLOQUEIO, NIVEIS } from '../gamificacao.js';
-import { CERTIFICADOS, linkCertificado } from '../certificados.js';
+import { CERTIFICADOS, ORDEM, linkCertificado } from '../certificados.js';
 import { svgBadge } from '../badges.js';
 import { statusDe, dataDe, diasAtivos, hoje, lerNome, gravarNome } from '../progresso.js';
 import { esc, $ } from './util.js';
@@ -57,9 +57,35 @@ function pedirNome({ obrigatorio = false } = {}) {
   });
 }
 
-async function abrirCertificado(modulo, data) {
+/**
+ * Situação de cada certificado, na ordem da cadeia. Um certificado só é liberado
+ * quando o módulo foi concluído E todos os anteriores da cadeia também, porque o
+ * selo dele inclui o hash do anterior (veja certificados.js).
+ */
+export function certificadosDaJornada(j = jornadaAtual()) {
+  const datas = Object.fromEntries([
+    ...j.modulos.map((m) => [m.id, m.concluido ? m.concluidoEm : null]),
+    ['final', j.final.concluido ? j.final.concluidoEm : null],
+  ]);
+  return ORDEM.map((id, i) => {
+    const falta = ORDEM.slice(0, i).find((anterior) => !datas[anterior]) ?? null;
+    return {
+      id,
+      titulo: CERTIFICADOS[id].titulo,
+      data: datas[id],
+      concluido: Boolean(datas[id]),
+      liberado: Boolean(datas[id]) && !falta,
+      falta,
+      cadeia: ORDEM.slice(0, i).map((anterior) => datas[anterior]),
+    };
+  });
+}
+
+async function abrirCertificado(modulo) {
+  const cert = certificadosDaJornada().find((c) => c.id === modulo);
+  if (!cert?.liberado) return;
   const nome = lerNome() || await pedirNome({ obrigatorio: true });
-  if (nome) location.hash = linkCertificado({ nome, modulo, data });
+  if (nome) location.hash = linkCertificado({ nome, modulo, data: cert.data, cadeia: cert.cadeia });
 }
 
 // ---------- pedaços da tela ----------
@@ -85,19 +111,26 @@ function no(item, i) {
   return `<li class="no ${item.tipo} estado-${item.estado}${item.ehProximo ? ' eh-proximo' : ''}" style="--d:${deslocamento}px">${alvo}</li>`;
 }
 
-function trofeu(m, rotulo = CERTIFICADOS[m.id].titulo) {
-  const texto = m.concluido ? 'Ver certificado' : `${m.resolvidos}/${m.total}`;
+function trofeu(m, cert) {
+  const rotulo = CERTIFICADOS[m.id].titulo;
+  const espera = cert.concluido && !cert.liberado; // módulo pronto, mas falta um certificado anterior
+  const texto = cert.liberado ? 'Ver certificado'
+    : espera ? `falta o certificado de ${CERTIFICADOS[cert.falta].titulo}`
+      : `${m.resolvidos}/${m.total}`;
+  const legenda = cert.liberado ? '🎉 Certificado liberado!'
+    : espera ? `🔗 Falta o certificado de ${esc(CERTIFICADOS[cert.falta].titulo)}`
+      : `Certificado · ${texto}`;
   return `
-    <li class="no trofeu ${m.concluido ? 'conquistado' : ''}" style="--d:0px">
-      <button type="button" class="alvo" data-certificado="${m.id}" data-data="${m.concluidoEm ?? ''}"
-        ${m.concluido ? '' : 'aria-disabled="true"'} aria-label="Certificado: ${esc(rotulo)} (${texto})">
+    <li class="no trofeu ${cert.liberado ? 'conquistado' : ''} ${espera ? 'em-espera' : ''}" style="--d:0px">
+      <button type="button" class="alvo" data-certificado="${m.id}"
+        ${cert.liberado ? '' : 'aria-disabled="true"'} aria-label="Certificado: ${esc(rotulo)} (${esc(texto)})">
         <span class="circulo" aria-hidden="true">🏆</span>
-        <span class="legenda">${m.concluido ? '🎉 Certificado liberado!' : `Certificado · ${texto}`}</span>
+        <span class="legenda">${legenda}</span>
       </button>
     </li>`;
 }
 
-function unidade(m, anterior, atual) {
+function unidade(m, anterior, atual, cert) {
   const bloqueio = !m.desbloqueado && anterior
     ? `<p class="aviso-bloqueio">🔒 Resolva ${LIMITE_DESBLOQUEIO}% de ${esc(anterior.titulo)} para desbloquear (agora: ${anterior.pct}%).</p>`
     : '';
@@ -137,15 +170,15 @@ function unidade(m, anterior, atual) {
   return `
     <section class="bloco-unidade ${m.desbloqueado ? '' : 'bloqueada'} ${atual ? 'unidade-atual' : ''}" id="unidade-${m.id}" aria-labelledby="titulo-${m.id}">
       ${cabecalho.replace('<h2>', `<h2 id="titulo-${m.id}">`)}
-      <ol class="trilha" id="trilha-${m.id}">${nos}${trofeu(m)}</ol>
+      <ol class="trilha" id="trilha-${m.id}">${nos}${trofeu(m, cert)}</ol>
     </section>`;
 }
 
 function painelJogador(j) {
   const nome = lerNome();
   const sequencia = sequenciaDeDias(diasAtivos(), hoje());
-  const certificados = [...j.modulos, { id: 'final', concluido: j.final.concluido, concluidoEm: j.final.concluidoEm }];
-  const emitidos = certificados.filter((c) => c.concluido).length;
+  const certificados = certificadosDaJornada(j);
+  const emitidos = certificados.filter((c) => c.liberado).length;
   const proximoNivel = j.nivel.proximo
     ? `${j.nivel.faltam} XP para <b>${esc(j.nivel.proximo.nome)}</b>`
     : 'Nível máximo! 🎉';
@@ -180,10 +213,10 @@ function painelJogador(j) {
       <ul class="lista-certificados">
         ${certificados.map((c) => `
           <li>
-            <button type="button" class="certificado-slot ${c.concluido ? 'emitido' : ''}" data-certificado="${c.id}" data-data="${c.concluidoEm ?? ''}"
-              ${c.concluido ? '' : 'aria-disabled="true"'}>
-              <span class="mini-badge" aria-hidden="true">${c.concluido ? svgBadge(c.id, { tamanho: 28 }) : c.id === 'final' ? '🎓' : '🔒'}</span>
-              <span>${esc(CERTIFICADOS[c.id].titulo)}</span>
+            <button type="button" class="certificado-slot ${c.liberado ? 'emitido' : ''}" data-certificado="${c.id}"
+              ${c.liberado ? '' : 'aria-disabled="true"'} ${c.concluido && !c.liberado ? `title="Falta o certificado de ${esc(CERTIFICADOS[c.falta].titulo)}"` : ''}>
+              <span class="mini-badge" aria-hidden="true">${c.liberado ? svgBadge(c.id, { tamanho: 28 }) : c.concluido ? '🔗' : c.id === 'final' ? '🎓' : '🔒'}</span>
+              <span>${esc(c.titulo)}</span>
             </button>
           </li>`).join('')}
       </ul>
@@ -197,7 +230,7 @@ function diploma(j) {
   const prontos = j.modulos.filter((m) => m.concluido).length;
   return `
     <section class="bloco-final" aria-label="Certificado final">
-      <button type="button" class="diploma ${j.final.concluido ? 'conquistado' : ''}" data-certificado="final" data-data="${j.final.concluidoEm ?? ''}"
+      <button type="button" class="diploma ${j.final.concluido ? 'conquistado' : ''}" data-certificado="final"
         ${j.final.concluido ? '' : 'aria-disabled="true"'}>
         <span class="circulo" aria-hidden="true">🎓</span>
         <span class="diploma-titulo">${esc(CERTIFICADOS.final.titulo)}</span>
@@ -210,6 +243,7 @@ function diploma(j) {
 
 export function renderInicio(el) {
   const j = jornadaAtual();
+  const certs = certificadosDaJornada(j);
   // Módulo atual: onde está o próximo passo. No modo foco, só ele mostra as etapas.
   const atual = j.modulos.find((m) => m.itens.some((i) => i.ehProximo))?.id ?? j.modulos.at(-1).id;
   el.innerHTML = `
@@ -223,7 +257,7 @@ export function renderInicio(el) {
           <span><i class="mini">⭐</i> fácil · <i class="mini">🔥</i> médio · <i class="mini">💎</i> difícil</span>
           <span>O módulo seguinte abre com ${LIMITE_DESBLOQUEIO}% dos exercícios.</span>
         </p>
-        ${j.modulos.map((m, i) => unidade(m, j.modulos[i - 1], m.id === atual)).join('')}
+        ${j.modulos.map((m, i) => unidade(m, j.modulos[i - 1], m.id === atual, certs[i])).join('')}
         ${diploma(j)}
       </div>
     </div>`;
@@ -231,7 +265,7 @@ export function renderInicio(el) {
   el.querySelectorAll('[data-certificado]').forEach((b) => {
     b.addEventListener('click', () => {
       if (b.getAttribute('aria-disabled') === 'true') return;
-      abrirCertificado(b.dataset.certificado, b.dataset.data || hoje());
+      abrirCertificado(b.dataset.certificado);
     });
   });
   el.querySelectorAll('[data-bloqueado]').forEach((b) => {

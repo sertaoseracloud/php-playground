@@ -4,6 +4,10 @@
 // progresso salvo ali, e o link compartilhável guarda nome, módulo e data.
 // Por isso ele é um comprovante de participação, não um documento verificável.
 //
+// Cadeia: os certificados seguem ORDEM, e cada um (menos o primeiro) inclui no selo
+// o hash do anterior, como os blocos de um blockchain. O link leva as datas dos
+// anteriores para a página recalcular a cadeia inteira.
+//
 // Selo: cada certificado leva um HMAC-SHA256 da data de obtenção, do emissor, da
 // empresa, do aluno e do módulo, com uma chave derivada de uma palavra secreta
 // (veja vite.config.js). O selo vai no link e a página confere: quem editar o nome
@@ -67,36 +71,92 @@ const DATA = /^\d{4}-\d{2}-\d{2}$/;
 // Injetada no build (vite.config.js). Fora do Vite (ex.: scripts/gerar-badges.mjs) não existe.
 const CHAVE = typeof __CHAVE_CERTIFICADO__ === 'undefined' ? null : __CHAVE_CERTIFICADO__;
 
-/** Selo do certificado: HMAC-SHA256 (64 caracteres hexadecimais). */
-export function hashCertificado({ nome, modulo, data }) {
+/**
+ * Ordem da cadeia de certificados. Como num blockchain, cada certificado (menos o
+ * primeiro) leva no selo o hash do certificado anterior desta lista. Para forjar o
+ * de PHP, seria preciso forjar também os de HTML e W3.CSS, com o mesmo nome; mudar
+ * uma data ou um nome em qualquer ponto quebra todos os selos seguintes.
+ */
+export const ORDEM = Object.keys(CERTIFICADOS);
+export const anteriores = (modulo) => ORDEM.slice(0, ORDEM.indexOf(modulo));
+
+/**
+ * Selo de um certificado: HMAC-SHA256 (64 caracteres hexadecimais) da data de
+ * obtenção, emissor, empresa, aluno, módulo e, a partir do segundo, do hash anterior.
+ * O primeiro da cadeia não tem anterior, e o selo dele é o mesmo da versão sem cadeia.
+ */
+export function hashCertificado({ nome, modulo, data }, anterior = '') {
   if (!CHAVE) throw new Error('Chave do certificado indisponível fora do build do site.');
   const campos = [data, EMISSOR.responsavel, EMISSOR.organizacao, nome.trim(), modulo];
+  if (anterior) campos.push(anterior);
   return hmacSha256(CHAVE, JSON.stringify(campos));
+}
+
+/**
+ * Recalcula a cadeia inteira até `modulo`. `cadeia` traz as datas dos certificados
+ * anteriores, na ordem de ORDEM. Devolve os elos [{ modulo, data, hash, anterior }].
+ */
+export function montarCadeia({ nome, modulo, data, cadeia = [] }) {
+  const ids = anteriores(modulo);
+  const datas = cadeia.map((c) => (typeof c === 'string' ? c : c.data));
+  if (datas.length !== ids.length) {
+    throw new Error(`O certificado de ${modulo} precisa das datas de ${ids.length} certificado(s) anterior(es).`);
+  }
+  const elos = [];
+  let anterior = '';
+  [...ids, modulo].forEach((id, i) => {
+    const elo = { modulo: id, data: i < datas.length ? datas[i] : data, anterior };
+    elo.hash = hashCertificado({ nome, modulo: id, data: elo.data }, anterior);
+    elos.push(elo);
+    anterior = elo.hash;
+  });
+  return elos;
 }
 
 /** Código curto para mostrar e para o LinkedIn: SSC-AAAA-XXXX-XXXX, tirado do selo. */
 export const idDoHash = (data, hash) => `SSC-${data.slice(0, 4)}-${hash.slice(0, 4)}-${hash.slice(4, 8)}`.toUpperCase();
-export const idCertificado = (cert) => idDoHash(cert.data, hashCertificado(cert));
+export const idCertificado = (cert) => cert.id ?? idDoHash(cert.data, montarCadeia(cert).at(-1).hash);
 
-export function codificarCertificado({ nome, modulo, data }) {
-  const h = hashCertificado({ nome, modulo, data });
-  return paraBase64Url(new TextEncoder().encode(JSON.stringify({ n: nome, m: modulo, d: data, h })));
+/** Código do link: nome, módulo, data, datas da cadeia (c) e o selo (h). */
+export function codificarCertificado(cert) {
+  const elos = montarCadeia(cert);
+  const dados = { n: cert.nome, m: cert.modulo, d: cert.data, h: elos.at(-1).hash };
+  if (elos.length > 1) dados.c = elos.slice(0, -1).map((e) => e.data);
+  return paraBase64Url(new TextEncoder().encode(JSON.stringify(dados)));
 }
 
 /**
- * Lê o código do link. Devolve null se for ilegível; senão, o certificado com
- * `selo`: 'confere', 'nao-confere' (link alterado) ou 'ausente' (link antigo, sem selo).
+ * Lê o código do link. Devolve null se for ilegível; senão, o certificado com a
+ * cadeia recalculada e `selo`: 'confere', 'nao-confere' (link alterado, ou cadeia
+ * incompleta) ou 'ausente' (link antigo, de antes do selo ou da cadeia).
  */
 export function decodificarCertificado(codigo) {
   try {
-    const { n, m, d, h } = JSON.parse(new TextDecoder().decode(deBase64Url(codigo)));
+    const { n, m, d, h, c } = JSON.parse(new TextDecoder().decode(deBase64Url(codigo)));
     const nome = typeof n === 'string' ? n.trim() : '';
     if (!nome || nome.length > 80 || !(m in CERTIFICADOS) || !DATA.test(d)) return null;
     const cert = { nome, modulo: m, data: d };
-    const esperado = hashCertificado(cert);
-    const selo = typeof h !== 'string' ? 'ausente' : h === esperado ? 'confere' : 'nao-confere';
-    const hash = selo === 'nao-confere' ? h : esperado;
-    return { ...cert, hash, id: idDoHash(d, hash), selo };
+    const precisaCadeia = anteriores(m).length > 0;
+
+    // Link antigo: sem selo, ou (depois do primeiro) sem as datas da cadeia.
+    if (typeof h !== 'string' || (precisaCadeia && c === undefined)) {
+      return { ...cert, cadeia: [], anterior: '', hash: h ?? '', id: idDoHash(d, h ?? '00000000'), selo: 'ausente' };
+    }
+    const datas = Array.isArray(c) ? c : [];
+    if (!datas.every((x) => typeof x === 'string' && DATA.test(x)) || datas.length !== anteriores(m).length) {
+      return { ...cert, cadeia: [], anterior: '', hash: h, id: idDoHash(d, h), selo: 'nao-confere' };
+    }
+    const elos = montarCadeia({ ...cert, cadeia: datas });
+    const ultimo = elos.at(-1);
+    const selo = h === ultimo.hash ? 'confere' : 'nao-confere';
+    return {
+      ...cert,
+      cadeia: elos.slice(0, -1),
+      anterior: ultimo.anterior,
+      hash: selo === 'confere' ? ultimo.hash : h,
+      id: idDoHash(d, selo === 'confere' ? ultimo.hash : h),
+      selo,
+    };
   } catch {
     return null;
   }
@@ -121,7 +181,7 @@ export function linkLinkedInPerfil(cert, urlCertificado = linkPublico(cert)) {
     issueYear: cert.data.slice(0, 4),
     issueMonth: String(Number(cert.data.slice(5, 7))),
     certUrl: urlCertificado,
-    certId: idCertificado(cert),
+    certId: cert.id ?? idCertificado(cert),
   });
   return `https://www.linkedin.com/profile/add?${parametros}`;
 }

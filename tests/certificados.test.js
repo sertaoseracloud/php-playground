@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   CERTIFICADOS, EMISSOR, codificarCertificado, decodificarCertificado, idCertificado, hashCertificado,
+  ORDEM, anteriores, montarCadeia,
   linkLinkedInPerfil, linkLinkedInPublicar, linkPublico, textoPublicacao, SITE,
 } from '../src/certificados.js';
 import { modulos } from '../src/conteudo/trilha.js';
@@ -9,7 +10,9 @@ import { lerRota, paraBase64Url, deBase64Url } from '../src/compartilhar.js';
 const lerCodigo = (codigo) => JSON.parse(new TextDecoder().decode(deBase64Url(codigo)));
 const escreverCodigo = (obj) => paraBase64Url(new TextEncoder().encode(JSON.stringify(obj)));
 
-const CERT = { nome: 'Maria da Conceição', modulo: 'php', data: '2026-10-11' };
+// PHP é o 3º da cadeia: precisa das datas de HTML e W3.CSS.
+const CERT = { nome: 'Maria da Conceição', modulo: 'php', data: '2026-10-11', cadeia: ['2026-10-01', '2026-10-05'] };
+const HTML = { nome: 'Maria da Conceição', modulo: 'html', data: '2026-10-01' };
 
 describe('certificados', () => {
   it('existe um certificado para cada módulo e um final', () => {
@@ -25,33 +28,34 @@ describe('certificados', () => {
     expect(EMISSOR.responsavel).toBe('Cláudio Raposo');
   });
 
-  it('o código guarda nome, módulo e data (com acentos)', () => {
+  it('o código guarda nome, módulo, data e a cadeia (com acentos)', () => {
     const codigo = codificarCertificado(CERT);
-    expect(decodificarCertificado(codigo)).toEqual({
-      ...CERT, hash: hashCertificado(CERT), id: idCertificado(CERT), selo: 'confere',
-    });
+    const cert = decodificarCertificado(codigo);
+    const elos = montarCadeia(CERT);
+    expect(cert).toMatchObject({ nome: CERT.nome, modulo: 'php', data: CERT.data, selo: 'confere', hash: elos[2].hash });
+    expect(cert.cadeia.map((e) => e.modulo)).toEqual(['html', 'w3css']);
     expect(lerRota(`#/certificado/${codigo}`)).toEqual({ tela: 'certificado', codigo });
   });
 
   it('id estável no formato SSC-AAAA-XXXX-XXXX, tirado do selo', () => {
-    expect(idCertificado(CERT)).toMatch(/^SSC-2026-[0-9A-F]{4}-[0-9A-F]{4}$/);
-    expect(idCertificado(CERT).replace(/-/g, '').slice(7).toLowerCase()).toBe(hashCertificado(CERT).slice(0, 8));
-    expect(idCertificado(CERT)).toBe(idCertificado({ ...CERT }));
-    expect(idCertificado(CERT)).not.toBe(idCertificado({ ...CERT, modulo: 'html' }));
+    const id = idCertificado(CERT);
+    expect(id).toMatch(/^SSC-2026-[0-9A-F]{4}-[0-9A-F]{4}$/);
+    expect(id.replace(/-/g, '').slice(7).toLowerCase()).toBe(montarCadeia(CERT).at(-1).hash.slice(0, 8));
+    expect(idCertificado({ ...CERT })).toBe(id);
   });
 
   it('selo HMAC-SHA256: muda com data, emissor, empresa, aluno e módulo', () => {
-    const hash = hashCertificado(CERT);
+    const hash = hashCertificado(HTML);
     expect(hash).toMatch(/^[0-9a-f]{64}$/);
-    for (const mudanca of [{ data: '2026-10-12' }, { nome: 'Maria da Conceicao' }, { modulo: 'html' }]) {
-      expect(hashCertificado({ ...CERT, ...mudanca })).not.toBe(hash);
+    for (const mudanca of [{ data: '2026-10-12' }, { nome: 'Maria da Conceicao' }, { modulo: 'w3css' }]) {
+      expect(hashCertificado({ ...HTML, ...mudanca })).not.toBe(hash);
     }
-    expect(hashCertificado({ ...CERT, nome: '  Maria da Conceição ' })).toBe(hash); // espaços nas pontas não contam
+    expect(hashCertificado({ ...HTML, nome: '  Maria da Conceição ' })).toBe(hash); // espaços nas pontas não contam
   });
 
   it('o link leva o selo, e a palavra secreta nunca aparece', () => {
     const dados = lerCodigo(codificarCertificado(CERT));
-    expect(dados.h).toBe(hashCertificado(CERT));
+    expect(dados.h).toBe(montarCadeia(CERT).at(-1).hash);
     expect(JSON.stringify(dados).toLowerCase()).not.toMatch(/caf[eé]/);
   });
 
@@ -66,11 +70,62 @@ describe('certificados', () => {
 
   it('rejeita códigos inválidos', () => {
     expect(decodificarCertificado('@@@')).toBeNull();
-    expect(decodificarCertificado(codificarCertificado({ ...CERT, modulo: 'inexistente' }))).toBeNull();
-    expect(decodificarCertificado(codificarCertificado({ ...CERT, nome: '  ' }))).toBeNull();
-    expect(decodificarCertificado(codificarCertificado({ ...CERT, data: 'ontem' }))).toBeNull();
+    expect(decodificarCertificado(escreverCodigo({ n: 'Ana', m: 'inexistente', d: '2026-10-11', h: 'x' }))).toBeNull();
+    expect(decodificarCertificado(escreverCodigo({ n: '  ', m: 'html', d: '2026-10-11', h: 'x' }))).toBeNull();
+    expect(decodificarCertificado(escreverCodigo({ n: 'Ana', m: 'html', d: 'ontem', h: 'x' }))).toBeNull();
+  });
+});
+
+describe('cadeia de certificados (como num blockchain)', () => {
+  it('a ordem é a da trilha, e o final fecha a cadeia', () => {
+    expect(ORDEM).toEqual(['html', 'w3css', 'php', 'pdo', 'projetos', 'final']);
+    expect(anteriores('html')).toEqual([]);
+    expect(anteriores('final')).toEqual(['html', 'w3css', 'php', 'pdo', 'projetos']);
   });
 
+  it('o primeiro não tem anterior e mantém o selo de antes da cadeia', () => {
+    const [primeiro] = montarCadeia(HTML);
+    expect(primeiro.anterior).toBe('');
+    expect(primeiro.hash).toBe(hashCertificado(HTML));
+    expect(lerCodigo(codificarCertificado(HTML))).not.toHaveProperty('c');
+  });
+
+  it('cada certificado leva no selo o hash do anterior', () => {
+    const elos = montarCadeia(CERT);
+    expect(elos.map((e) => e.modulo)).toEqual(['html', 'w3css', 'php']);
+    expect(elos[1].anterior).toBe(elos[0].hash);
+    expect(elos[2].anterior).toBe(elos[1].hash);
+    expect(elos[2].hash).toBe(hashCertificado(CERT, elos[1].hash));
+    expect(elos[2].hash).not.toBe(hashCertificado(CERT)); // sem o anterior, o selo é outro
+  });
+
+  it('mudar a data de um certificado anterior quebra o selo dos seguintes', () => {
+    const dados = lerCodigo(codificarCertificado(CERT));
+    const adulterado = decodificarCertificado(escreverCodigo({ ...dados, c: ['2026-09-01', dados.c[1]] }));
+    expect(adulterado.selo).toBe('nao-confere');
+  });
+
+  it('não dá para pular um certificado da cadeia', () => {
+    expect(() => codificarCertificado({ ...CERT, cadeia: ['2026-10-01'] })).toThrow(/2 certificado/);
+    const dados = lerCodigo(codificarCertificado(CERT));
+    expect(decodificarCertificado(escreverCodigo({ ...dados, c: [dados.c[0]] })).selo).toBe('nao-confere');
+  });
+
+  it('link de módulo seguinte sem a cadeia é tratado como antigo', () => {
+    const dados = lerCodigo(codificarCertificado(CERT));
+    delete dados.c;
+    expect(decodificarCertificado(escreverCodigo(dados)).selo).toBe('ausente');
+  });
+
+  it('o certificado final encadeia os seis', () => {
+    const final = { nome: 'Ana', modulo: 'final', data: '2026-12-01', cadeia: ['2026-10-01', '2026-10-05', '2026-10-11', '2026-11-01', '2026-11-20'] };
+    const cert = decodificarCertificado(codificarCertificado(final));
+    expect(cert.selo).toBe('confere');
+    expect(cert.cadeia).toHaveLength(5);
+  });
+});
+
+describe('compartilhar', () => {
   it('links do LinkedIn: adicionar ao perfil e publicar', () => {
     const url = 'https://sertaoseracloud.github.io/php-playground/#/certificado/abc';
     const perfil = new URL(linkLinkedInPerfil(CERT, url));
@@ -93,7 +148,7 @@ describe('certificados', () => {
   it('link público aponta para a página estática do badge, com o código', () => {
     const link = new URL(linkPublico(CERT));
     expect(link.href.startsWith(`${SITE}badge/php/`)).toBe(true);
-    expect(decodificarCertificado(link.searchParams.get('c'))).toMatchObject(CERT);
+    expect(decodificarCertificado(link.searchParams.get('c'))).toMatchObject({ nome: CERT.nome, modulo: 'php', selo: 'confere' });
   });
 
   it('texto do post cita o badge, o emissor, o link e hashtags', () => {

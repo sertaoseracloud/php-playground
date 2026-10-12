@@ -24,12 +24,17 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
   // Só um certificado com selo válido pode ser compartilhado: gerar o link de novo
   // a partir de dados alterados criaria um selo válido para eles.
   const url = confere ? linkPublico(cert) : '';
-  const hashEmGrupos = cert.hash.match(/.{1,16}/g).join(' ');
+  const grupos = (hash) => (hash.match(/.{1,16}/g) ?? []).join(' ');
+  const hashEmGrupos = grupos(cert.hash);
+  const curto = (hash) => `${hash.slice(0, 8)}…${hash.slice(-4)}`;
+  const dataCurta = (data) => new Date(`${data}T12:00:00`).toLocaleDateString('pt-BR');
+  // A cadeia, do primeiro certificado até este: cada bloco aponta para o hash do anterior.
+  const blocos = confere ? [...cert.cadeia, { modulo: cert.modulo, data: cert.data, hash: cert.hash, anterior: cert.anterior }] : [];
   const avisoSelo = {
     'nao-confere': `<div class="aviso-selo erro" role="alert">⚠️ <b>O selo não confere.</b> Os dados deste link foram
       alterados depois da emissão: este certificado não é válido.</div>`,
-    ausente: `<div class="aviso-selo" role="status">ℹ️ <b>Link de uma versão antiga, sem selo de verificação.</b>
-      Se o certificado é seu, abra-o de novo pela trilha para gerar um link com selo.</div>`,
+    ausente: `<div class="aviso-selo" role="status">ℹ️ <b>Link de uma versão antiga, sem selo ou sem a cadeia de certificados.</b>
+      Se o certificado é seu, abra-o de novo pela trilha para gerar um link novo.</div>`,
   }[cert.selo] ?? '';
 
   el.innerHTML = `
@@ -60,6 +65,18 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
             <p>O selo é calculado a partir da <b>data de obtenção</b>, do <b>emissor</b> (${esc(EMISSOR.responsavel)}),
               da <b>empresa</b> (${esc(EMISSOR.organizacao)}), do <b>aluno</b> e do módulo, com uma chave secreta da
               ${esc(EMISSOR.organizacao)}. Se qualquer um desses dados mudar no link, o selo deixa de conferir.</p>
+            ${blocos.length > 1 ? `
+              <p><b>🔗 Cadeia de certificados.</b> Como num blockchain, cada certificado leva no selo o hash do
+                anterior. Para alterar este, seria preciso alterar todos os anteriores também.</p>
+              <ol class="cadeia">
+                ${blocos.map((b) => `
+                  <li class="${b.modulo === cert.modulo ? 'atual' : ''}">
+                    <b>${esc(CERTIFICADOS[b.modulo].titulo)}</b>
+                    <span>${dataCurta(b.data)}</span>
+                    <code title="${esc(b.hash)}">${esc(curto(b.hash))}</code>
+                    <small>${b.anterior ? `anterior: <code>${esc(curto(b.anterior))}</code>` : 'primeiro da cadeia'}</small>
+                  </li>`).join('')}
+              </ol>` : ''}
           </details>
           <div class="acoes-certificado" ${confere ? '' : 'hidden'}>
             <a class="btn btn-linkedin" href="${esc(linkLinkedInPublicar(cert, url))}" target="_blank" rel="noopener">in Publicar no LinkedIn</a>
@@ -105,6 +122,7 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
               <b>${dataPorExtenso(cert.data)}</b>
               <span class="cert-codigo">Código: ${esc(cert.id)}</span>
               <span class="cert-hash" title="Selo de verificação (HMAC-SHA256)">Selo: ${esc(hashEmGrupos)}</span>
+              ${cert.anterior ? `<span class="cert-hash" title="Hash do certificado anterior da cadeia">Anterior: ${esc(grupos(cert.anterior))}</span>` : ''}
             </div>
             <div class="cert-assinatura">
               <span class="linha-assinatura" aria-hidden="true"></span>
