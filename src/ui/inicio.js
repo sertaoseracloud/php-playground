@@ -80,7 +80,7 @@ function trofeu(m, rotulo = CERTIFICADOS[m.id].titulo) {
     </li>`;
 }
 
-function unidade(m, anterior) {
+function unidade(m, anterior, atual) {
   const bloqueio = !m.desbloqueado && anterior
     ? `<p class="aviso-bloqueio">🔒 Resolva ${LIMITE_DESBLOQUEIO}% de ${esc(anterior.titulo)} para desbloquear (agora: ${anterior.pct}%).</p>`
     : '';
@@ -91,6 +91,7 @@ function unidade(m, anterior) {
         <h2>${m.icone} ${esc(m.titulo)}</h2>
         <p class="unidade-desc">${esc(m.descricao)}</p>
         ${bloqueio}
+        ${atual ? '' : `<button type="button" class="btn-link btn-ver-etapas" aria-expanded="false" aria-controls="trilha-${m.id}">Ver etapas</button>`}
       </div>
       <div class="unidade-progresso" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${m.pct}" aria-label="Progresso em ${esc(m.titulo)}">
         <span class="anel" style="--pct:${m.pct}"><b>${m.pct}%</b></span>
@@ -112,9 +113,9 @@ function unidade(m, anterior) {
     nos = m.itens.map(no).join('');
   }
   return `
-    <section class="bloco-unidade ${m.desbloqueado ? '' : 'bloqueada'}" id="unidade-${m.id}" aria-labelledby="titulo-${m.id}">
+    <section class="bloco-unidade ${m.desbloqueado ? '' : 'bloqueada'} ${atual ? 'unidade-atual' : ''}" id="unidade-${m.id}" aria-labelledby="titulo-${m.id}">
       ${cabecalho.replace('<h2>', `<h2 id="titulo-${m.id}">`)}
-      <ol class="trilha">${nos}${trofeu(m)}</ol>
+      <ol class="trilha" id="trilha-${m.id}">${nos}${trofeu(m)}</ol>
     </section>`;
 }
 
@@ -185,12 +186,14 @@ function diploma(j) {
 
 export function renderInicio(el) {
   const j = jornadaAtual();
+  // Módulo atual: onde está o próximo passo. No modo foco, só ele mostra as etapas.
+  const atual = j.modulos.find((m) => m.itens.some((i) => i.ehProximo))?.id ?? j.modulos.at(-1).id;
   el.innerHTML = `
     <div class="caminho-pagina">
       ${painelJogador(j)}
       <div class="caminho">
         <h1 class="caminho-titulo">Trilha: do HTML ao banco de dados</h1>
-        ${j.modulos.map((m, i) => unidade(m, j.modulos[i - 1])).join('')}
+        ${j.modulos.map((m, i) => unidade(m, j.modulos[i - 1], m.id === atual)).join('')}
         ${diploma(j)}
       </div>
     </div>`;
@@ -207,6 +210,13 @@ export function renderInicio(el) {
       unidadeBloqueada?.classList.remove('chacoalhar');
       void unidadeBloqueada?.offsetWidth;
       unidadeBloqueada?.classList.add('chacoalhar');
+    });
+  });
+  el.querySelectorAll('.btn-ver-etapas').forEach((b) => {
+    b.addEventListener('click', () => {
+      const aberta = b.closest('.bloco-unidade').classList.toggle('expandida');
+      b.setAttribute('aria-expanded', String(aberta));
+      b.textContent = aberta ? 'Esconder etapas' : 'Ver etapas';
     });
   });
   $('btn-nome')?.addEventListener('click', async () => {

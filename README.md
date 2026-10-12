@@ -46,6 +46,24 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
   editor incluído); fonte Atkinson Hyperlegible; mais espaçamento; links sublinhados e foco reforçado;
   reduzir animações; **🔊 Ouvir** o enunciado; atalhos de teclado; link "Pular para o conteúdo";
   rótulos e regiões `aria-live` para leitores de tela.
+- **🧠 Neurodiversidade** (baseado nas recomendações do W3C para acessibilidade cognitiva, COGA):
+  - **Perfis rápidos** no painel ♿: 🎯 Foco (TDAH), 📖 Leitura facilitada (dislexia),
+    🌿 Calmo (autismo, sensibilidade sensorial) e 🤝 Sem pressão (ansiedade). Cada perfil só liga um
+    conjunto de opções; dá para combinar e ajustar uma a uma.
+  - **Modo foco**: o caminho mostra só o módulo atual e esconde contadores e textos extras.
+  - **Lista de tarefas**: os pedidos do exercício viram caixas de marcar, com "2 de 4 feitas" e o
+    próximo passo ("agora clique em ▶ Executar").
+  - **Régua de leitura**, **linhas curtas**, tema **Suave** (cores calmas) e **lembrete de pausa**
+    a cada 25 minutos de estudo contínuo.
+  - **Sem pressão**: esconde XP, nível e sequência de dias e troca "Resposta errada" por mensagens
+    que dizem quantos casos já funcionam e onde olhar.
+- **Instruções com estrutura previsível**: todo desafio mostra a mesma sequência:
+  - um roteiro curto (1. leia, 2. faça uma parte, 3. ▶ Executar, 4. confira, 5. ⬆ Enviar);
+  - 🎯 **O que fazer**;
+  - 📚 **Palavras técnicas**: até 6 termos do desafio, cada um com explicação simples,
+    **analogia do dia a dia** e exemplo de código. O glossário fica em `src/conteudo/glossario.js`;
+  - ✅ **Como saber que deu certo**: as regras dos testes visíveis em linguagem simples;
+  - 💡 Dica.
 - **❓ Tutorial** em modal, passo a passo, destacando cada parte da tela. Abre sozinho na primeira visita.
 - **Progresso** por módulo e por dificuldade (✅ resolvido, ◐ tentado), salvo no navegador do aluno.
 - **Aba Banco**: mostra as tabelas e os dados do problema. O banco é recriado a cada execução.

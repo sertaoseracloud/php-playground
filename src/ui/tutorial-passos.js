@@ -96,8 +96,10 @@ export const PASSOS = [
   {
     alvo: '#btn-acessibilidade',
     titulo: '♿ Acessibilidade',
-    texto: `<p>Mude o <b>tema</b> (escuro, alto contraste ou claro), o <b>tamanho do texto</b>, use uma
-      <b>fonte mais legível</b> ou mais espaçamento. Lá também estão os atalhos de teclado.</p>`,
+    texto: `<p>Mude o <b>tema</b>, o <b>tamanho do texto</b>, a fonte e o espaçamento.</p>
+      <p>Há <b>perfis rápidos</b> para estudar do seu jeito: <b>🎯 Foco</b> (menos distrações, tarefas
+      em lista, lembrete de pausa), <b>📖 Leitura facilitada</b> (fonte legível e régua de leitura),
+      <b>🌿 Calmo</b> (cores suaves, nada se mexe) e <b>🤝 Sem pressão</b> (sem pontuação, mensagens gentis).</p>`,
   },
   {
     alvo: '#btn-tutorial',

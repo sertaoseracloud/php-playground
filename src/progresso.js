@@ -65,6 +65,10 @@ export const diasAtivos = () => ler('atividade', []);
 export const lerNome = () => ler('nome', '');
 export const gravarNome = (nome) => gravar('nome', nome.trim());
 
+// ---------- lista de tarefas do enunciado (índices marcados) ----------
+export const lerTarefas = (id) => ler(`tarefas:${id}`, []);
+export const gravarTarefas = (id, indices) => gravar(`tarefas:${id}`, indices);
+
 // ---------- rascunhos de código ----------
 export const lerRascunho = (id) => ler(`rascunho:${id}`);
 export const gravarRascunho = (id, arquivos) => gravar(`rascunho:${id}`, arquivos);

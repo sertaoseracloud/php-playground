@@ -10,6 +10,7 @@ import './caminho.css';
 import { MotorPHP } from './php/motor.js';
 import { lerRota } from './compartilhar.js';
 import { iniciarAcessibilidade } from './ui/acessibilidade.js';
+import { iniciarRegua, iniciarPausa } from './ui/neuro.js';
 import { renderInicio, resumoProgresso } from './ui/inicio.js';
 import { criarTelaItem } from './ui/item.js';
 import { renderCertificado } from './ui/certificado.js';
@@ -18,7 +19,9 @@ import { iniciarTutorial } from './ui/tutorial.js';
 import { $ } from './ui/util.js';
 
 // Antes de tudo: tema e tamanho de texto escolhidos pelo aluno.
-iniciarAcessibilidade();
+const acessibilidade = iniciarAcessibilidade();
+iniciarRegua();
+iniciarPausa({ ativo: () => acessibilidade.atuais().lembretePausa });
 
 const telaInicio = $('tela-inicio');
 const telaItem = $('tela-item');
@@ -92,6 +95,11 @@ document.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('hashchange', navegar);
+// Opções como modo foco e lista de tarefas mudam o conteúdo: redesenha a tela aberta.
+window.addEventListener('preferencias', () => {
+  if (!telaInicio.hidden) renderInicio(telaInicio);
+  if (!telaItem.hidden) telaDoItem.redesenharDescricao();
+});
 atualizarProgressoTopo();
 navegar();
 

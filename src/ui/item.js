@@ -10,9 +10,14 @@ import {
 } from '../progresso.js';
 import { EditorArquivos } from './editor.js';
 import { iniciarLeitura } from './acessibilidade.js';
+import { aplicarChecklist } from './neuro.js';
+import { termosDoTexto } from '../conteudo/glossario.js';
+import { descreverRegra } from '../verificacoes.js';
 import { jornadaAtual } from './inicio.js';
 import { LIMITE_DESBLOQUEIO } from '../gamificacao.js';
 import { $, esc } from './util.js';
+
+const semPressao = () => document.documentElement.classList.contains('a11y-sem-pressao');
 
 export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }) {
   const el = {
@@ -133,7 +138,8 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
       <div class="etapa-info">🔒 Este módulo ainda está bloqueado no caminho: resolva ${LIMITE_DESBLOQUEIO}% do módulo anterior.
         Você pode praticar aqui, mas siga a trilha na ordem para aproveitar melhor.</div>` : '';
     if (item.tipo !== 'problema') {
-      el.enunciado.innerHTML = avisoBloqueio + item.resumo;
+      el.enunciado.innerHTML = avisoBloqueio + item.resumo + glossario(item, item.titulo, item.resumo);
+      aplicarChecklist(el.enunciado, item.id);
       return;
     }
     const etapa = item.projeto ? `
@@ -144,16 +150,19 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
               <button class="btn btn-fantasma btn-pequeno" id="btn-referencia">Usar o código de referência</button></p>`
           : item.etapaAnterior ? '<p>O código inicial é a solução de referência da etapa anterior.</p>' : ''}
       </div>` : '';
-    const exemplos = item.testes.filter((t) => !t.oculto && (t.url || t.metodo)).map((t) => `
-      <div class="caso-exemplo"><span class="rotulo">Teste:</span> ${esc(t.descricao ?? `${t.metodo ?? 'GET'} ${t.url}`)}</div>`).join('');
     const ocultos = item.testes.filter((t) => t.oculto).length;
     el.enunciado.innerHTML = `
       ${avisoBloqueio}
       ${etapa}
-      ${item.enunciado}
-      ${exemplos ? `<h2>Casos de teste</h2>${exemplos}` : ''}
-      ${ocultos ? `<p class="licao-chip">+ ${ocultos} caso(s) oculto(s) rodam quando você clica em Enviar.</p>` : ''}
+      <ol class="roteiro" aria-label="Como resolver">
+        <li>Leia o que fazer</li><li>Faça uma parte</li><li>▶ Executar</li><li>Confira os ✅</li><li>⬆ Enviar</li>
+      </ol>
+      <section class="secao secao-fazer"><h2>🎯 O que fazer</h2>${item.enunciado}</section>
+      ${glossario(item, item.titulo, item.enunciado, item.dica)}
+      ${comoConferir(item.testes)}
+      ${ocultos ? `<p class="licao-chip">+ ${ocultos} caso(s) oculto(s) rodam quando você clica em ⬆ Enviar. Eles usam outros dados, para conferir que o seu código não está "decorado".</p>` : ''}
       <details><summary>💡 Dica</summary><p><code>${esc(item.dica)}</code></p></details>`;
+    aplicarChecklist(el.enunciado, item.id);
     $('btn-referencia')?.addEventListener('click', () => {
       if (!confirm('Trocar o seu código pelo código de referência desta etapa?')) return;
       editor.carregar(item.arquivos);
@@ -162,6 +171,40 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
       renderDescricao();
       executar({ url: `/${editor.principal}` });
     });
+  }
+
+  /** "Como saber que deu certo": as regras dos casos visíveis, em linguagem simples. */
+  function comoConferir(testes) {
+    const blocos = testes.filter((t) => !t.oculto).map((t) => {
+      const regras = t.regras.map(descreverRegra).filter(Boolean);
+      if (!regras.length) return '';
+      const soCodigo = t.regras.every((r) => 'codigo' in r);
+      const onde = t.url || t.metodo
+        ? `Ao abrir <code>${esc(t.descricao ?? `${t.metodo ?? 'GET'} ${t.url}`)}</code>`
+        : soCodigo ? 'No seu código' : 'Ao executar';
+      return `<p class="caso-exemplo"><span class="rotulo">${onde}:</span></p>
+        <ul>${regras.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`;
+    }).join('');
+    return blocos ? `<section class="secao secao-conferir"><h2>✅ Como saber que deu certo</h2>${blocos}</section>` : '';
+  }
+
+  /** Palavras técnicas do desafio, cada uma com explicação, analogia e exemplo. */
+  function glossario(item, ...textos) {
+    const div = document.createElement('div');
+    div.innerHTML = textos.join(' ');
+    const termos = termosDoTexto(div.textContent, { modulo: item.modulo });
+    if (!termos.length) return '';
+    return `
+      <section class="secao glossario">
+        <h2>📚 Palavras técnicas</h2>
+        <p class="glossario-ajuda">Toque numa palavra para ver o que ela significa, com uma comparação do dia a dia.</p>
+        ${termos.map((t) => `
+          <details class="termo">
+            <summary><b>${esc(t.termo)}</b><span>${esc(t.definicao)}</span></summary>
+            <p class="analogia"><span aria-hidden="true">🧠</span> <b>Pense assim:</b> ${esc(t.analogia)}</p>
+            ${t.exemplo ? `<pre class="trecho exemplo-termo"><code>${esc(t.exemplo)}</code></pre>` : ''}
+          </details>`).join('')}
+      </section>`;
   }
 
   function renderSolucao() {
@@ -371,10 +414,15 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     }).join('');
 
     const passaram = relatorio.filter((t) => t.ok).length;
-    const titulo = aprovado ? (envio ? 'Aceito 🎉 Você acertou a questão!' : 'Casos visíveis passaram') : 'Resposta errada';
+    const gentil = semPressao();
+    const titulo = aprovado
+      ? (envio ? 'Aceito 🎉 Você acertou a questão!' : 'Casos visíveis passaram')
+      : (gentil ? 'Ainda não passou, e tudo bem: errar faz parte' : 'Resposta errada');
     const sub = aprovado && !envio
       ? 'Agora clique em ⬆ Enviar para rodar também os casos ocultos.'
-      : `${passaram}/${relatorio.length} casos passaram${envio ? ' (incluindo os ocultos)' : ''}.`;
+      : gentil && !aprovado
+        ? `${passaram} de ${relatorio.length} casos já funcionam. Abra o caso marcado abaixo para ver o próximo ajuste.`
+        : `${passaram}/${relatorio.length} casos passaram${envio ? ' (incluindo os ocultos)' : ''}.`;
     const { proximo } = vizinhos(estado.item.id);
     el.testes.innerHTML = `
       <p class="veredito ${aprovado ? 'ok' : 'falha'}">${titulo}</p>
@@ -406,7 +454,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
             Seu certificado da Sertão será cloud está liberado.
             <a class="btn btn-roxo btn-pequeno" href="#/">Ver no caminho</a></div>`);
       }
-      definirStatus(aprovado ? 'Aceito! 🎉' : 'Resposta errada');
+      definirStatus(aprovado ? 'Aceito! 🎉' : semPressao() ? 'Ainda não passou: veja o que falta' : 'Resposta errada');
     } catch (erro) {
       tratarErro(erro);
       el.testes.innerHTML = `<p class="veredito falha">Erro</p><p class="veredito-sub">${esc(erro.message)}</p>`;
@@ -455,6 +503,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
 
   return {
     abrir,
+    redesenharDescricao: () => estado.item && renderDescricao(),
     aoMudarEstadoPhp(pronto) {
       const primeiraVez = pronto && !estado.jaIniciou;
       estado.phpPronto = pronto;

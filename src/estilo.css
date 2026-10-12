@@ -67,6 +67,29 @@
   color-scheme: light;
 }
 
+/* Suave: cores pouco saturadas e sem brilho forte, para quem se cansa com estímulo
+   visual (sensibilidade sensorial). O texto mantém contraste acima de 4,5:1. */
+:root[data-tema="suave"] {
+  --fundo: #2b2d33;
+  --fundo-escuro: #25272c;
+  --fundo-mais-escuro: #202226;
+  --linha: #41444d;
+  --linha-atual: #41444d66;
+  --selecao: #474b57;
+  --texto: #dedcd5;
+  --suave: #9a9fb0;
+  --ciano: #93b9c4;
+  --verde: #9fc49b;
+  --laranja: #d6b38f;
+  --rosa: #cfa8bc;
+  --roxo: #b5aad6;
+  --vermelho: #d69494;
+  --amarelo: #d6d09c;
+  --sobre-cor: #202226;
+  --foco: #d6d09c;
+  color-scheme: dark;
+}
+
 :root {
   --escala: 1;
   --raio: 8px;
@@ -82,6 +105,77 @@
 :root.a11y-espacamento body { letter-spacing: 0.03em; word-spacing: 0.08em; }
 :root.a11y-links a { text-decoration: underline; text-underline-offset: 3px; }
 :root.a11y-links :focus-visible { outline-width: 4px !important; }
+:root.a11y-linhas-curtas .conteudo-desc > *,
+:root.a11y-linhas-curtas .unidade-desc,
+:root.a11y-linhas-curtas .badge-desc,
+:root.a11y-linhas-curtas .tutorial-texto { max-width: 65ch; }
+
+/* régua de leitura: faixa na linha do mouse, o resto da tela fica mais escuro */
+.regua-leitura {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: calc(2.4em * var(--escala));
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 50;
+  display: none;
+  border-block: 2px solid var(--foco);
+  background: color-mix(in srgb, var(--foco) 7%, transparent);
+  box-shadow: 0 0 0 100vmax rgb(0 0 0 / 0.3);
+}
+:root.a11y-regua .regua-leitura.visivel { display: block; }
+
+/* modo foco: só o módulo atual mostra as etapas; somem contadores e textos extras */
+:root.a11y-foco .progresso-topo,
+:root.a11y-foco .estatisticas,
+:root.a11y-foco .nota-niveis,
+:root.a11y-foco .unidade-desc { display: none !important; }
+:root.a11y-foco .bloco-unidade:not(.unidade-atual):not(.expandida) .trilha { display: none; }
+:root.a11y-foco .bloco-unidade:not(.unidade-atual) .unidade { opacity: 0.8; }
+.btn-ver-etapas { display: none; margin-top: 6px; }
+:root.a11y-foco .btn-ver-etapas { display: inline-block; }
+
+/* sem pressão: sem pontuação, nível nem contagem de dias */
+:root.a11y-sem-pressao .estatisticas,
+:root.a11y-sem-pressao .barra-xp,
+:root.a11y-sem-pressao .xp-legenda,
+:root.a11y-sem-pressao .jogador-nivel,
+:root.a11y-sem-pressao .nota-niveis,
+:root.a11y-sem-pressao .progresso-topo { display: none !important; }
+
+/* lista de tarefas do enunciado */
+.tarefas-progresso {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--verde) 12%, transparent);
+}
+li.tarefa { list-style: none; margin-left: -1.3em; padding: 2px 0; }
+li.tarefa label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+li.tarefa input { width: 18px; height: 18px; margin-top: 0.3em; flex-shrink: 0; accent-color: var(--verde); }
+li.tarefa.feita > label > span { opacity: 0.6; }
+
+/* lembrete de pausa */
+.lembrete-pausa {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  max-width: min(380px, calc(100vw - 32px));
+  z-index: 60;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: var(--texto);
+  background: var(--fundo-escuro);
+  border: 2px solid var(--verde);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.4);
+  font-family: var(--fonte-texto);
+  font-size: calc(14px * var(--escala));
+  line-height: var(--altura-linha);
+}
+.lembrete-pausa p { margin: 0; }
+.lembrete-botoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
 :root.a11y-sem-movimento *,
 :root.a11y-sem-movimento *::before,
 :root.a11y-sem-movimento *::after {
@@ -389,6 +483,32 @@ kbd {
 }
 .caso-exemplo .rotulo { color: var(--suave); }
 
+/* enunciado com estrutura previsível: roteiro, o que fazer, palavras, como conferir */
+.roteiro {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  counter-reset: passo;
+  font-size: 0.8rem;
+  color: var(--suave);
+}
+.roteiro li { counter-increment: passo; padding: 2px 8px; border: 1px solid var(--linha); border-radius: 999px; }
+.roteiro li::before { content: counter(passo) ". "; color: var(--roxo); font-weight: 700; }
+.secao { margin: 0 0 14px; }
+.secao > h2 { font-size: 1rem; margin: 0 0 6px; color: var(--ciano); }
+.secao-conferir ul { margin: 4px 0 10px; }
+.glossario-ajuda { margin: 0 0 6px; font-size: 0.85rem; color: var(--suave); }
+.termo { border: 1px solid var(--linha); border-radius: 8px; margin: 6px 0; background: var(--fundo-escuro); }
+.termo summary { cursor: pointer; padding: 8px 10px; display: flex; flex-wrap: wrap; gap: 2px 8px; }
+.termo summary b { color: var(--amarelo); }
+.termo summary span { color: var(--texto); font-size: 0.88rem; }
+.termo[open] summary { border-bottom: 1px dashed var(--linha); }
+.termo .analogia { margin: 8px 10px; }
+.termo .exemplo-termo { margin: 0 10px 10px; }
+
 /* aba Banco */
 .tabela-banco { margin-bottom: 18px; }
 .tabela-banco h3 { margin: 0 0 6px; font-size: 0.95rem; color: var(--ciano); }
@@ -509,6 +629,7 @@ kbd {
   font-size: calc(14px * var(--escala));
   line-height: var(--altura-linha);
 }
+#dialogo-a11y { width: min(660px, calc(100vw - 32px)); }
 .dialogo::backdrop { background: rgb(0 0 0 / 0.55); }
 .dialogo h2 { margin: 0 0 10px; color: var(--roxo); font-size: 1.15rem; }
 .dialogo-cabecalho { display: flex; justify-content: space-between; align-items: center; }
@@ -523,6 +644,26 @@ kbd {
 [data-amostra="dracula"] .amostra { background: linear-gradient(90deg, #282a36 50%, #bd93f9 50%); }
 [data-amostra="alto-contraste"] .amostra { background: linear-gradient(90deg, #000 50%, #ffff00 50%); }
 [data-amostra="claro"] .amostra { background: linear-gradient(90deg, #fffbeb 50%, #644ac9 50%); }
+[data-amostra="suave"] .amostra { background: linear-gradient(90deg, #2b2d33 50%, #b5aad6 50%); }
+.a11y-ajuda { margin: 0 0 8px; color: var(--suave); font-size: 0.9em; }
+.perfis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 8px; }
+.perfil {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  font: inherit;
+  color: var(--texto);
+  background: var(--fundo-escuro);
+  border: 2px solid var(--linha);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+.perfil span { color: var(--suave); font-size: 0.85em; }
+.perfil:hover { border-color: var(--roxo); }
+.perfil[aria-pressed="true"] { border-color: var(--verde); background: color-mix(in srgb, var(--verde) 12%, var(--fundo-escuro)); }
+.perfil[aria-pressed="true"] b::after { content: " · ligado"; color: var(--verde); font-weight: 400; }
 .controle-tamanho { display: flex; align-items: center; gap: 12px; }
 .controle-tamanho output { min-width: 60px; text-align: center; font-weight: 700; }
 .atalhos summary { cursor: pointer; color: var(--laranja); }

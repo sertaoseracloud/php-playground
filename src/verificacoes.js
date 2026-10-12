@@ -67,3 +67,22 @@ export function verificarRegra(regra, { html, erros, codigo }) {
   }
   throw new Error(`Regra desconhecida: ${JSON.stringify(regra)}`);
 }
+
+/**
+ * A regra em linguagem simples, para a seção "Como saber que deu certo".
+ * Regras de código sem `msg` são regex e ficariam confusas: devolve null.
+ */
+export function descreverRegra(regra) {
+  if (regra.msg) return regra.msg;
+  if ('contem' in regra) return `A página mostra "${regra.contem}"`;
+  if ('naoContem' in regra) return `A página não mostra "${regra.naoContem}"`;
+  if ('seletor' in regra && 'texto' in regra) return `Tem um elemento ${regra.seletor} com o texto "${regra.texto}"`;
+  if ('seletor' in regra) {
+    const { min, max, igual } = regra;
+    if (igual !== undefined) return `Tem exatamente ${igual} elemento(s) ${regra.seletor}`;
+    if (max !== undefined) return `Tem de ${min ?? 0} a ${max} elemento(s) ${regra.seletor}`;
+    return (min ?? 1) === 1 ? `Tem um elemento ${regra.seletor}` : `Tem pelo menos ${min} elementos ${regra.seletor}`;
+  }
+  if ('semErros' in regra) return 'O PHP roda sem erros nem avisos';
+  return null;
+}

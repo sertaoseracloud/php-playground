@@ -151,6 +151,12 @@
       </div>
 
       <fieldset>
+        <legend>Perfis rápidos</legend>
+        <p class="a11y-ajuda">Cada perfil liga um conjunto de opções. Combine quantos quiser e ajuste abaixo.</p>
+        <div id="a11y-perfis" class="perfis"></div>
+      </fieldset>
+
+      <fieldset>
         <legend>Tema de cores</legend>
         <div id="a11y-temas" class="opcoes-tema"></div>
       </fieldset>
@@ -164,10 +170,7 @@
         </div>
       </fieldset>
 
-      <fieldset>
-        <legend>Leitura</legend>
-        <div id="a11y-opcoes" class="opcoes-check"></div>
-      </fieldset>
+      <div id="a11y-opcoes"></div>
 
       <details class="atalhos">
         <summary>⌨️ Atalhos de teclado</summary>
@@ -186,6 +189,11 @@
       </div>
     </form>
   </dialog>
+
+  <!-- Régua de leitura (opção do painel de acessibilidade) -->
+  <div id="regua-leitura" class="regua-leitura" aria-hidden="true"></div>
+  <!-- Lembrete de pausa -->
+  <div id="lembrete-pausa" class="lembrete-pausa" role="status" hidden></div>
 
   <script type="module" src="/src/main.js"></script>
 </body>
