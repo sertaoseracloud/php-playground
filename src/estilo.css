@@ -251,14 +251,64 @@ kbd {
   background: var(--fundo-escuro);
   border-bottom: 1px solid var(--linha);
 }
-.marca { font-weight: 700; font-size: 1.05rem; color: var(--roxo); text-decoration: none; white-space: nowrap; }
-.menu { display: flex; gap: 4px; }
+.marca { order: 0; font-weight: 700; font-size: 1.05rem; color: var(--roxo); text-decoration: none; white-space: nowrap; }
+/* Desktop: o painel do menu "some" e os filhos entram na linha do topo. */
+.menu-topo { display: contents; }
+.menu { order: 1; display: flex; gap: 4px; }
 .menu a { color: var(--texto); text-decoration: none; padding: 5px 12px; border-radius: 6px; }
 .menu a:hover { background: var(--linha); }
 .menu a.ativo { background: var(--linha); color: var(--rosa); }
-.progresso-topo { color: var(--verde); white-space: nowrap; }
-.status { margin-left: auto; color: var(--suave); font-size: 0.85rem; white-space: nowrap; }
-.ferramentas { display: flex; gap: 6px; }
+.progresso-topo { order: 2; color: var(--verde); white-space: nowrap; }
+.status { order: 3; margin-left: auto; color: var(--suave); font-size: 0.85rem; white-space: nowrap; }
+.ferramentas { order: 4; display: flex; gap: 6px; }
+.btn-menu { display: none; }
+
+/* Celular: uma linha só (marca, status, progresso, ☰); o resto abre num painel. */
+@media (max-width: 760px) {
+  .topo { position: relative; flex-wrap: nowrap; gap: 10px; padding: 8px 12px; min-height: 52px; }
+  .marca { font-size: 1rem; }
+  .status { order: 1; flex: 1; min-width: 0; margin-left: 0; overflow: hidden; text-overflow: ellipsis; font-size: 0.78rem; }
+  .progresso-topo { order: 2; font-size: 0.85rem; }
+  .rotulo-progresso { display: none; }
+  .btn-menu {
+    order: 3;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    font-size: 1.4rem;
+    color: var(--texto);
+    background: transparent;
+    border: 1px solid var(--linha);
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .btn-menu[aria-expanded="true"] { background: var(--linha); color: var(--rosa); }
+  .menu-topo {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 70;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 12px 14px;
+    background: var(--fundo-escuro);
+    border-bottom: 1px solid var(--linha);
+    box-shadow: 0 16px 30px rgb(0 0 0 / 0.45);
+  }
+  .menu-topo.aberto { display: flex; }
+  .menu { flex-direction: column; gap: 2px; }
+  .menu a { padding: 12px 14px; font-size: 1rem; border-radius: 8px; }
+  .ferramentas { flex-wrap: wrap; gap: 8px; padding-top: 10px; border-top: 1px solid var(--linha); }
+  .ferramentas .btn { flex: 1 1 140px; justify-content: center; padding: 10px; font-size: 0.95rem; }
+}
+@media (max-width: 380px) {
+  .marca { font-size: 0; }
+  .marca span { font-size: 1.4rem; }
+}
 
 /* ---------- botões e chips ---------- */
 .btn {
@@ -700,8 +750,10 @@ kbd {
 }
 
 /* ---------- telas estreitas ---------- */
-@media (max-width: 900px) {
+@media (max-width: 900px) and (min-width: 761px) {
   .status { margin-left: 0; width: 100%; order: 10; }
+}
+@media (max-width: 900px) {
   .barra-item .acoes { width: 100%; }
   .area[data-modo="celular"] .painel-descricao { max-height: 45vh; }
   .area[data-modo="celular"] .painel-codigo { height: 55vh; }

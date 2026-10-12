@@ -19,18 +19,24 @@
   <a class="pular" href="#conteudo">Pular para o conteúdo</a>
 
   <header class="topo">
-    <a href="#/" class="marca">🐘 PHP Playground</a>
-    <nav class="menu" aria-label="Principal">
-      <a href="#/trilha" data-menu="inicio">🗺️ Trilha</a>
-      <a href="#/livre" data-menu="livre">Playground livre</a>
-      <a href="#/privacidade" data-menu="privacidade">🔒 Privacidade</a>
-    </nav>
-    <span id="progresso-topo" class="progresso-topo" aria-label="Problemas resolvidos"></span>
-    <span id="status" class="status" role="status">Carregando o PHP…</span>
-    <div class="ferramentas">
-      <button id="btn-tutorial" class="btn btn-fantasma btn-pequeno" aria-haspopup="dialog">❓ Tutorial</button>
-      <button id="btn-acessibilidade" class="btn btn-fantasma btn-pequeno" aria-haspopup="dialog">♿ Acessibilidade</button>
+    <a href="#/" class="marca"><span aria-hidden="true">🐘</span> PHP Playground</a>
+    <!-- No celular, menu e ferramentas ficam no painel do botão ☰; no desktop, em linha. -->
+    <button type="button" id="btn-menu" class="btn-menu" aria-expanded="false" aria-controls="menu-topo" aria-label="Abrir menu">
+      <span aria-hidden="true">☰</span>
+    </button>
+    <div id="menu-topo" class="menu-topo">
+      <nav class="menu" aria-label="Principal">
+        <a href="#/trilha" data-menu="inicio">🗺️ Trilha</a>
+        <a href="#/livre" data-menu="livre">🧪 Playground livre</a>
+        <a href="#/privacidade" data-menu="privacidade">🔒 Privacidade</a>
+      </nav>
+      <div class="ferramentas">
+        <button id="btn-tutorial" class="btn btn-fantasma btn-pequeno" aria-haspopup="dialog">❓ Tutorial</button>
+        <button id="btn-acessibilidade" class="btn btn-fantasma btn-pequeno" aria-haspopup="dialog">♿ Acessibilidade</button>
+      </div>
     </div>
+    <span id="progresso-topo" class="progresso-topo"></span>
+    <span id="status" class="status" role="status">Carregando o PHP…</span>
   </header>
 
   <div id="conteudo" class="conteudo" tabindex="-1">

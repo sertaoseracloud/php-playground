@@ -14,6 +14,7 @@ import { iniciarAcessibilidade } from './ui/acessibilidade.js';
 import { iniciarRegua, iniciarPausa } from './ui/neuro.js';
 import { renderPrivacidade, iniciarAvisoPrivacidade } from './ui/privacidade.js';
 import { renderLanding } from './ui/landing.js';
+import { iniciarMenu } from './ui/menu.js';
 import { renderInicio, resumoProgresso } from './ui/inicio.js';
 import { criarTelaItem } from './ui/item.js';
 import { renderCertificado } from './ui/certificado.js';
@@ -23,6 +24,7 @@ import { $ } from './ui/util.js';
 
 // Antes de tudo: tema e tamanho de texto escolhidos pelo aluno.
 const acessibilidade = iniciarAcessibilidade();
+iniciarMenu();
 iniciarRegua();
 iniciarPausa({ ativo: () => acessibilidade.atuais().lembretePausa });
 
@@ -45,7 +47,7 @@ const definirStatus = (texto) => { $('status').textContent = texto; };
 function atualizarProgressoTopo() {
   const { resolvidos, total, licoesLidas, totalLicoes } = resumoProgresso();
   const topo = $('progresso-topo');
-  topo.textContent = `✅ ${resolvidos}/${total} exercícios`;
+  topo.innerHTML = `✅ ${resolvidos}/${total}<span class="rotulo-progresso"> exercícios</span>`;
   topo.title = `${resolvidos} de ${total} exercícios resolvidos · ${licoesLidas} de ${totalLicoes} lições lidas`;
   topo.setAttribute('aria-label', topo.title);
 }
