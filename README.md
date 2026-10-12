@@ -136,12 +136,14 @@ erros, que cada solução passa em todos os casos e que cada código inicial ain
 ```bash
 npm install
 npm run dev      # servidor local com recarga
+npm run lint     # ESLint (regras em eslint.config.js)
 npm test         # testes (regras, motor PHP, banco e toda a trilha)
 npm run build    # gera dist/
+npm run badges   # regenera as imagens e páginas dos badges em public/
 ```
 
 A cada push na `main`, o GitHub Actions ([`.github/workflows/pages.yml`](.github/workflows/pages.yml))
-roda os testes, faz o build e publica no GitHub Pages.
+roda o lint e os testes, faz o build e publica no GitHub Pages.
 
 ## Como funciona
 
