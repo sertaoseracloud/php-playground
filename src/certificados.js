@@ -16,6 +16,7 @@
 import { paraBase64Url, deBase64Url } from './compartilhar.js';
 import { hmacSha256 } from './sha256.js';
 import { assinar, verificar, CHAVE_PUBLICA } from './ed25519.js';
+import { textoHoras } from './cargaHoraria.js';
 
 /** Endereço público do site: os links compartilhados apontam para cá. */
 export const SITE = 'https://sertaoseracloud.github.io/php-playground/';
@@ -28,39 +29,47 @@ export const EMISSOR = {
   logo: 'https://github.com/sertaoseracloud.png?size=160',
 };
 
+// cargaHoraria: horas de cada certificado (soma das atividades do módulo, mínimo 1 hora;
+// veja src/cargaHoraria.js). O final soma todos os módulos.
 export const CERTIFICADOS = {
   html: {
     titulo: 'Fundamentos de HTML',
+    cargaHoraria: 5,
     resumo: 'concluiu o módulo de HTML, resolvendo os 10 problemas práticos',
     hashtags: ['HTML', 'DesenvolvimentoWeb'],
     conteudos: ['Estrutura de documentos', 'Links e imagens acessíveis', 'Listas e tabelas', 'Formulários', 'HTML semântico'],
   },
   w3css: {
     titulo: 'Interfaces responsivas com W3.CSS',
+    cargaHoraria: 5,
     resumo: 'concluiu o módulo de W3.CSS, resolvendo os 10 problemas práticos',
     hashtags: ['CSS', 'W3CSS', 'FrontEnd'],
     conteudos: ['Cores e containers', 'Botões, painéis e cards', 'Barra de navegação', 'Grade responsiva', 'Tabelas e formulários estilizados'],
   },
   php: {
     titulo: 'Programação web com PHP',
+    cargaHoraria: 6,
     resumo: 'concluiu o módulo de PHP, resolvendo os 10 problemas práticos',
     hashtags: ['PHP', 'BackEnd'],
     conteudos: ['Variáveis e condicionais', 'Laços e arrays', 'Funções', 'Formulários com $_GET e $_POST', 'Segurança com htmlspecialchars'],
   },
   pdo: {
     titulo: 'Banco de dados com PHP e PDO',
+    cargaHoraria: 6,
     resumo: 'concluiu o módulo de PHP + PDO, resolvendo os 10 problemas práticos',
     hashtags: ['PHP', 'SQL', 'BancoDeDados'],
     conteudos: ['Conexão com PDO', 'Consultas preparadas e SQL injection', 'JOIN, GROUP BY e LEFT JOIN', 'INSERT a partir de formulários', 'Paginação com LIMIT e OFFSET'],
   },
   projetos: {
     titulo: 'Projetos web completos com PHP',
+    cargaHoraria: 17,
     resumo: 'construiu os 6 projetos completos da trilha, em 33 etapas',
     hashtags: ['PHP', 'Projetos', 'DesenvolvimentoWeb'],
     conteudos: ['Lista de tarefas (CRUD)', 'Blog com login', 'Rede social', 'Loja virtual com carrinho e transações', 'Biblioteca escolar', 'Fórum de perguntas'],
   },
   final: {
     titulo: 'Desenvolvedor Web PHP: trilha completa',
+    cargaHoraria: 39,
     resumo: 'concluiu a trilha completa: os 4 módulos, 40 problemas práticos e 6 projetos (33 etapas)',
     hashtags: ['PHP', 'HTML', 'SQL', 'DesenvolvimentoWeb'],
     conteudos: ['HTML', 'W3.CSS', 'PHP', 'Banco de dados com PDO', '6 projetos completos'],
@@ -193,7 +202,7 @@ export function textoPublicacao(cert, url = linkPublico(cert)) {
     ? `🎓 Concluí a trilha completa "${def.titulo}" e recebi o certificado emitido pela ${EMISSOR.organizacao}!
 
 `
-      + `Foram ${def.resumo.replace(/^concluiu a trilha completa: /, '')}.
+      + `Foram ${def.resumo.replace(/^concluiu a trilha completa: /, '')}, com carga horária de ${textoHoras(def.cargaHoraria)}.
 
 ${url}
 
@@ -202,6 +211,7 @@ ${tags}`
 
 `
       + `Habilidades: ${def.conteudos.join(', ')}.
+Carga horária: ${textoHoras(def.cargaHoraria)}.
 
 ${url}
 
@@ -287,6 +297,7 @@ export function certificadoXml(cert, codigo = codificarCertificado(cert)) {
   <aluno>${escXml(cert.nome.trim())}</aluno>
   <modulo id="${cert.modulo}">${escXml(CERTIFICADOS[cert.modulo].titulo)}</modulo>
   <dataConclusao>${cert.data}</dataConclusao>
+  <cargaHoraria unidade="horas">${CERTIFICADOS[cert.modulo].cargaHoraria}</cargaHoraria>
   <codigo>${idDoHash(cert.data, atual.hash)}</codigo>
   <selo algoritmo="HMAC-SHA256">${atual.hash}</selo>
   <seloAnterior>${atual.anterior}</seloAnterior>

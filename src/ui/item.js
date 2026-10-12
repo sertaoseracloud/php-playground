@@ -1,4 +1,5 @@
 // Tela de uma lição, problema ou do playground livre.
+import { minutosDoItem } from '../cargaHoraria.js';
 import { buscarItem, modulos, vizinhos, DIFICULDADES } from '../conteudo/trilha.js';
 import { TempoEsgotado } from '../php/motor.js';
 import { SCRIPT_PONTE, montarRequisicao, normalizarUrl } from '../navegacao.js';
@@ -235,6 +236,9 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     el.titulo.textContent = item.titulo;
     el.dificuldade.className = item.tipo === 'problema' ? `dificuldade ${item.dificuldade}` : 'licao-chip';
     el.dificuldade.textContent = item.tipo === 'problema' ? DIFICULDADES[item.dificuldade] : item.tipo === 'licao' ? 'Lição' : '';
+    const minutos = minutosDoItem(item);
+    if (minutos) el.dificuldade.textContent += ` · ⏱ ~${minutos} min`;
+    el.dificuldade.title = minutos ? `Tempo estimado: cerca de ${minutos} minutos (conta na carga horária do certificado)` : '';
     const status = statusDe(item.id);
     el.status.textContent = item.tipo === 'problema' && status === 'resolvido' ? '✅ Resolvido' : status === 'tentado' ? '◐ Tentado' : '';
     el.status.className = 'chip';

@@ -93,6 +93,11 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
 - **Publicar no LinkedIn** abre a caixa de post com o texto pronto e o link do badge. O LinkedIn monta
   a prévia com a imagem do badge, como nos posts da Credly. **Adicionar ao perfil** preenche a seção
   Licenças e certificados.
+- **Carga horária**: cada atividade tem um tempo estimado (lição 10 min, fácil 15, médio 30, difícil
+  45), mostrado no exercício. O certificado de cada módulo vale a soma, arredondada para cima em horas e
+  com o mínimo de 1 hora; o final soma os módulos (39 horas). As horas ficam fixas em
+  `src/certificados.js` (não entram no selo, então certificados antigos continuam válidos) e
+  `tests/carga-horaria.test.js` avisa quando o conteúdo mudar. A regra fica em `src/cargaHoraria.js`.
 - **Selo de verificação**: cada certificado leva um **HMAC-SHA256** da data de obtenção, do emissor
   (Cláudio Raposo), da empresa (Sertão será cloud), do aluno e do módulo, calculado com uma
   **palavra secreta**. O selo vai no link, aparece no certificado (com o código `SSC-AAAA-XXXX-XXXX`
