@@ -28,6 +28,8 @@ export function pedirNome({ obrigatorio = false } = {}) {
   const dialogo = $('dialogo-nome');
   const campo = $('campo-nome');
   campo.value = lerNome();
+  $('btn-cancelar-nome').onclick = () => dialogo.close('cancelar');
+  dialogo.returnValue = '';
   dialogo.showModal();
   campo.focus();
   return new Promise((resolve) => {

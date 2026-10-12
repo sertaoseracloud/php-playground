@@ -129,9 +129,10 @@
       <h2 id="nome-titulo">🎓 Seu nome no certificado</h2>
       <p>Digite seu nome completo, do jeito que deve aparecer nos certificados.</p>
       <label for="campo-nome" class="sr">Nome completo</label>
-      <input id="campo-nome" class="campo-texto" maxlength="80" autocomplete="name" placeholder="Nome completo">
+      <input id="campo-nome" class="campo-texto" maxlength="80" autocomplete="name" placeholder="Nome completo" required>
       <div class="dialogo-rodape">
-        <button class="btn btn-fantasma" value="cancelar" formnovalidate>Cancelar</button>
+        <!-- type="button": o Enter no campo tem que acionar o Salvar, não o Cancelar -->
+        <button type="button" class="btn btn-fantasma" id="btn-cancelar-nome">Cancelar</button>
         <button class="btn btn-roxo" value="salvar">Salvar</button>
       </div>
     </form>
