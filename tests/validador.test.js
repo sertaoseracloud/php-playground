@@ -2,8 +2,10 @@
 import { describe, it, expect } from 'vitest';
 import {
   codificarCertificado, decodificarCertificado, extrairCodigo, validarImpresso, montarCadeia, linkPublico, SITE,
-  certificadoXml, lerCertificadoXml, cadeiaCoerente, mensagemAssinada,
+  certificadoXml, lerCertificadoXml, cadeiaCoerente, mensagemAssinada, conferirAssinaturas,
 } from '../src/certificados.js';
+import { CHAVE_PUBLICA } from '../src/ed25519.js';
+import { createPublicKey, verify } from 'node:crypto';
 import { resultadoDoLink, resultadoDoImpresso, resultadoDoXml, renderValidador } from '../src/ui/validador.js';
 import { lerRota } from '../src/compartilhar.js';
 
@@ -98,9 +100,31 @@ describe('XML do certificado', () => {
   const codigo = codificarCertificado(PHP);
   const xml = certificadoXml(decodificarCertificado(codigo), codigo);
 
-  it('não leva o segredo nem a chave', () => {
-    expect(xml).not.toContain('chave-dos-testes'); // a chave usada nos testes (vitest.config.js)
-    expect(xml.toLowerCase()).not.toMatch(/caf[eé]|segredo/);
+  it('não leva o segredo, a chave do selo nem a semente da assinatura', () => {
+    expect(xml).not.toContain('chave-dos-testes'); // chave do HMAC usada nos testes (vitest.config.js)
+    expect(xml).not.toContain('01'.repeat(32)); // semente Ed25519 dos testes
+    expect(xml.toLowerCase()).not.toMatch(/caf[eé]/);
+  });
+
+  it('assinatura Ed25519 confere só com a chave pública, inclusive fora do site (node:crypto)', () => {
+    const { xml: dados } = lerCertificadoXml(xml);
+    expect(dados.chavePublica).toBe(CHAVE_PUBLICA);
+    expect(conferirAssinaturas(dados).todas).toBe(true);
+    const chave = createPublicKey({ key: { kty: 'OKP', crv: 'Ed25519', x: Buffer.from(CHAVE_PUBLICA, 'hex').toString('base64url') }, format: 'jwk' });
+    for (const b of dados.blocos) {
+      expect(verify(null, Buffer.from(b.mensagem, 'utf8'), chave, Buffer.from(b.assinatura, 'hex'))).toBe(true);
+    }
+  });
+
+  it('assinatura não confere com mensagem alterada nem com outra chave', () => {
+    const { xml: dados } = lerCertificadoXml(xml);
+    const alterada = { ...dados, blocos: dados.blocos.map((b) => ({ ...b, mensagem: b.mensagem.replace(PHP.nome, 'Outra') })) };
+    expect(conferirAssinaturas(alterada).todas).toBe(false);
+    expect(conferirAssinaturas(dados, 'ab'.repeat(32)).chaveConfere).toBe(false);
+  });
+
+  it('XML com chave pública trocada é recusado pelo validador', () => {
+    expect(resultadoDoXml(xml.replace(CHAVE_PUBLICA, 'cd'.repeat(32)))).toContain('XML alterado');
   });
 
   it('é XML válido, com os dados, o selo e a cadeia', () => {

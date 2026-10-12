@@ -1,7 +1,7 @@
 // Tela do certificado: o documento (pronto para imprimir/salvar em PDF) e os
 // botões para compartilhar no LinkedIn. Abre por link (#/certificado/<código>),
 // então quem recebe o link vê o mesmo certificado.
-import { CERTIFICADOS, EMISSOR, certificadoXml, decodificarCertificado, linkLinkedInPerfil, linkLinkedInPublicar, linkPublico, textoPublicacao } from '../certificados.js';
+import { CERTIFICADOS, EMISSOR, URL_CHAVE_PUBLICA, assinaturaDoCertificado, certificadoXml, decodificarCertificado, linkLinkedInPerfil, linkLinkedInPublicar, linkPublico, textoPublicacao } from '../certificados.js';
 import { svgBadge } from '../badges.js';
 import { esc } from './util.js';
 
@@ -65,6 +65,9 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
             <p>O selo é calculado a partir da <b>data de obtenção</b>, do <b>emissor</b> (${esc(EMISSOR.responsavel)}),
               da <b>empresa</b> (${esc(EMISSOR.organizacao)}), do <b>aluno</b> e do módulo, com uma chave secreta da
               ${esc(EMISSOR.organizacao)}. Se qualquer um desses dados mudar no link, o selo deixa de conferir.</p>
+            ${confere ? `<p><b>✍️ Assinatura digital Ed25519</b> (confere com a
+              <a href="${URL_CHAVE_PUBLICA}" target="_blank" rel="noopener">chave pública publicada</a>, sem segredo):</p>
+              <p class="selo-hash"><code>${esc(grupos(assinaturaDoCertificado(cert)))}</code></p>` : ''}
             ${blocos.length > 1 ? `
               <p><b>🔗 Cadeia de certificados.</b> Como num blockchain, cada certificado leva no selo o hash do
                 anterior. Para alterar este, seria preciso alterar todos os anteriores também.</p>

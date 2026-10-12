@@ -1,7 +1,14 @@
 import { defineConfig } from 'vitest/config';
+import { chavePublicaDe } from './src/ed25519.js';
+
+// Chaves fictícias para os testes dos certificados (as de verdade só existem no build; veja vite.config.js).
+const SEMENTE_TESTES = '0101010101010101010101010101010101010101010101010101010101010101';
 
 export default defineConfig({
-  // Chave fictícia para os testes do selo dos certificados (a de verdade só existe no build; veja vite.config.js).
-  define: { __CHAVE_CERTIFICADO__: JSON.stringify('chave-dos-testes') },
+  define: {
+    __CHAVE_CERTIFICADO__: JSON.stringify('chave-dos-testes'),
+    __SEMENTE_ED25519__: JSON.stringify(SEMENTE_TESTES),
+    __CHAVE_PUBLICA_ED25519__: JSON.stringify(chavePublicaDe(SEMENTE_TESTES)),
+  },
   test: { testTimeout: 60000, hookTimeout: 120000 },
 });

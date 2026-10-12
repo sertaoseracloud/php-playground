@@ -4,7 +4,7 @@
 // A conferência acontece no navegador de quem valida; nada é enviado a servidor.
 import {
   CERTIFICADOS, EMISSOR, ORDEM, anteriores, decodificarCertificado, extrairCodigo, validarImpresso, linkCertificado,
-  lerCertificadoXml, cadeiaCoerente,
+  lerCertificadoXml, cadeiaCoerente, conferirAssinaturas, mensagemAssinada, URL_CHAVE_PUBLICA,
 } from '../certificados.js';
 import { esc, $ } from './util.js';
 
@@ -82,11 +82,24 @@ export function resultadoDoXml(texto) {
     !cadeiaCoerente(xml.blocos) && 'cadeia (um "anterior" não bate com o selo do bloco de antes)',
     xml.blocos.length !== cert.cadeia.length + 1 && 'número de blocos da cadeia',
   ].filter(Boolean);
+  // Assinaturas Ed25519: chave do arquivo = chave publicada, e cada bloco assinado sobre a
+  // mensagem que o certificado emitido gera (não sobre o texto do arquivo, que pode ter sido editado).
+  const { chaveConfere, todas } = conferirAssinaturas({
+    ...xml,
+    blocos: xml.blocos.map((b, i) => {
+      const elo = [...cert.cadeia, { modulo: cert.modulo, data: cert.data, anterior: cert.anterior }][i];
+      return elo ? { ...b, mensagem: mensagemAssinada({ nome: cert.nome, modulo: elo.modulo, data: elo.data }, elo.anterior) } : b;
+    }),
+  });
+  if (!chaveConfere) divergencias.push(`chave pública (não é a publicada em ${URL_CHAVE_PUBLICA})`);
+  else if (!todas) divergencias.push('assinatura Ed25519 de algum bloco');
   if (divergencias.length) {
     return `<div class="resultado-validacao invalido" role="status"><h2>⚠️ XML alterado</h2>
       <p>O selo do certificado confere, mas o arquivo foi editado: ${esc(divergencias.join(', '))} não bate(m) com o certificado emitido.</p></div>`;
   }
-  return resultadoDoLink(lido.codigo).replace('✅ Certificado válido', '✅ XML e certificado válidos');
+  return resultadoDoLink(lido.codigo)
+    .replace('✅ Certificado válido', '✅ XML e certificado válidos')
+    .replace('</p>', ` As assinaturas Ed25519 dos ${xml.blocos.length} bloco(s) conferem com a chave pública publicada.</p>`);
 }
 
 /** Resultado da validação de um certificado impresso, em HTML. */
@@ -106,9 +119,7 @@ export function renderValidador(el, codigoInicial = '') {
     <article class="pagina-texto validador">
       <p class="voltar-trilha"><a href="#/">← Página inicial</a></p>
       <h1>🔎 Validar certificado</h1>
-      <p>Confira se um certificado ou badge da <b>${esc(EMISSOR.organizacao)}</b> é autêntico. Cada certificado tem um
-        <b>selo</b> (HMAC-SHA256) calculado com a data, o emissor, a empresa, o aluno e o módulo, e, a partir do
-        segundo, com o hash do certificado anterior (uma cadeia, como num blockchain).</p>
+      <p>Confira se um certificado ou badge da <b>${esc(EMISSOR.organizacao)}</b> é autêntico.</p>
 
       <section class="cartao-validacao" aria-labelledby="val-link">
         <h2 id="val-link">1. Colar o link</h2>

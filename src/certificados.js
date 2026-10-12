@@ -15,6 +15,7 @@
 // no JavaScript do site; o selo impede alterações casuais, não falsificação dedicada.
 import { paraBase64Url, deBase64Url } from './compartilhar.js';
 import { hmacSha256 } from './sha256.js';
+import { assinar, verificar, CHAVE_PUBLICA } from './ed25519.js';
 
 /** Endereço público do site: os links compartilhados apontam para cá. */
 export const SITE = 'https://sertaoseracloud.github.io/php-playground/';
@@ -112,7 +113,7 @@ export function montarCadeia({ nome, modulo, data, cadeia = [] }) {
 }
 
 /** Código curto para mostrar e para o LinkedIn: SSC-AAAA-XXXX-XXXX, tirado do selo. */
-export const idDoHash = (data, hash) => `SSC-${data.slice(0, 4)}-${hash.slice(0, 4)}-${hash.slice(4, 8)}`.toUpperCase();
+const idDoHash = (data, hash) => `SSC-${data.slice(0, 4)}-${hash.slice(0, 4)}-${hash.slice(4, 8)}`.toUpperCase();
 export const idCertificado = (cert) => cert.id ?? idDoHash(cert.data, montarCadeia(cert).at(-1).hash);
 
 /** Código do link: nome, módulo, data, datas da cadeia (c) e o selo (h). */
@@ -247,7 +248,9 @@ export function validarImpresso({ nome, modulo, data, selo, anterior }) {
 
 // ---------- XML para validação em outras páginas ----------
 
-export const XML_NS = `${SITE}certificado/v1`;
+const XML_NS = `${SITE}certificado/v1`;
+/** Onde a chave pública oficial fica publicada (gerada no build, vite.config.js). */
+export const URL_CHAVE_PUBLICA = `${SITE}chave-publica-ed25519.txt`;
 const escXml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[c]);
 
 /** Mensagem exata que o selo (HMAC-SHA256) assina: um array JSON. Não contém a chave. */
@@ -266,10 +269,12 @@ export function certificadoXml(cert, codigo = codificarCertificado(cert)) {
   const elos = montarCadeia(cert);
   const atual = elos.at(-1);
   const url = `${SITE}#/validar/${codigo}`;
+  const msg = (e) => mensagemAssinada({ nome: cert.nome, modulo: e.modulo, data: e.data }, e.anterior);
   const bloco = (e, i) => `    <bloco ordem="${i + 1}" modulo="${e.modulo}" titulo="${escXml(CERTIFICADOS[e.modulo].titulo)}" data="${e.data}">
       <selo>${e.hash}</selo>
       <anterior>${e.anterior}</anterior>
-      <mensagemAssinada>${escXml(mensagemAssinada({ nome: cert.nome, modulo: e.modulo, data: e.data }, e.anterior))}</mensagemAssinada>
+      <mensagemAssinada>${escXml(msg(e))}</mensagemAssinada>
+      <assinatura algoritmo="Ed25519">${assinar(msg(e))}</assinatura>
     </bloco>`;
   return `<?xml version="1.0" encoding="UTF-8"?>
 <certificado xmlns="${XML_NS}" versao="1">
@@ -285,7 +290,12 @@ export function certificadoXml(cert, codigo = codificarCertificado(cert)) {
   <codigo>${idDoHash(cert.data, atual.hash)}</codigo>
   <selo algoritmo="HMAC-SHA256">${atual.hash}</selo>
   <seloAnterior>${atual.anterior}</seloAnterior>
-  <mensagemAssinada>${escXml(mensagemAssinada(cert, atual.anterior))}</mensagemAssinada>
+  <mensagemAssinada>${escXml(msg(atual))}</mensagemAssinada>
+  <assinatura algoritmo="Ed25519">
+    <chavePublica formato="hex">${CHAVE_PUBLICA}</chavePublica>
+    <chavePublicaPublicada>${escXml(URL_CHAVE_PUBLICA)}</chavePublicaPublicada>
+    <valor formato="hex">${assinar(msg(atual))}</valor>
+  </assinatura>
   <cadeia ordem="${ORDEM.join(' ')}">
 ${elos.map(bloco).join('\n')}
   </cadeia>
@@ -293,6 +303,8 @@ ${elos.map(bloco).join('\n')}
     <url>${escXml(url)}</url>
     <codigoDoLink>${codigo}</codigoDoLink>
     <regras>
+      <regra>A assinatura Ed25519 de cada bloco é sobre a mensagemAssinada (texto UTF-8) e se confere com a chave pública, sem segredo.</regra>
+      <regra>Use a chave pública publicada em ${escXml(URL_CHAVE_PUBLICA)}: se a chave deste arquivo for diferente, ele não foi emitido pela ${escXml(EMISSOR.organizacao)}.</regra>
       <regra>O selo é o HMAC-SHA256 da mensagemAssinada com a chave da ${escXml(EMISSOR.organizacao)}, que não está neste arquivo.</regra>
       <regra>Na cadeia, o primeiro bloco tem anterior vazio e cada bloco seguinte tem anterior igual ao selo do bloco anterior.</regra>
       <regra>A conferência completa (com a chave) é feita em: ${escXml(url)}</regra>
@@ -319,6 +331,8 @@ export function lerCertificadoXml(texto, parser = new DOMParser()) {
     data: b.getAttribute('data'),
     selo: b.getElementsByTagNameNS(XML_NS, 'selo')[0]?.textContent.trim() ?? '',
     anterior: b.getElementsByTagNameNS(XML_NS, 'anterior')[0]?.textContent.trim() ?? '',
+    mensagem: b.getElementsByTagNameNS(XML_NS, 'mensagemAssinada')[0]?.textContent ?? '',
+    assinatura: b.getElementsByTagNameNS(XML_NS, 'assinatura')[0]?.textContent.trim() ?? '',
   }));
   return {
     codigo,
@@ -328,6 +342,7 @@ export function lerCertificadoXml(texto, parser = new DOMParser()) {
       data: pega('dataConclusao'),
       selo: pega('selo'),
       anterior: pega('seloAnterior'),
+      chavePublica: pega('chavePublica'),
       blocos,
     },
   };
@@ -337,3 +352,20 @@ export function lerCertificadoXml(texto, parser = new DOMParser()) {
 export function cadeiaCoerente(blocos) {
   return blocos.length > 0 && blocos.every((b, i) => (i === 0 ? b.anterior === '' : b.anterior === blocos[i - 1].selo));
 }
+
+/**
+ * Confere as assinaturas Ed25519 dos blocos de um XML lido, só com a chave pública.
+ * É o que qualquer página pode fazer fora do site. `chaveOficial` é a chave publicada;
+ * a do arquivo precisa ser igual a ela.
+ */
+export function conferirAssinaturas(xml, chaveOficial = CHAVE_PUBLICA) {
+  const chaveConfere = Boolean(chaveOficial) && xml.chavePublica?.toLowerCase() === chaveOficial.toLowerCase();
+  const blocos = xml.blocos.map((b) => verificar(b.mensagem, b.assinatura, chaveOficial));
+  return { chaveConfere, blocos, todas: chaveConfere && blocos.length > 0 && blocos.every(Boolean) };
+}
+
+/** Assinatura Ed25519 do certificado (para mostrar na página). */
+export const assinaturaDoCertificado = (cert) => {
+  const atual = montarCadeia(cert).at(-1);
+  return assinar(mensagemAssinada(cert, atual.anterior));
+};

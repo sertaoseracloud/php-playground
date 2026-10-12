@@ -115,6 +115,22 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
   coerente (cada "anterior" igual ao selo do bloco de antes); a conferência do selo, que precisa da chave,
   é feita no validador, que aceita o XML e avisa se o arquivo foi editado. Namespace:
   `https://sertaoseracloud.github.io/php-playground/certificado/v1`.
+- **✍️ Assinatura digital Ed25519**: cada bloco da cadeia também é assinado com Ed25519. A **chave
+  pública** fica no XML e publicada em
+  [`chave-publica-ed25519.txt`](https://sertaoseracloud.github.io/php-playground/chave-publica-ed25519.txt)
+  (e em `.json`, com JWK). Qualquer sistema confere o certificado **sem segredo e sem o site**, por
+  exemplo em Node:
+
+  ```js
+  import { createPublicKey, verify } from 'node:crypto';
+  const chave = createPublicKey({ key: { kty: 'OKP', crv: 'Ed25519', x: '<jwk.x do .json>' }, format: 'jwk' });
+  verify(null, Buffer.from(mensagemAssinada, 'utf8'), chave, Buffer.from(assinatura, 'hex')); // true
+  ```
+
+  Regra importante: compare a chave pública do XML com a publicada no site; um XML com outra chave
+  não foi emitido pela Sertão será cloud. A semente da chave privada é derivada da mesma palavra
+  secreta no build e, sem servidor, vai no JavaScript: a assinatura torna a **verificação** pública e
+  independente, mas não impede quem extrair a semente de assinar. Para isso, só assinando num servidor.
 - **A palavra secreta nunca entra no código nem no site.** Ela fica no secret
   `CERTIFICADO_SEGREDO` do GitHub Actions; o build injeta só um SHA-256 derivado dela
   (`vite.config.js`), e falha se o secret não existir. Para gerar o build localmente:

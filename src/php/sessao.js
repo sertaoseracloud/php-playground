@@ -1,8 +1,8 @@
 import { HttpCookieStore, PHPRequestHandler, setPhpIniEntries } from '@php-wasm/universal';
 
-export const RAIZ = '/www';
-export const PASTA_BANCO = '/banco';
-export const ARQUIVO_BANCO = '/banco/escola.sqlite';
+const RAIZ = '/www';
+const PASTA_BANCO = '/banco';
+const ARQUIVO_BANCO = '/banco/escola.sqlite';
 
 // Mostra erros e avisos do PHP na própria página, como num servidor de desenvolvimento.
 const PHP_INI = {
@@ -100,7 +100,7 @@ export async function criarSessao(php) {
       if (r.errors) throw new Error(r.errors);
     } catch (erro) {
       const detalhe = String(erro?.message ?? erro).match(/SQLSTATE[^\n]*/)?.[0] ?? erro;
-      throw new Error(`Erro no script do banco: ${detalhe}`);
+      throw new Error(`Erro no script do banco: ${detalhe}`, { cause: erro });
     } finally {
       php.unlink(`${PASTA_BANCO}/.seed.sql`);
     }

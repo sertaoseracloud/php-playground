@@ -17,7 +17,7 @@ const rotr = (x, n) => (x >>> n) | (x << (32 - n));
 const bytes = (dado) => (typeof dado === 'string' ? new TextEncoder().encode(dado) : dado);
 
 /** SHA-256 de um texto (UTF-8) ou de bytes. Devolve os 32 bytes do resumo. */
-export function sha256Bytes(dado) {
+function sha256Bytes(dado) {
   const msg = bytes(dado);
   const total = Math.ceil((msg.length + 9) / 64) * 64;
   const buf = new Uint8Array(total);
@@ -51,7 +51,7 @@ export function sha256Bytes(dado) {
   return saida;
 }
 
-export const paraHex = (b) => [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
+const paraHex = (b) => [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
 
 export const sha256 = (dado) => paraHex(sha256Bytes(dado));
 
