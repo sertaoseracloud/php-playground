@@ -157,9 +157,12 @@
 @keyframes pulsar-laranja { 50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--laranja) 25%, transparent); } }
 @keyframes pulsar { 50% { box-shadow: 0 0 0 12px color-mix(in srgb, var(--roxo) 10%, transparent); } }
 .no.estado-tentado .balao { border-color: var(--laranja); color: var(--laranja); }
+/* O balão fica acima do círculo: o passo atual reserva esse espaço para não cobrir o nome do passo anterior. */
+.no.eh-proximo { margin-top: 30px; }
 .balao {
   position: absolute;
-  top: -30px;
+  top: -34px;
+  white-space: nowrap;
   padding: 3px 10px;
   border-radius: 8px;
   background: var(--fundo);
@@ -171,6 +174,29 @@
   animation: flutuar 1.6s ease-in-out infinite;
 }
 @keyframes flutuar { 50% { transform: translateY(-4px); } }
+/* setinha do balão apontando para o círculo */
+.balao::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  border: inherit;
+  border-top: 0;
+  border-left: 0;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+/* "📍 Passo atual": aparece quando o passo atual sai da tela */
+.ir-passo-atual {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 40;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.4);
+}
 
 .no.trofeu .circulo { width: 76px; height: 76px; font-size: 2rem; background: var(--fundo); border: 3px dashed var(--linha); filter: grayscale(1); opacity: 0.7; }
 .no.trofeu .alvo[aria-disabled="true"] { cursor: not-allowed; }

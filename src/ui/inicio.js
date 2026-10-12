@@ -223,6 +223,35 @@ export function renderInicio(el) {
     await pedirNome();
     renderInicio(el);
   });
-  // Rola até o próximo passo, como nos apps de idiomas.
-  el.querySelector('.eh-proximo')?.scrollIntoView({ block: 'center' });
+  mostrarPassoAtual(el);
+}
+
+/**
+ * Rola até o passo atual, como nos apps de idiomas, e mostra o botão "📍 Passo atual"
+ * sempre que ele sai da tela (ao rolar ou ao mudar o tamanho da janela).
+ */
+function mostrarPassoAtual(el) {
+  const passo = el.querySelector('.eh-proximo');
+  if (!passo) return;
+  const suave = () => (document.documentElement.classList.contains('a11y-sem-movimento') ? 'auto' : 'smooth');
+  const irAoPasso = (behavior = suave()) => passo.scrollIntoView({ block: 'center', behavior });
+  irAoPasso('auto');
+
+  const botao = document.createElement('button');
+  botao.type = 'button';
+  botao.className = 'btn btn-roxo ir-passo-atual';
+  botao.hidden = true;
+  botao.innerHTML = '📍 Passo atual';
+  botao.setAttribute('aria-label', `Ir para o passo atual: ${passo.querySelector('.legenda')?.textContent ?? ''}`);
+  botao.onclick = () => {
+    irAoPasso();
+    passo.querySelector('.alvo')?.focus({ preventScroll: true });
+  };
+  el.append(botao);
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([entrada]) => {
+      botao.hidden = entrada.isIntersecting;
+    }, { root: el, threshold: 0.6 }).observe(passo.querySelector('.circulo') ?? passo);
+  }
 }
