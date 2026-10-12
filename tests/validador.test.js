@@ -1,9 +1,10 @@
 // @vitest-environment happy-dom
 import { describe, it, expect } from 'vitest';
 import {
-  codificarCertificado, extrairCodigo, validarImpresso, montarCadeia, linkPublico, SITE,
+  codificarCertificado, decodificarCertificado, extrairCodigo, validarImpresso, montarCadeia, linkPublico, SITE,
+  certificadoXml, lerCertificadoXml, cadeiaCoerente, mensagemAssinada,
 } from '../src/certificados.js';
-import { resultadoDoLink, resultadoDoImpresso, renderValidador } from '../src/ui/validador.js';
+import { resultadoDoLink, resultadoDoImpresso, resultadoDoXml, renderValidador } from '../src/ui/validador.js';
 import { lerRota } from '../src/compartilhar.js';
 
 const PHP = { nome: 'Maria da Conceição', modulo: 'php', data: '2026-10-12', cadeia: ['2026-10-01', '2026-10-05'] };
@@ -90,5 +91,43 @@ describe('página', () => {
     form.modulo.value = 'html';
     form.modulo.onchange();
     expect(document.getElementById('rotulo-anterior').hidden).toBe(true);
+  });
+});
+
+describe('XML do certificado', () => {
+  const codigo = codificarCertificado(PHP);
+  const xml = certificadoXml(decodificarCertificado(codigo), codigo);
+
+  it('não leva o segredo nem a chave', () => {
+    expect(xml).not.toContain('chave-dos-testes'); // a chave usada nos testes (vitest.config.js)
+    expect(xml.toLowerCase()).not.toMatch(/caf[eé]|segredo/);
+  });
+
+  it('é XML válido, com os dados, o selo e a cadeia', () => {
+    const lido = lerCertificadoXml(xml);
+    expect(lido.erro).toBeUndefined();
+    const elos = montarCadeia(PHP);
+    expect(lido.xml).toMatchObject({ aluno: PHP.nome, modulo: 'php', data: PHP.data, selo: elos[2].hash, anterior: elos[1].hash });
+    expect(lido.xml.blocos.map((b) => b.modulo)).toEqual(['html', 'w3css', 'php']);
+    expect(cadeiaCoerente(lido.xml.blocos)).toBe(true);
+    expect(xml).toContain(`<url>${SITE}#/validar/${codigo}</url>`);
+  });
+
+  it('a mensagem assinada é exatamente o que o selo cobre', () => {
+    expect(mensagemAssinada(PHP, montarCadeia(PHP)[1].hash)).toBe(
+      JSON.stringify([PHP.data, 'Cláudio Raposo', 'Sertão será cloud', PHP.nome, 'php', montarCadeia(PHP)[1].hash]),
+    );
+  });
+
+  it('outras páginas conferem a cadeia sem a chave', () => {
+    const { xml: dados } = lerCertificadoXml(xml);
+    const quebrada = dados.blocos.map((b, i) => (i === 1 ? { ...b, selo: '0'.repeat(64) } : b));
+    expect(cadeiaCoerente(quebrada)).toBe(false);
+  });
+
+  it('o validador aceita o XML e detecta edição no arquivo', () => {
+    expect(resultadoDoXml(xml)).toContain('XML e certificado válidos');
+    expect(resultadoDoXml(xml.replace(`<aluno>${PHP.nome}</aluno>`, '<aluno>Outra Pessoa</aluno>'))).toContain('XML alterado');
+    expect(resultadoDoXml('<html></html>')).toContain('XML inválido');
   });
 });

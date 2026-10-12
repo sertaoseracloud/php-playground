@@ -87,9 +87,7 @@ export const anteriores = (modulo) => ORDEM.slice(0, ORDEM.indexOf(modulo));
  */
 export function hashCertificado({ nome, modulo, data }, anterior = '') {
   if (!CHAVE) throw new Error('Chave do certificado indisponível fora do build do site.');
-  const campos = [data, EMISSOR.responsavel, EMISSOR.organizacao, nome.trim(), modulo];
-  if (anterior) campos.push(anterior);
-  return hmacSha256(CHAVE, JSON.stringify(campos));
+  return hmacSha256(CHAVE, mensagemAssinada({ nome, modulo, data }, anterior));
 }
 
 /**
@@ -245,4 +243,97 @@ export function validarImpresso({ nome, modulo, data, selo, anterior }) {
   return esperado === h
     ? { valido: true, motivo: 'O selo confere com o nome, o certificado, a data e o elo anterior informados.' }
     : { valido: false, motivo: 'O selo não confere. Confira se digitou tudo exatamente como no certificado, inclusive acentos.' };
+}
+
+// ---------- XML para validação em outras páginas ----------
+
+export const XML_NS = `${SITE}certificado/v1`;
+const escXml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[c]);
+
+/** Mensagem exata que o selo (HMAC-SHA256) assina: um array JSON. Não contém a chave. */
+export function mensagemAssinada({ nome, modulo, data }, anterior = '') {
+  const campos = [data, EMISSOR.responsavel, EMISSOR.organizacao, nome.trim(), modulo];
+  if (anterior) campos.push(anterior);
+  return JSON.stringify(campos);
+}
+
+/**
+ * XML do certificado, com tudo o que é preciso para conferi-lo fora do site, menos o
+ * segredo: dados, selo, hash anterior, a cadeia inteira, a mensagem assinada e o link
+ * de validação. Só para certificados com selo que confere.
+ */
+export function certificadoXml(cert, codigo = codificarCertificado(cert)) {
+  const elos = montarCadeia(cert);
+  const atual = elos.at(-1);
+  const url = `${SITE}#/validar/${codigo}`;
+  const bloco = (e, i) => `    <bloco ordem="${i + 1}" modulo="${e.modulo}" titulo="${escXml(CERTIFICADOS[e.modulo].titulo)}" data="${e.data}">
+      <selo>${e.hash}</selo>
+      <anterior>${e.anterior}</anterior>
+      <mensagemAssinada>${escXml(mensagemAssinada({ nome: cert.nome, modulo: e.modulo, data: e.data }, e.anterior))}</mensagemAssinada>
+    </bloco>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<certificado xmlns="${XML_NS}" versao="1">
+  <emissor>
+    <organizacao>${escXml(EMISSOR.organizacao)}</organizacao>
+    <responsavel>${escXml(EMISSOR.responsavel)}</responsavel>
+    <cargo>${escXml(EMISSOR.cargo)}</cargo>
+  </emissor>
+  <curso>${escXml(EMISSOR.curso)}</curso>
+  <aluno>${escXml(cert.nome.trim())}</aluno>
+  <modulo id="${cert.modulo}">${escXml(CERTIFICADOS[cert.modulo].titulo)}</modulo>
+  <dataConclusao>${cert.data}</dataConclusao>
+  <codigo>${idDoHash(cert.data, atual.hash)}</codigo>
+  <selo algoritmo="HMAC-SHA256">${atual.hash}</selo>
+  <seloAnterior>${atual.anterior}</seloAnterior>
+  <mensagemAssinada>${escXml(mensagemAssinada(cert, atual.anterior))}</mensagemAssinada>
+  <cadeia ordem="${ORDEM.join(' ')}">
+${elos.map(bloco).join('\n')}
+  </cadeia>
+  <validacao>
+    <url>${escXml(url)}</url>
+    <codigoDoLink>${codigo}</codigoDoLink>
+    <regras>
+      <regra>O selo é o HMAC-SHA256 da mensagemAssinada com a chave da ${escXml(EMISSOR.organizacao)}, que não está neste arquivo.</regra>
+      <regra>Na cadeia, o primeiro bloco tem anterior vazio e cada bloco seguinte tem anterior igual ao selo do bloco anterior.</regra>
+      <regra>A conferência completa (com a chave) é feita em: ${escXml(url)}</regra>
+    </regras>
+  </validacao>
+</certificado>
+`;
+}
+
+/**
+ * Lê um XML de certificado e devolve { codigo, xml } para validar, ou { erro }.
+ * `xml` traz os campos do arquivo, para comparar com o que o link diz.
+ */
+export function lerCertificadoXml(texto, parser = new DOMParser()) {
+  const doc = parser.parseFromString(String(texto ?? ''), 'application/xml');
+  if (doc.querySelector('parsererror') || doc.documentElement?.localName !== 'certificado') {
+    return { erro: 'O arquivo não é um XML de certificado do PHP Playground.' };
+  }
+  const pega = (nome) => doc.getElementsByTagNameNS(XML_NS, nome)[0]?.textContent?.trim() ?? '';
+  const codigo = pega('codigoDoLink');
+  if (!codigo) return { erro: 'O XML não tem o código de validação (codigoDoLink).' };
+  const blocos = [...doc.getElementsByTagNameNS(XML_NS, 'bloco')].map((b) => ({
+    modulo: b.getAttribute('modulo'),
+    data: b.getAttribute('data'),
+    selo: b.getElementsByTagNameNS(XML_NS, 'selo')[0]?.textContent.trim() ?? '',
+    anterior: b.getElementsByTagNameNS(XML_NS, 'anterior')[0]?.textContent.trim() ?? '',
+  }));
+  return {
+    codigo,
+    xml: {
+      aluno: pega('aluno'),
+      modulo: doc.getElementsByTagNameNS(XML_NS, 'modulo')[0]?.getAttribute('id') ?? '',
+      data: pega('dataConclusao'),
+      selo: pega('selo'),
+      anterior: pega('seloAnterior'),
+      blocos,
+    },
+  };
+}
+
+/** Confere se a cadeia do XML é coerente (cada "anterior" = selo do bloco anterior). Não precisa da chave. */
+export function cadeiaCoerente(blocos) {
+  return blocos.length > 0 && blocos.every((b, i) => (i === 0 ? b.anterior === '' : b.anterior === blocos[i - 1].selo));
 }

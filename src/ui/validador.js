@@ -4,6 +4,7 @@
 // A conferência acontece no navegador de quem valida; nada é enviado a servidor.
 import {
   CERTIFICADOS, EMISSOR, ORDEM, anteriores, decodificarCertificado, extrairCodigo, validarImpresso, linkCertificado,
+  lerCertificadoXml, cadeiaCoerente,
 } from '../certificados.js';
 import { esc, $ } from './util.js';
 
@@ -60,6 +61,34 @@ export function resultadoDoLink(texto) {
     </div>`;
 }
 
+/**
+ * Resultado da validação de um XML: valida o código do link (com a chave, aqui no site)
+ * e confere se os campos do arquivo batem com ele, para pegar XML editado à mão.
+ */
+export function resultadoDoXml(texto) {
+  const lido = lerCertificadoXml(texto);
+  if (lido.erro) {
+    return `<div class="resultado-validacao invalido" role="status"><h2>⚠️ XML inválido</h2><p>${esc(lido.erro)}</p></div>`;
+  }
+  const cert = decodificarCertificado(lido.codigo);
+  if (!cert || cert.selo !== 'confere') return resultadoDoLink(lido.codigo);
+  const { xml } = lido;
+  const divergencias = [
+    xml.aluno !== cert.nome && 'aluno',
+    xml.modulo !== cert.modulo && 'módulo',
+    xml.data !== cert.data && 'data de conclusão',
+    xml.selo !== cert.hash && 'selo',
+    xml.anterior !== cert.anterior && 'selo anterior',
+    !cadeiaCoerente(xml.blocos) && 'cadeia (um "anterior" não bate com o selo do bloco de antes)',
+    xml.blocos.length !== cert.cadeia.length + 1 && 'número de blocos da cadeia',
+  ].filter(Boolean);
+  if (divergencias.length) {
+    return `<div class="resultado-validacao invalido" role="status"><h2>⚠️ XML alterado</h2>
+      <p>O selo do certificado confere, mas o arquivo foi editado: ${esc(divergencias.join(', '))} não bate(m) com o certificado emitido.</p></div>`;
+  }
+  return resultadoDoLink(lido.codigo).replace('✅ Certificado válido', '✅ XML e certificado válidos');
+}
+
 /** Resultado da validação de um certificado impresso, em HTML. */
 export function resultadoDoImpresso(dados) {
   const { valido, motivo } = validarImpresso(dados);
@@ -110,6 +139,19 @@ export function renderValidador(el, codigoInicial = '') {
         <div id="saida-impresso" aria-live="polite"></div>
       </section>
 
+      <section class="cartao-validacao" aria-labelledby="val-xml">
+        <h2 id="val-xml">3. Arquivo XML</h2>
+        <p class="a11y-ajuda">O XML é baixado na página do certificado ("📄 Baixar XML"). Ele traz os dados, o selo e a
+          cadeia, sem o segredo: outras páginas conferem a cadeia sozinhas, e aqui conferimos também o selo.</p>
+        <form id="form-xml" class="form-validacao">
+          <label>Escolher arquivo <input type="file" id="arquivo-xml" accept=".xml,application/xml,text/xml"></label>
+          <label for="campo-xml">ou colar o conteúdo</label>
+          <textarea id="campo-xml" rows="4" spellcheck="false" placeholder="&lt;?xml version=&quot;1.0&quot; …"></textarea>
+          <button class="btn btn-verde">🔎 Validar</button>
+        </form>
+        <div id="saida-xml" aria-live="polite"></div>
+      </section>
+
       <p class="nota-validacao">A conferência acontece no seu navegador, sem enviar nada a servidor. Ela detecta
         certificados alterados; como o site não tem servidor, ela não substitui um registro oficial de emissão.</p>
     </article>`;
@@ -133,6 +175,18 @@ export function renderValidador(el, codigoInicial = '') {
     e.preventDefault();
     const dados = Object.fromEntries(new FormData(form));
     $('saida-impresso').innerHTML = resultadoDoImpresso(dados);
+  };
+
+  const campoXml = $('campo-xml');
+  $('arquivo-xml').onchange = async (e) => {
+    const arquivo = e.target.files?.[0];
+    if (!arquivo) return;
+    campoXml.value = await arquivo.text();
+    $('saida-xml').innerHTML = resultadoDoXml(campoXml.value);
+  };
+  $('form-xml').onsubmit = (e) => {
+    e.preventDefault();
+    $('saida-xml').innerHTML = resultadoDoXml(campoXml.value);
   };
 
   if (codigoInicial) {

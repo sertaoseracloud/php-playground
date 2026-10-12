@@ -1,7 +1,7 @@
 // Tela do certificado: o documento (pronto para imprimir/salvar em PDF) e os
 // botões para compartilhar no LinkedIn. Abre por link (#/certificado/<código>),
 // então quem recebe o link vê o mesmo certificado.
-import { CERTIFICADOS, EMISSOR, decodificarCertificado, linkLinkedInPerfil, linkLinkedInPublicar, linkPublico, textoPublicacao } from '../certificados.js';
+import { CERTIFICADOS, EMISSOR, certificadoXml, decodificarCertificado, linkLinkedInPerfil, linkLinkedInPublicar, linkPublico, textoPublicacao } from '../certificados.js';
 import { svgBadge } from '../badges.js';
 import { esc } from './util.js';
 
@@ -85,6 +85,7 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
             <button type="button" class="btn btn-fantasma" id="btn-copiar-texto">📝 Copiar texto do post</button>
             <button type="button" class="btn btn-fantasma" id="btn-imprimir">🖨️ Imprimir / PDF</button>
             <a class="btn btn-fantasma" href="#/validar/${esc(codigo)}">🔎 Validar</a>
+            <button type="button" class="btn btn-fantasma" id="btn-xml" title="Arquivo com os dados para conferir o certificado em outras páginas (sem o segredo)">📄 Baixar XML</button>
           </div>
         </div>
       </section>
@@ -146,6 +147,15 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
     }
   };
   if (!confere) return cert;
+  el.querySelector('#btn-xml').onclick = () => {
+    const blob = new Blob([certificadoXml(cert, codigo)], { type: 'application/xml' });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `certificado-${cert.id}.xml` });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    definirStatus('📄 XML do certificado baixado.');
+  };
   el.querySelector('#btn-copiar-certificado').onclick = () => copiar(url, '🔗 Link do badge copiado!');
   el.querySelector('#btn-copiar-texto').onclick = () => copiar(textoPublicacao(cert, url), '📝 Texto do post copiado!');
   return cert;

@@ -109,6 +109,12 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
   página recalcula a cadeia e diz se é válido, mostrando aluno, certificado, data, código, selo e os
   blocos da cadeia. Para certificado **impresso ou em PDF**, digite nome, certificado, data, selo e o
   hash "Anterior" do rodapé. Cada certificado tem um botão "🔎 Validar" (`#/validar/<código>`).
+- **📄 XML do certificado** (botão na página do certificado): traz aluno, emissor, empresa, módulo, data,
+  código, selo, selo anterior, a cadeia inteira (cada bloco com selo, anterior e a mensagem assinada) e o
+  link de validação, **sem o segredo nem a chave**. Outras páginas conferem sozinhas se a cadeia é
+  coerente (cada "anterior" igual ao selo do bloco de antes); a conferência do selo, que precisa da chave,
+  é feita no validador, que aceita o XML e avisa se o arquivo foi editado. Namespace:
+  `https://sertaoseracloud.github.io/php-playground/certificado/v1`.
 - **A palavra secreta nunca entra no código nem no site.** Ela fica no secret
   `CERTIFICADO_SEGREDO` do GitHub Actions; o build injeta só um SHA-256 derivado dela
   (`vite.config.js`), e falha se o secret não existir. Para gerar o build localmente:
