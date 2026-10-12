@@ -21,6 +21,8 @@ import { renderCertificado } from './ui/certificado.js';
 import { criarLayout } from './ui/layout.js';
 import { iniciarTutorial } from './ui/tutorial.js';
 import { $ } from './ui/util.js';
+import { definirPagina, PRINCIPAL, NOME } from './seo.js';
+import { buscarItem, modulos } from './conteudo/trilha.js';
 
 // Antes de tudo: tema e tamanho de texto escolhidos pelo aluno.
 const acessibilidade = iniciarAcessibilidade();
@@ -76,19 +78,28 @@ function marcarMenu(nome) {
 }
 
 function navegar() {
+  // A landing vem pré-renderizada no HTML; daqui em diante quem mostra/esconde as telas é o JS.
+  document.documentElement.classList.remove('rota-interna');
   const rota = lerRota(location.hash);
   if (rota.tela === 'item' && telaDoItem.abrir(rota.id, rota.arquivos)) {
     mostrarTela(telaItem);
     layout.aplicar();
     marcarMenu(rota.id === 'livre' ? 'livre' : '');
-    document.title = `${$('item-titulo').textContent} · PHP Playground`;
+    const item = buscarItem(rota.id);
+    const modulo = modulos.find((m) => m.id === item?.modulo);
+    definirPagina({
+      titulo: `${$('item-titulo').textContent} · ${NOME}`,
+      descricao: rota.id === 'livre'
+        ? 'Playground livre de PHP com banco SQLite: escreva e rode PHP, HTML e W3.CSS direto no navegador.'
+        : `${item?.tipo === 'licao' ? 'Lição' : 'Exercício'} de ${modulo?.titulo ?? 'PHP'}: ${item?.titulo}. Escreva o código, execute e veja os testes na hora.`,
+    });
     return;
   }
   if (rota.tela === 'landing') {
     renderLanding(telaLanding);
     mostrarTela(telaLanding);
     marcarMenu('');
-    document.title = 'PHP Playground · Aprenda PHP no navegador';
+    definirPagina(PRINCIPAL);
     telaLanding.scrollTop = 0;
     return;
   }
@@ -96,7 +107,7 @@ function navegar() {
     renderPrivacidade(telaPrivacidade, { definirStatus });
     mostrarTela(telaPrivacidade);
     marcarMenu('privacidade');
-    document.title = 'Privacidade e cookies · PHP Playground';
+    definirPagina({ titulo: `Privacidade e cookies · ${NOME}`, descricao: 'Sem cookies e sem rastreamento: como o PHP Playground trata seus dados e atende à LGPD.' });
     telaPrivacidade.scrollTop = 0;
     return;
   }
@@ -104,14 +115,14 @@ function navegar() {
     const cert = renderCertificado(telaCertificado, rota.codigo, { definirStatus });
     mostrarTela(telaCertificado);
     marcarMenu('');
-    document.title = cert ? `Certificado de ${cert.nome} · Sertão será cloud` : 'Certificado · PHP Playground';
+    definirPagina({ titulo: cert ? `Certificado de ${cert.nome} · Sertão será cloud` : `Certificado · ${NOME}` });
     telaCertificado.scrollTop = 0;
     return;
   }
   mostrarTela(telaInicio);
   renderInicio(telaInicio);
   marcarMenu('inicio');
-  document.title = 'Trilha · PHP Playground';
+  definirPagina({ titulo: `Trilha · ${NOME}`, descricao: 'A trilha do HTML ao banco de dados: módulos que desbloqueiam aos 70%, XP, níveis e certificados.' });
 }
 
 // Atalhos fora do editor (dentro dele, o próprio editor trata).

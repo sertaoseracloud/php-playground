@@ -1,22 +1,24 @@
 <!doctype html>
-<html lang="pt-br" data-tema="dracula">
+<html lang="pt-BR" data-tema="dracula">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#21222c">
-  <title>PHP Playground</title>
-  <meta name="description" content="Trilha de exercícios de HTML, W3.CSS, PHP e PDO que roda direto no navegador, para usar em aula.">
-  <meta property="og:title" content="PHP Playground · Sertão será cloud">
-  <meta property="og:description" content="Trilha gamificada do HTML ao banco de dados, com certificados emitidos pela Sertão será cloud.">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="https://sertaoseracloud.github.io/php-playground/badges/final-card.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="627">
-  <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐘</text></svg>">
+  <!-- seo:inicio -->
+  <!-- No build, este bloco é trocado pelas meta tags de src/seo.js (scripts/prerender.mjs). -->
+  <title>PHP Playground: aprenda PHP, HTML e W3.CSS no navegador</title>
+  <meta name="description" content="Aprenda PHP do zero, grátis e no navegador: trilha com exercícios de HTML, W3.CSS, PHP e PDO corrigidos na hora e certificados.">
+  <!-- seo:fim -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="icone-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <!-- Link direto para uma tela interna (#/trilha, #/p/...): esconde a landing pré-renderizada até o JS assumir. -->
+  <script>if (/^#\/./.test(location.hash)) document.documentElement.classList.add('rota-interna');</script>
 </head>
 <body>
   <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <noscript><p class="sem-js">O PHP Playground roda o PHP no seu navegador e precisa de JavaScript ativado.</p></noscript>
 
   <header class="topo">
     <a href="#/" class="marca"><span aria-hidden="true">🐘</span> PHP Playground</a>
@@ -40,7 +42,7 @@
   </header>
 
   <div id="conteudo" class="conteudo" tabindex="-1">
-    <main id="tela-landing" class="tela-landing" hidden></main>
+    <main id="tela-landing" class="tela-landing"></main>
     <main id="tela-inicio" class="tela-inicio" hidden></main>
     <main id="tela-certificado" class="tela-certificado" hidden></main>
     <main id="tela-privacidade" class="tela-privacidade" hidden></main>
@@ -76,11 +78,16 @@
             <button class="aba ativa" data-desc="enunciado" role="tab" aria-selected="true">Descrição</button>
             <button class="aba" data-desc="banco" id="aba-banco" role="tab" aria-selected="false">🗄️ Banco</button>
             <button class="aba" data-desc="solucao" id="aba-solucao" role="tab" aria-selected="false">Solução</button>
+            <button class="aba" data-desc="testes" id="aba-testes" role="tab" aria-selected="false" aria-controls="desc-testes">
+              🧪 Testes <span id="resumo-testes" class="resumo-testes" aria-live="polite"></span></button>
             <button class="aba aba-direita" id="btn-ouvir" title="Ler a descrição em voz alta" aria-pressed="false">🔊 Ouvir</button>
           </div>
           <div class="conteudo-desc" id="desc-enunciado" role="tabpanel"></div>
           <div class="conteudo-desc" id="desc-banco" role="tabpanel" hidden></div>
           <div class="conteudo-desc" id="desc-solucao" role="tabpanel" hidden></div>
+          <div class="conteudo-desc" id="desc-testes" role="tabpanel" aria-label="Testes funcionais" hidden>
+            <div id="saida-testes" class="saida testes"></div>
+          </div>
         </section>
 
         <section class="painel painel-codigo" aria-label="Código">
@@ -109,15 +116,6 @@
           <pre id="erros" class="erros" hidden role="alert"></pre>
         </section>
 
-        <section class="painel painel-testes" id="painel-testes" aria-label="Testes funcionais">
-          <div class="cabecalho-testes">
-            <button id="btn-recolher-testes" class="btn-recolher" aria-expanded="true" aria-controls="saida-testes">
-              <span aria-hidden="true">▾</span> 🧪 Testes funcionais
-            </button>
-            <span id="resumo-testes" class="resumo-testes" aria-live="polite"></span>
-          </div>
-          <div id="saida-testes" class="saida testes"></div>
-        </section>
       </div>
     </main>
   </div>

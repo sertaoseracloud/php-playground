@@ -2,12 +2,15 @@
 //   public/badges/<id>.png        badge quadrado (600×600)
 //   public/badges/<id>-card.png   cartão 1200×627 da prévia do LinkedIn
 //   public/badge/<id>/index.html  página que o LinkedIn lê (meta tags og:) e
-//                                 que leva quem clica ao certificado
+//                                 que leva quem clica ao certificado (noindex)
+//   public/favicon.svg, icone-192.png, icone-512.png, apple-touch-icon.png
+//   public/og-capa.png            capa 1200×630 para compartilhar o site
 // Rode com `npm run badges` depois de mudar src/badges.js ou src/certificados.js
 // e faça commit dos arquivos gerados. Os PNGs usam as fontes do sistema.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
-import { svgBadge, svgCartao } from '../src/badges.js';
+import { svgBadge, svgCartao, svgIcone, svgCapa } from '../src/badges.js';
+import { modulos, problemas } from '../src/conteudo/trilha.js';
 import { CERTIFICADOS, EMISSOR, SITE } from '../src/certificados.js';
 
 const raiz = new URL('../public/', import.meta.url);
@@ -38,6 +41,7 @@ export function paginaBadge(id) {
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="627">
   <meta property="og:image:alt" content="${esc(`Badge ${def.titulo}`)}">
+  <meta name="robots" content="noindex, follow">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="${imagem}">
   <style>
@@ -72,3 +76,13 @@ for (const id of Object.keys(CERTIFICADOS)) {
   writeFileSync(new URL(`badge/${id}/index.html`, raiz), paginaBadge(id));
   console.log(`badge ${id} ok`);
 }
+
+// ---------- ícones e capa do site ----------
+const icone = svgIcone();
+writeFileSync(new URL('favicon.svg', raiz), icone);
+writeFileSync(new URL('icone-192.png', raiz), png(icone, 192));
+writeFileSync(new URL('icone-512.png', raiz), png(icone, 512));
+writeFileSync(new URL('apple-touch-icon.png', raiz), png(icone, 180));
+const projetos = modulos.find((m) => m.grupos)?.grupos.length ?? 0;
+writeFileSync(new URL('og-capa.png', raiz), png(svgCapa({ exercicios: problemas.length, projetos }), 1200));
+console.log('ícones e capa ok');

@@ -4,7 +4,7 @@
   "description": "Playground de PHP, HTML e W3.CSS rodando no navegador",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "badges": "node scripts/gerar-badges.mjs",

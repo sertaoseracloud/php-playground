@@ -34,7 +34,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     compartilhar: $('btn-compartilhar'),
     abaBanco: $('aba-banco'),
     abaSolucao: $('aba-solucao'),
-    painelTestes: $('painel-testes'),
+    abaTestes: $('aba-testes'),
     resumoTestes: $('resumo-testes'),
     enunciado: $('desc-enunciado'),
     banco: $('desc-banco'),
@@ -54,7 +54,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
   const editor = new EditorArquivos({
     abas: $('abas-arquivos'),
     editor: $('editor'),
-    aoExecutar: () => executar(),
+    aoExecutar: () => executarPeloAluno(),
     aoEnviar: () => enviar(),
     aoMudar: (arquivos) => {
       clearTimeout(salvarTimer);
@@ -66,13 +66,13 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
   // 🔊 Ouvir: lê a aba visível do painel de descrição.
   const leitura = iniciarLeitura($('btn-ouvir'), () =>
     [el.titulo.textContent, ...Object.values(paineisDescricao()).filter((p) => !p.hidden).map((p) => p.innerText)].join('. '));
-  const paineisDescricao = () => ({ enunciado: el.enunciado, banco: el.banco, solucao: el.solucao });
+  const paineisDescricao = () => paineisDesc;
 
   const ehProblema = () => estado.item?.tipo === 'problema';
   const ehLivre = () => estado.item?.tipo === 'livre';
 
   // ---------- abas ----------
-  const paineisDesc = { enunciado: el.enunciado, banco: el.banco, solucao: el.solucao };
+  const paineisDesc = { enunciado: el.enunciado, banco: el.banco, solucao: el.solucao, testes: $('desc-testes') };
   function mostrarDesc(nome) {
     for (const [chave, painel] of Object.entries(paineisDesc)) painel.hidden = chave !== nome;
     document.querySelectorAll('[data-desc]').forEach((b) => {
@@ -275,7 +275,8 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     el.resetarBanco.hidden = !ehLivre();
     el.abaBanco.hidden = !item.banco;
     el.abaSolucao.hidden = !ehProblema();
-    layout.configurar({ comTestes: ehProblema() });
+    el.abaTestes.hidden = !ehProblema();
+    layout.aplicar();
     leitura.parar();
     if (ehProblema()) {
       renderSolucao();
@@ -312,7 +313,17 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
    * formulários do preview (`navegacao`) continuam com o mesmo banco e sessão,
    * como num site de verdade: o post publicado continua lá no próximo clique.
    */
-  async function executar(req = { url: estado.url }, { navegacao = false } = {}) {
+  /** Executar pedido pelo aluno (botão ou Ctrl+Enter): mostra a aba de testes com o resultado. */
+  const executarPeloAluno = () => executar(undefined, { abrirTestes: true });
+
+  /** Abre a aba 🧪 Testes (e a descrição, se estiver oculta). */
+  function abrirAbaTestes() {
+    if (!ehProblema()) return;
+    layout.mostrarDescricao();
+    mostrarDesc('testes');
+  }
+
+  async function executar(req = { url: estado.url }, { navegacao = false, abrirTestes = false } = {}) {
     if (!estado.phpPronto || !estado.item) return;
     const item = estado.item;
     const arquivos = { ...editor.arquivos };
@@ -343,7 +354,10 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
         marcar(item.id, 'resolvido');
         aoMudarProgresso();
       }
-      if (item.tipo === 'problema' && !navegacao) await rodarTestes({ incluirOcultos: false });
+      if (item.tipo === 'problema' && !navegacao) {
+        await rodarTestes({ incluirOcultos: false });
+        if (abrirTestes && estado.item === item) abrirAbaTestes();
+      }
       if (!el.banco.hidden) renderBanco();
     } catch (erro) {
       tratarErro(erro);
@@ -440,6 +454,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     estado.ocupado = true;
     el.enviar.disabled = true;
     el.testes.innerHTML = '<p class="veredito-sub">Rodando todos os casos de teste…</p>';
+    abrirAbaTestes();
     definirResumo('rodando…');
     definirStatus('Enviando…');
     try {
@@ -475,7 +490,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     executar({ url: normalizarUrl(el.url.value, editor.principal) }, { navegacao: true });
   });
 
-  el.executar.onclick = () => executar();
+  el.executar.onclick = () => executarPeloAluno();
   el.enviar.onclick = () => enviar();
 
   el.restaurar.onclick = () => {

@@ -394,7 +394,6 @@ kbd {
 .painel-descricao { grid-area: desc; }
 .painel-codigo { grid-area: codigo; }
 .painel-preview { grid-area: preview; }
-.painel-testes { grid-area: testes; }
 .divisor { grid-area: divisor; }
 
 .painel {
@@ -432,14 +431,6 @@ kbd {
 .area.arrastando .divisor::after { background: var(--roxo); width: auto; height: auto; }
 .area.arrastando { user-select: none; }
 .area.arrastando iframe { pointer-events: none; } /* o iframe "engole" o mouse durante o arraste */
-
-/* painel de testes: altura conforme o modo */
-.area[data-modo="lado"] .painel-testes,
-.area[data-modo="empilhado"] .painel-codigo ~ .painel-testes:last-child { min-height: 0; }
-.area[data-modo="lado"] .painel-testes { height: 30vh; min-height: 150px; }
-.area[data-modo="empilhado"] .painel-descricao[hidden] ~ .painel-testes { height: 26vh; min-height: 130px; }
-.painel-testes.recolhido { height: auto !important; min-height: 0 !important; align-self: start; }
-.painel-testes.recolhido .saida { display: none; }
 
 .abas {
   display: flex;
@@ -571,27 +562,8 @@ kbd {
 .saida { flex: 1; min-height: 0; overflow: auto; margin: 0; }
 .fonte { padding: 12px; font-size: 0.93em; white-space: pre-wrap; word-break: break-word; color: var(--texto); }
 
-/* painel de testes funcionais */
-.cabecalho-testes {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 12px;
-  padding: 4px 10px;
-  background: var(--fundo-escuro);
-  border-bottom: 1px solid var(--linha);
-  flex-shrink: 0;
-}
-.btn-recolher {
-  font: inherit;
-  font-weight: 600;
-  color: var(--roxo);
-  background: transparent;
-  border: 0;
-  padding: 4px;
-  cursor: pointer;
-}
-.btn-recolher[aria-expanded="false"] span { display: inline-block; transform: rotate(-90deg); }
+/* aba de testes funcionais (no painel de descrição) */
+.aba .resumo-testes { margin-left: 4px; font-size: 0.8rem; }
 .resumo-testes { font-size: 0.85rem; color: var(--suave); }
 .resumo-testes.ok { color: var(--verde); font-weight: 600; }
 .resumo-testes.falha { color: var(--vermelho); font-weight: 600; }
@@ -724,7 +696,6 @@ kbd {
   .area[data-modo="celular"] .painel-descricao { max-height: 45vh; }
   .area[data-modo="celular"] .painel-codigo { height: 55vh; }
   .area[data-modo="celular"] .painel-preview { height: 65vh; }
-  .area[data-modo="celular"] .painel-testes { min-height: 200px; }
   .tela-item { overflow: auto; }
   .area[data-modo="celular"] { flex: none; }
 }

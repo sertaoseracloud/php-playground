@@ -107,3 +107,41 @@ export function svgCartao(modulo) {
   <text x="630" y="${y0 + linhas.length * 60 + 62}" font-family="${SANS}" font-size="24" fill="#9e9bb8">${escXml(EMISSOR.curso)}</text>
 </svg>`;
 }
+
+/** Ícone do site (favicon, PWA): "php" em roxo num quadrado arredondado Dracula. */
+export function svgIcone() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="112" fill="#282a36"/>
+  <rect x="24" y="24" width="464" height="464" rx="92" fill="none" stroke="#bd93f9" stroke-width="20"/>
+  <text x="256" y="300" text-anchor="middle" font-family="${MONO}" font-size="190" font-weight="700" fill="#bd93f9">php</text>
+  <text x="256" y="400" text-anchor="middle" font-family="${MONO}" font-size="72" font-weight="700" fill="#50fa7b">&lt;/&gt;</text>
+</svg>`;
+}
+
+/** Capa 1200×630 para compartilhar o site (og:image da página principal). */
+export function svgCapa({ exercicios, projetos }) {
+  const badge = (id, x, y, tamanho) =>
+    `<svg x="${x}" y="${y}" width="${tamanho}" height="${tamanho}" viewBox="0 0 600 600">${desenhoBadge(id, `capa-${id}-`)}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="capa-luz" cx="0.78" cy="0.5" r="0.6">
+      <stop offset="0" stop-color="#bd93f9" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#bd93f9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#21222c"/>
+  <rect width="1200" height="630" fill="url(#capa-luz)"/>
+  <rect width="1200" height="10" fill="#bd93f9"/>
+  <text x="70" y="120" font-family="${SANS}" font-size="26" font-weight="700" letter-spacing="5" fill="#8be9fd">${escXml(EMISSOR.organizacao.toUpperCase())}</text>
+  <text x="70" y="215" font-family="${SANS}" font-size="76" font-weight="800" fill="#f8f8f2">PHP <tspan fill="#bd93f9">Playground</tspan></text>
+  <text x="70" y="285" font-family="${SANS}" font-size="36" fill="#f8f8f2">Aprenda PHP, HTML e W3.CSS</text>
+  <text x="70" y="333" font-family="${SANS}" font-size="36" fill="#f8f8f2">direto no navegador.</text>
+  <text x="70" y="420" font-family="${SANS}" font-size="28" fill="#50fa7b" font-weight="700">${exercicios} exercícios · ${projetos} projetos · certificados</text>
+  <text x="70" y="468" font-family="${SANS}" font-size="26" fill="#9e9bb8">Grátis, sem instalar nada e sem cadastro.</text>
+  <rect x="70" y="510" width="330" height="62" rx="12" fill="#50fa7b"/>
+  <text x="235" y="551" text-anchor="middle" font-family="${SANS}" font-size="28" font-weight="800" fill="#21222c">Começar a trilha</text>
+  ${badge('html', 760, 70, 230)}
+  ${badge('php', 930, 200, 230)}
+  ${badge('final', 760, 330, 230)}
+</svg>`;
+}

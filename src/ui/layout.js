@@ -1,10 +1,10 @@
 // Controla a posição do código e do preview: modo (auto/lado/empilhado),
-// divisor arrastável, descrição e testes recolhíveis. A escolha fica salva.
+// divisor arrastável e descrição (com a aba de testes) que pode ser ocultada. A escolha fica salva.
 import { escolherModo, montarGrade, faixaW3 } from './layout-calculo.js';
 import { lerPreferencia, gravarPreferencia } from '../progresso.js';
 import { $ } from './util.js';
 
-const PADRAO = { modo: 'auto', divisao: 50, descricao: true, testesRecolhidos: false };
+const PADRAO = { modo: 'auto', divisao: 50, descricao: true };
 const MIN = 20;
 const MAX = 80;
 
@@ -12,14 +12,13 @@ export function criarLayout() {
   const area = $('area');
   const divisor = $('divisor');
   const descricao = $('painel-descricao');
-  const testes = $('painel-testes');
   const btnDescricao = $('btn-descricao');
-  const btnRecolher = $('btn-recolher-testes');
   const medidor = $('medidor');
   const iframe = $('resultado');
 
+  // testesRecolhidos era da época do painel de testes separado: ignorado.
   const prefs = { ...PADRAO, ...lerPreferencia('layout', {}) };
-  let temTestes = false;
+  delete prefs.testesRecolhidos;
   let modoAtual = 'lado';
 
   const salvar = () => gravarPreferencia('layout', prefs);
@@ -27,16 +26,13 @@ export function criarLayout() {
   function aplicar() {
     const largura = window.innerWidth; // a área ocupa a largura toda da janela
     modoAtual = window.innerWidth < 900 ? 'celular' : prefs.modo === 'auto' ? escolherModo({ largura, descricao: prefs.descricao }) : prefs.modo;
-    const grade = montarGrade({ modo: modoAtual, largura, descricao: prefs.descricao, testes: temTestes, divisao: prefs.divisao });
+    const grade = montarGrade({ modo: modoAtual, largura, descricao: prefs.descricao, divisao: prefs.divisao });
     area.style.gridTemplateColumns = grade.colunas;
     area.style.gridTemplateRows = grade.linhas;
     area.style.gridTemplateAreas = grade.areas;
     area.dataset.modo = modoAtual;
 
     descricao.hidden = !prefs.descricao;
-    testes.hidden = !temTestes;
-    testes.classList.toggle('recolhido', prefs.testesRecolhidos);
-    btnRecolher.setAttribute('aria-expanded', String(!prefs.testesRecolhidos));
     divisor.setAttribute('aria-orientation', modoAtual === 'lado' ? 'vertical' : 'horizontal');
     divisor.setAttribute('aria-valuenow', String(Math.round(prefs.divisao)));
     divisor.hidden = modoAtual === 'celular';
@@ -57,11 +53,6 @@ export function criarLayout() {
   });
   btnDescricao.onclick = () => {
     prefs.descricao = !prefs.descricao;
-    salvar();
-    aplicar();
-  };
-  btnRecolher.onclick = () => {
-    prefs.testesRecolhidos = !prefs.testesRecolhidos;
     salvar();
     aplicar();
   };
@@ -121,9 +112,11 @@ export function criarLayout() {
   window.addEventListener('resize', aplicar);
 
   return {
-    /** Chamado ao abrir um item: problemas têm painel de testes; lições não. */
-    configurar({ comTestes }) {
-      temTestes = comTestes;
+    /** Garante a descrição visível (é onde fica a aba de testes). */
+    mostrarDescricao() {
+      if (prefs.descricao) return;
+      prefs.descricao = true;
+      salvar();
       aplicar();
     },
     aplicar,

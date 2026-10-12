@@ -73,9 +73,11 @@ export const PASSOS = [
   },
   {
     tela: 'item',
-    alvo: '#painel-testes',
+    alvo: '#aba-testes',
     titulo: '🧪 Testes funcionais',
-    texto: `<p>Cada cartão é um caso de teste: ⏳ ainda não rodou, ✅ passou, ❌ falhou.
+    texto: `<p>Os testes ficam nesta aba, ao lado da descrição. Ela abre sozinha quando você clica em
+      <b>▶ Executar</b>, e o resultado aparece no nome da aba (ex.: ✅ 3/3).</p>
+      <p>Cada cartão é um caso de teste: ⏳ ainda não rodou, ✅ passou, ❌ falhou.
       O cartão que falhou diz <b>o que faltou</b>, por exemplo "encontrei 0 elementos li".</p>`,
   },
   {

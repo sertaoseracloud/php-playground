@@ -33,24 +33,25 @@ export function escolherModo({ largura, descricao }) {
 
 const linhasDeAreas = (linhas) => linhas.map((l) => `"${l.join(' ')}"`).join(' ');
 
-/** Monta grid-template-columns/rows/areas para o modo escolhido. */
-export function montarGrade({ modo, largura, descricao, testes, divisao = 50 }) {
+/**
+ * Monta grid-template-columns/rows/areas para o modo escolhido. Os testes
+ * funcionais são uma aba do painel de descrição, então não têm área própria.
+ */
+export function montarGrade({ modo, largura, descricao, divisao = 50 }) {
   const a = Math.round(divisao);
   const b = 100 - a;
   const desc = descricao ? `${larguraDescricao(largura)}px ` : '';
 
   if (modo === 'celular') {
-    const areas = [descricao && ['desc'], ['codigo'], ['preview'], testes && ['testes']].filter(Boolean);
+    const areas = [descricao && ['desc'], ['codigo'], ['preview']].filter(Boolean);
     return { colunas: 'minmax(0, 1fr)', linhas: areas.map(() => 'auto').join(' '), areas: linhasDeAreas(areas) };
   }
 
   if (modo === 'lado') {
-    const topo = [...(descricao ? ['desc'] : []), 'codigo', 'divisor', 'preview'];
-    const areas = testes ? [topo, [...(descricao ? ['desc'] : []), 'testes', 'testes', 'testes']] : [topo];
     return {
       colunas: `${desc}minmax(0, ${a}fr) ${DIVISOR}px minmax(0, ${b}fr)`,
-      linhas: testes ? 'minmax(0, 1fr) auto' : 'minmax(0, 1fr)',
-      areas: linhasDeAreas(areas),
+      linhas: 'minmax(0, 1fr)',
+      areas: linhasDeAreas([[...(descricao ? ['desc'] : []), 'codigo', 'divisor', 'preview']]),
     };
   }
 
@@ -60,9 +61,8 @@ export function montarGrade({ modo, largura, descricao, testes, divisao = 50 }) 
     return {
       colunas: `${desc}minmax(0, 1fr)`,
       linhas,
-      areas: linhasDeAreas([['desc', 'codigo'], ['desc', 'divisor'], [testes ? 'testes' : 'desc', 'preview']]),
+      areas: linhasDeAreas([['desc', 'codigo'], ['desc', 'divisor'], ['desc', 'preview']]),
     };
   }
-  const areas = [['codigo'], ['divisor'], ['preview'], ...(testes ? [['testes']] : [])];
-  return { colunas: 'minmax(0, 1fr)', linhas: testes ? `${linhas} auto` : linhas, areas: linhasDeAreas(areas) };
+  return { colunas: 'minmax(0, 1fr)', linhas, areas: linhasDeAreas([['codigo'], ['divisor'], ['preview']]) };
 }

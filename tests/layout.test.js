@@ -40,38 +40,38 @@ describe('escolherModo', () => {
 });
 
 describe('montarGrade', () => {
-  const base = { largura: 1920, descricao: true, testes: true, divisao: 50 };
+  const base = { largura: 1920, descricao: true, divisao: 50 };
 
-  it('lado a lado: testes embaixo do código e do preview', () => {
+  it('lado a lado: descrição (com a aba de testes), código e preview', () => {
     expect(montarGrade({ ...base, modo: 'lado' })).toEqual({
       colunas: '420px minmax(0, 50fr) 6px minmax(0, 50fr)',
-      linhas: 'minmax(0, 1fr) auto',
-      areas: '"desc codigo divisor preview" "desc testes testes testes"',
+      linhas: 'minmax(0, 1fr)',
+      areas: '"desc codigo divisor preview"',
     });
   });
 
-  it('empilhado: código em cima, preview embaixo, testes sob a descrição', () => {
+  it('empilhado: a descrição ocupa a coluna toda, código em cima e preview embaixo', () => {
     expect(montarGrade({ ...base, largura: 1366, modo: 'empilhado', divisao: 40 })).toEqual({
       colunas: '355px minmax(0, 1fr)',
       linhas: 'minmax(0, 40fr) 6px minmax(0, 60fr)',
-      areas: '"desc codigo" "desc divisor" "testes preview"',
+      areas: '"desc codigo" "desc divisor" "desc preview"',
     });
   });
 
-  it('sem testes e sem descrição', () => {
-    expect(montarGrade({ ...base, modo: 'lado', descricao: false, testes: false })).toEqual({
+  it('sem descrição', () => {
+    expect(montarGrade({ ...base, modo: 'lado', descricao: false })).toEqual({
       colunas: 'minmax(0, 50fr) 6px minmax(0, 50fr)',
       linhas: 'minmax(0, 1fr)',
       areas: '"codigo divisor preview"',
     });
-    expect(montarGrade({ ...base, modo: 'empilhado', descricao: false, testes: true })).toEqual({
+    expect(montarGrade({ ...base, modo: 'empilhado', descricao: false })).toEqual({
       colunas: 'minmax(0, 1fr)',
-      linhas: 'minmax(0, 50fr) 6px minmax(0, 50fr) auto',
-      areas: '"codigo" "divisor" "preview" "testes"',
+      linhas: 'minmax(0, 50fr) 6px minmax(0, 50fr)',
+      areas: '"codigo" "divisor" "preview"',
     });
   });
 
-  it('celular: tudo em uma coluna', () => {
-    expect(montarGrade({ ...base, modo: 'celular' }).areas).toBe('"desc" "codigo" "preview" "testes"');
+  it('celular: tudo em uma coluna, sem área de testes', () => {
+    expect(montarGrade({ ...base, modo: 'celular' }).areas).toBe('"desc" "codigo" "preview"');
   });
 });
