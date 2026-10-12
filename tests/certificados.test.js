@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   CERTIFICADOS, EMISSOR, codificarCertificado, decodificarCertificado, idCertificado,
-  linkLinkedInPerfil, linkLinkedInPublicar,
+  linkLinkedInPerfil, linkLinkedInPublicar, linkPublico, textoPublicacao, SITE,
 } from '../src/certificados.js';
 import { modulos } from '../src/conteudo/trilha.js';
 import { lerRota } from '../src/compartilhar.js';
@@ -54,6 +54,35 @@ describe('certificados', () => {
       certUrl: url,
       certId: idCertificado(CERT),
     });
-    expect(linkLinkedInPublicar(url)).toBe(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`);
+    const publicar = new URL(linkLinkedInPublicar(CERT, url));
+    expect(publicar.origin + publicar.pathname).toBe('https://www.linkedin.com/feed/');
+    expect(publicar.searchParams.get('shareActive')).toBe('true');
+    expect(publicar.searchParams.get('text')).toBe(textoPublicacao(CERT, url));
+  });
+
+  it('link público aponta para a página estática do badge, com o código', () => {
+    const link = new URL(linkPublico(CERT));
+    expect(link.href.startsWith(`${SITE}badge/php/`)).toBe(true);
+    expect(decodificarCertificado(link.searchParams.get('c'))).toMatchObject(CERT);
+  });
+
+  it('texto do post cita o badge, o emissor, o link e hashtags', () => {
+    const texto = textoPublicacao(CERT, 'https://exemplo/x');
+    expect(texto).toContain(`"${CERTIFICADOS.php.titulo}"`);
+    expect(texto).toContain('Sertão será cloud');
+    expect(texto).toContain('https://exemplo/x');
+    expect(texto).toMatch(/#SertaoSeraCloud/);
+  });
+
+  it('os números do texto batem com o conteúdo da trilha', () => {
+    for (const m of modulos) {
+      const problemas = m.itens.filter((i) => i.tipo === 'problema').length;
+      if (m.grupos) {
+        expect(CERTIFICADOS[m.id].resumo).toContain(`${m.grupos.length} projetos`);
+        expect(CERTIFICADOS[m.id].resumo).toContain(`${problemas} etapas`);
+      } else {
+        expect(CERTIFICADOS[m.id].resumo).toContain(`${problemas} problemas`);
+      }
+    }
   });
 });

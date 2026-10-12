@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "badges": "node scripts/gerar-badges.mjs"
   },
   "type": "module",
   "dependencies": {
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@php-wasm/node": "3.1.52",
+    "@resvg/resvg-js": "^2.6.2",
     "happy-dom": "^20.14.6",
     "vite": "^6.3.5",
     "vitest": "^5.0.3"

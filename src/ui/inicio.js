@@ -5,6 +5,7 @@ import { modulos, problemas, DIFICULDADES } from '../conteudo/trilha.js';
 import { linkItem } from '../compartilhar.js';
 import { calcularJornada, sequenciaDeDias, LIMITE_DESBLOQUEIO, NIVEIS } from '../gamificacao.js';
 import { CERTIFICADOS, linkCertificado } from '../certificados.js';
+import { svgBadge } from '../badges.js';
 import { statusDe, dataDe, diasAtivos, hoje, lerNome, gravarNome } from '../progresso.js';
 import { esc, $ } from './util.js';
 
@@ -24,7 +25,7 @@ export function resumoProgresso() {
 
 // ---------- nome do aluno (para os certificados) ----------
 
-export function pedirNome({ obrigatorio = false } = {}) {
+function pedirNome({ obrigatorio = false } = {}) {
   const dialogo = $('dialogo-nome');
   const campo = $('campo-nome');
   campo.value = lerNome();
@@ -157,7 +158,7 @@ function painelJogador(j) {
           <li>
             <button type="button" class="certificado-slot ${c.concluido ? 'emitido' : ''}" data-certificado="${c.id}" data-data="${c.concluidoEm ?? ''}"
               ${c.concluido ? '' : 'aria-disabled="true"'}>
-              <span aria-hidden="true">${c.id === 'final' ? '🎓' : c.concluido ? '🏆' : '🔒'}</span>
+              <span class="mini-badge" aria-hidden="true">${c.concluido ? svgBadge(c.id, { tamanho: 28 }) : c.id === 'final' ? '🎓' : '🔒'}</span>
               <span>${esc(CERTIFICADOS[c.id].titulo)}</span>
             </button>
           </li>`).join('')}

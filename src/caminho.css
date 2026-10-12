@@ -66,6 +66,7 @@
 }
 .certificado-slot.emitido { color: var(--texto); border: 1px solid var(--amarelo); cursor: pointer; }
 .certificado-slot.emitido:hover { background: var(--linha); }
+.mini-badge { width: 28px; height: 28px; flex-shrink: 0; display: inline-grid; place-items: center; }
 .nota-niveis { font-size: 0.72rem; color: var(--suave); margin: 14px 0 0; }
 
 /* trilha */
@@ -224,9 +225,42 @@
    ========================================================= */
 .tela-certificado { flex: 1; overflow: auto; }
 .certificado-pagina { max-width: 1060px; margin: 0 auto; padding: 16px; }
-.acoes-certificado { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.voltar-trilha { margin: 0 0 12px; }
+.acoes-certificado { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 .acoes-certificado a { text-decoration: none; }
-.btn-linkedin { background: #0a66c2; color: #fff; font-weight: 600; }
+.btn-linkedin { background: #0a66c2; border-color: #0a66c2; color: #fff; font-weight: 600; }
+.btn-linkedin-contorno { background: transparent; border: 1px solid #70b5f9; color: #70b5f9; font-weight: 600; }
+
+/* página do badge, no estilo da Credly */
+.badge-credly {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 28px;
+  align-items: start;
+  padding: 24px;
+  margin-bottom: 28px;
+  border-radius: 14px;
+  background: var(--fundo);
+  border: 1px solid var(--linha);
+}
+.badge-imagem { display: grid; place-items: center; padding: 10px; border-radius: 12px; background: color-mix(in srgb, var(--roxo) 10%, transparent); }
+.badge-imagem svg { width: 100%; max-width: 240px; height: auto; filter: drop-shadow(0 8px 18px rgb(0 0 0 / 0.35)); }
+.badge-rotulo { margin: 0; color: var(--suave); font-size: 0.85rem; }
+.badge-info h1 { margin: 4px 0 6px; font-size: 1.7rem; line-height: 1.2; }
+.badge-dono { margin: 0; }
+.badge-desc { color: var(--suave); line-height: 1.55; }
+.badge-subtitulo { margin: 16px 0 8px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--suave); }
+.badge-habilidades { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; }
+.badge-habilidades li { padding: 4px 12px; border-radius: 999px; background: color-mix(in srgb, var(--ciano) 14%, transparent); border: 1px solid color-mix(in srgb, var(--ciano) 40%, transparent); font-size: 0.85rem; }
+.badge-dados { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 16px 0 0; }
+.badge-dados dt { font-size: 0.75rem; color: var(--suave); text-transform: uppercase; letter-spacing: 0.06em; }
+.badge-dados dd { margin: 2px 0 0; font-weight: 600; }
+.cert-codigo-dd { font-family: "Fira Code", monospace; }
+.titulo-documento { font-size: 1rem; color: var(--suave); margin: 0 0 10px; }
+@media (max-width: 700px) {
+  .badge-credly { grid-template-columns: 1fr; padding: 16px; }
+  .badge-imagem svg { max-width: 180px; }
+}
 .aviso-certificado { padding: 16px; background: var(--fundo); border: 1px solid var(--linha); border-radius: 8px; }
 .nota-certificado { color: var(--suave); font-size: 0.82rem; text-align: center; }
 
@@ -295,7 +329,7 @@
 @page { size: A4 landscape; margin: 0; }
 @media print {
   body { background: #fff; display: block; height: auto; }
-  .topo, .pular, dialog, .acoes-certificado, .nota-certificado,
+  .topo, .pular, dialog, .badge-credly, .voltar-trilha, .titulo-documento, .nota-certificado,
   .conteudo > main:not(.tela-certificado) { display: none !important; }
   .tela-certificado { overflow: visible; }
   .certificado-pagina { padding: 0; max-width: none; }

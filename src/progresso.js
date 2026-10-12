@@ -39,8 +39,19 @@ export function marcar(id, status) {
   }
 }
 
-/** Dia em que o item foi resolvido (vira a data do certificado). */
-export const dataDe = (id) => ler('datas', {})[id] ?? (statusDe(id) === 'resolvido' ? hoje() : null);
+/**
+ * Dia em que o item foi resolvido (vira a data do certificado). Itens resolvidos
+ * antes de as datas existirem ganham a data de hoje uma única vez e ela fica
+ * salva; senão a data e o código do certificado mudariam a cada dia.
+ */
+export function dataDe(id) {
+  const datas = ler('datas', {});
+  if (datas[id]) return datas[id];
+  if (statusDe(id) !== 'resolvido') return null;
+  datas[id] = hoje();
+  gravar('datas', datas);
+  return datas[id];
+}
 
 // ---------- dias com atividade (sequência 🔥) ----------
 function registrarAtividade() {

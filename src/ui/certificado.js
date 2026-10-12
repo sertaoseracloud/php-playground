@@ -1,7 +1,8 @@
 // Tela do certificado: o documento (pronto para imprimir/salvar em PDF) e os
 // botões para compartilhar no LinkedIn. Abre por link (#/certificado/<código>),
 // então quem recebe o link vê o mesmo certificado.
-import { CERTIFICADOS, EMISSOR, decodificarCertificado, linkLinkedInPerfil, linkLinkedInPublicar } from '../certificados.js';
+import { CERTIFICADOS, EMISSOR, decodificarCertificado, linkLinkedInPerfil, linkLinkedInPublicar, linkPublico, textoPublicacao } from '../certificados.js';
+import { svgBadge } from '../badges.js';
 import { esc } from './util.js';
 
 const dataPorExtenso = (data) => new Date(`${data}T12:00:00`).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -19,18 +20,39 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
 
   const def = CERTIFICADOS[cert.modulo];
   const final = cert.modulo === 'final';
-  const url = `${location.origin}${location.pathname}#/certificado/${codigo}`;
+  const url = linkPublico(cert);
 
   el.innerHTML = `
     <div class="certificado-pagina">
-      <div class="acoes-certificado">
-        <a class="btn btn-fantasma" href="#/">← Voltar à trilha</a>
-        <button type="button" class="btn btn-roxo" id="btn-imprimir">🖨️ Imprimir / salvar PDF</button>
-        <a class="btn btn-linkedin" href="${esc(linkLinkedInPerfil(cert, url))}" target="_blank" rel="noopener">in Adicionar ao perfil</a>
-        <a class="btn btn-linkedin" href="${esc(linkLinkedInPublicar(url))}" target="_blank" rel="noopener">in Publicar no LinkedIn</a>
-        <button type="button" class="btn btn-fantasma" id="btn-copiar-certificado">🔗 Copiar link</button>
-      </div>
+      <p class="voltar-trilha"><a href="#/">← Voltar à trilha</a></p>
 
+      <!-- Página do badge, no estilo da Credly -->
+      <section class="badge-credly" aria-labelledby="badge-titulo">
+        <div class="badge-imagem">${svgBadge(cert.modulo, { tamanho: 240 })}</div>
+        <div class="badge-info">
+          <p class="badge-rotulo">${final ? 'Certificado de conclusão' : 'Badge digital'} · emitido por <b>${esc(EMISSOR.organizacao)}</b></p>
+          <h1 id="badge-titulo">${esc(def.titulo)}</h1>
+          <p class="badge-dono">Conquistado por <b>${esc(cert.nome)}</b> em ${dataPorExtenso(cert.data)}</p>
+          <p class="badge-desc">Quem tem este ${final ? 'certificado' : 'badge'} ${esc(def.resumo)} do curso
+            <b>${esc(EMISSOR.curso)}</b>, com exercícios corrigidos automaticamente por testes funcionais.</p>
+          <h2 class="badge-subtitulo">Habilidades</h2>
+          <ul class="badge-habilidades">${def.conteudos.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>
+          <dl class="badge-dados">
+            <div><dt>Emissor</dt><dd>${esc(EMISSOR.organizacao)}</dd></div>
+            <div><dt>Responsável</dt><dd>${esc(EMISSOR.responsavel)}</dd></div>
+            <div><dt>Código</dt><dd class="cert-codigo-dd">${esc(cert.id)}</dd></div>
+          </dl>
+          <div class="acoes-certificado">
+            <a class="btn btn-linkedin" href="${esc(linkLinkedInPublicar(cert, url))}" target="_blank" rel="noopener">in Publicar no LinkedIn</a>
+            <a class="btn btn-linkedin-contorno" href="${esc(linkLinkedInPerfil(cert, url))}" target="_blank" rel="noopener">＋ Adicionar ao perfil</a>
+            <button type="button" class="btn btn-fantasma" id="btn-copiar-certificado">🔗 Copiar link</button>
+            <button type="button" class="btn btn-fantasma" id="btn-copiar-texto">📝 Copiar texto do post</button>
+            <button type="button" class="btn btn-fantasma" id="btn-imprimir">🖨️ Imprimir / PDF</button>
+          </div>
+        </div>
+      </section>
+
+      <h2 class="titulo-documento">Certificado</h2>
       <article class="certificado ${final ? 'certificado-final' : ''}" aria-label="Certificado de ${esc(cert.nome)}">
         <div class="moldura">
           <header class="cert-topo">
@@ -45,7 +67,7 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
 
           <p class="cert-tipo">${final ? 'Certificado de conclusão da trilha' : 'Certificado de conclusão de módulo'}</p>
           <p class="cert-certificamos">Certificamos que</p>
-          <h1 class="cert-nome">${esc(cert.nome)}</h1>
+          <p class="cert-nome">${esc(cert.nome)}</p>
           <p class="cert-texto">${esc(def.resumo)} em <b>${esc(def.titulo)}</b>,
             com exercícios corrigidos automaticamente.</p>
 
@@ -76,13 +98,15 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
     </div>`;
 
   el.querySelector('#btn-imprimir').onclick = () => window.print();
-  el.querySelector('#btn-copiar-certificado').onclick = async () => {
+  const copiar = async (texto, aviso) => {
     try {
-      await navigator.clipboard.writeText(url);
-      definirStatus('🔗 Link do certificado copiado!');
+      await navigator.clipboard.writeText(texto);
+      definirStatus(aviso);
     } catch {
-      prompt('Copie o link do certificado:', url);
+      prompt('Copie:', texto);
     }
   };
+  el.querySelector('#btn-copiar-certificado').onclick = () => copiar(url, '🔗 Link do badge copiado!');
+  el.querySelector('#btn-copiar-texto').onclick = () => copiar(textoPublicacao(cert, url), '📝 Texto do post copiado!');
   return cert;
 }

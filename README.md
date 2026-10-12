@@ -64,11 +64,30 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
 - Ao concluir 100% de um módulo, o 🏆 libera o **certificado do módulo**. Com todos os módulos
   (inclusive Projetos), o 🎓 libera o **certificado final**. Os certificados são emitidos pela
   **Sertão será cloud** e assinados por **Cláudio Raposo**.
-- Na página do certificado: **Imprimir / salvar PDF** (A4 paisagem), **Adicionar ao perfil do LinkedIn**
-  (seção Licenças e certificados), **Publicar no LinkedIn** e copiar o link.
-- O certificado é gerado no navegador e codificado no link (`#/certificado/...`), com um código
-  `SSC-AAAA-XXXXXX`. Não há servidor que valide o código: ele serve de registro da conclusão,
-  não de prova contra falsificação.
+- Cada certificado tem um **badge digital no estilo Credly** (hexágono com a cor do módulo). A página
+  do certificado mostra o badge, as habilidades, o emissor e o código, e o documento para imprimir
+  ou salvar em PDF (A4 paisagem).
+- **Publicar no LinkedIn** abre a caixa de post com o texto pronto e o link do badge. O LinkedIn monta
+  a prévia com a imagem do badge, como nos posts da Credly. **Adicionar ao perfil** preenche a seção
+  Licenças e certificados.
+- O certificado é gerado no navegador e codificado no link, com um código `SSC-AAAA-XXXXXX`.
+  Não há servidor que valide o código: ele serve de registro da conclusão, não de prova contra
+  falsificação.
+
+#### Como a prévia do LinkedIn funciona
+
+O robô do LinkedIn não roda JavaScript nem lê o que vem depois do `#`. Por isso cada badge tem uma
+página estática em `public/badge/<módulo>/` com as meta tags `og:` apontando para a imagem do badge
+(`public/badges/<módulo>-card.png`, 1200×627). O link compartilhado é
+`.../badge/<módulo>/?c=<código>`, e quem clica é levado ao certificado.
+
+Esses arquivos saem de `src/badges.js` e `src/certificados.js`. Depois de mudar um deles, rode:
+
+```bash
+npm run badges
+```
+
+e faça commit de `public/`. O teste `tests/badges.test.js` falha se algum arquivo estiver faltando.
 
 ### Links diretos para a aula
 
