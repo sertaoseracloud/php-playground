@@ -393,9 +393,13 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     return testes.map((t) => (t.oculto ? `🔒 Oculto ${++oculto}` : `Caso ${++visivel}`));
   }
 
+  /** Resumo no nome da aba: curto ("✅ 3/3"); o texto completo vai na dica e no leitor de tela. */
   function definirResumo(texto, classe = '') {
-    el.resumoTestes.textContent = texto;
+    const curto = texto.match(/^[✅❌]\s*\d+\/\d+/)?.[0] ?? (texto.startsWith('rodando') ? '⏳' : '');
+    el.resumoTestes.textContent = curto;
     el.resumoTestes.className = `resumo-testes ${classe}`;
+    el.abaTestes.title = `Testes funcionais: ${texto}`;
+    el.abaTestes.setAttribute('aria-label', `Testes funcionais: ${texto}`);
   }
 
   /** Antes de executar: lista todos os casos como pendentes. */
