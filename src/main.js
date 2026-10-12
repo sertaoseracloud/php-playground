@@ -17,6 +17,7 @@ import { renderLanding } from './ui/landing.js';
 import { renderValidador } from './ui/validador.js';
 import { renderLicenca, renderTermos } from './ui/paginas-legais.js';
 import { renderNovidades } from './ui/novidades.js';
+import { renderInstrutor } from './ui/instrutor.js';
 import { VERSAO } from './novidades.js';
 import { iniciarMenu, iniciarFlutuantes } from './ui/menu.js';
 import { renderInicio, resumoProgresso } from './ui/inicio.js';
@@ -44,6 +45,7 @@ const telaValidador = $('tela-validador');
 const telaLicenca = $('tela-licenca');
 const telaTermos = $('tela-termos');
 const telaNovidades = $('tela-novidades');
+const telaInstrutor = $('tela-instrutor');
 
 function mostrarTela(tela) {
   telaInicio.hidden = tela !== telaInicio;
@@ -55,6 +57,7 @@ function mostrarTela(tela) {
   telaLicenca.hidden = tela !== telaLicenca;
   telaTermos.hidden = tela !== telaTermos;
   telaNovidades.hidden = tela !== telaNovidades;
+  telaInstrutor.hidden = tela !== telaInstrutor;
 }
 
 const definirStatus = (texto) => { $('status').textContent = texto; };
@@ -134,16 +137,27 @@ function navegar() {
     marcarMenu('validar');
     definirPagina({
       titulo: `Validar certificado · ${NOME}`,
-      descricao: 'Confira se um certificado ou badge do PHP Playground, emitido pela Sertão será cloud, é autêntico.',
+      descricao: `Confira se um certificado ou badge do ${NOME}, emitido pela Sertão será cloud, é autêntico.`,
     });
     telaValidador.scrollTop = 0;
+    return;
+  }
+  if (rota.tela === 'instrutor') {
+    telaInstrutor.scrollTop = 0;
+    mostrarTela(telaInstrutor);
+    renderInstrutor(telaInstrutor, { ancora: rota.ancora });
+    marcarMenu('instrutor');
+    definirPagina({
+      titulo: `${rota.ancora === 'apoie' ? 'Apoie o projeto' : 'Quem é o instrutor?'} · ${NOME}`,
+      descricao: 'Cláudio Filipe Lima Rapôso: arquiteto de soluções, Microsoft MVP, Docker Captain e professor. Apoie o projeto com um PIX de qualquer valor.',
+    });
     return;
   }
   if (rota.tela === 'novidades') {
     renderNovidades(telaNovidades);
     mostrarTela(telaNovidades);
     marcarMenu('');
-    definirPagina({ titulo: `Novidades (v${VERSAO}) · ${NOME}`, descricao: 'Todas as alterações do PHP Playground, versão por versão.' });
+    definirPagina({ titulo: `Novidades (v${VERSAO}) · ${NOME}`, descricao: `Todas as alterações do ${NOME}, versão por versão.` });
     telaNovidades.scrollTop = 0;
     return;
   }
@@ -154,8 +168,8 @@ function navegar() {
     mostrarTela(tela);
     marcarMenu('');
     definirPagina(licenca
-      ? { titulo: `Licença · ${NOME}`, descricao: 'O PHP Playground é software livre (AGPL-3.0) com conteúdo aberto (CC BY-SA 4.0).' }
-      : { titulo: `Termos de uso · ${NOME}`, descricao: 'Termos de uso do PHP Playground, da Sertão será cloud.' });
+      ? { titulo: `Licença · ${NOME}`, descricao: `O ${NOME} é software livre (AGPL-3.0) com conteúdo aberto (CC BY-SA 4.0).` }
+      : { titulo: `Termos de uso · ${NOME}`, descricao: `Termos de uso do ${NOME}, da Sertão será cloud.` });
     tela.scrollTop = 0;
     return;
   }
@@ -163,7 +177,7 @@ function navegar() {
     renderPrivacidade(telaPrivacidade, { definirStatus });
     mostrarTela(telaPrivacidade);
     marcarMenu('privacidade');
-    definirPagina({ titulo: `Privacidade e cookies · ${NOME}`, descricao: 'Sem cookies e sem rastreamento: como o PHP Playground trata seus dados e atende à LGPD.' });
+    definirPagina({ titulo: `Privacidade e cookies · ${NOME}`, descricao: `Sem cookies e sem rastreamento: como o ${NOME} trata seus dados e atende à LGPD.` });
     telaPrivacidade.scrollTop = 0;
     return;
   }

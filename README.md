@@ -39,6 +39,13 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
 - **Como no LeetCode**: **▶ Executar** roda os casos visíveis; **⬆ Enviar** roda todos, inclusive os
   **casos ocultos**. Os ocultos usam outros valores e outro banco, então resposta fixa no código não passa.
   O resultado sai como "Aceito" ou "Resposta errada", mostrando o caso que falhou.
+- **👨‍🏫 Quem é o instrutor?** (`#/instrutor` e seção na landing): perfil de Cláudio Filipe Lima Rapôso
+  (atuação, reconhecimentos, certificações e formação), com a foto servida pelo próprio site
+  (`public/instrutor.webp`). Os dados ficam em `src/instrutor.js`, sem telefone nem endereço.
+- **☕ Apoie o projeto** (`#/apoie`): PIX de qualquer valor para a conta PicPay do instrutor, por **QR Code**
+  ou **copia e cola** (com botão de copiar). O código segue o BR Code do Banco Central (campos EMV e
+  CRC16) e é montado no navegador por `src/apoio.js`; o QR Code sai da biblioteca `qrcode-generator` (MIT).
+  A chave fica em `PIX.chave`: sem ela, o apoio aparece como "em breve".
 - **Casos de teste detalhados** (aba 🧪 Testes): cada caso mostra o **cenário** como requisições HTTP
   (`GET /index.php?pagina=2`, `POST /login.php` com os campos do corpo, banco diferente do exemplo, passos
   com a mesma sessão), o placar e o tempo; cada verificação mostra a **categoria** (Texto da página,

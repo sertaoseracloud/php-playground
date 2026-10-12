@@ -32,5 +32,6 @@ export const TERCEIROS = [
   { nome: 'Assinatura digital (@noble/ed25519, @noble/hashes)', pacotes: ['@noble/ed25519', '@noble/hashes'], licenca: 'MIT' },
   { nome: 'Fontes Fira Code e Atkinson Hyperlegible', pacotes: ['@fontsource/fira-code', '@fontsource/atkinson-hyperlegible'], licenca: 'OFL-1.1' },
   { nome: 'W3.CSS (carregado do site da W3Schools nos exercícios)', pacotes: [], licenca: 'termos de uso da W3Schools' },
+  { nome: 'QR Code do PIX (qrcode-generator)', pacotes: ['qrcode-generator'], licenca: 'MIT' },
   { nome: 'Cores do tema Dracula', pacotes: [], licenca: 'MIT' },
 ];
