@@ -6,6 +6,8 @@ import { svgBadge } from '../badges.js';
 import { linkItem } from '../compartilhar.js';
 import { jornadaAtual } from './inicio.js';
 import { esc } from './util.js';
+// Versão injetada pelo Vite (e pelo prerender); sem importar o histórico, que só existe no build.
+const VERSAO = typeof __VERSAO__ === 'undefined' ? '' : __VERSAO__;
 
 const REPOSITORIO = 'https://github.com/sertaoseracloud/php-playground';
 
@@ -133,7 +135,7 @@ export function renderLanding(el) {
       </section>
 
       <footer class="rodape-landing">
-        <p><b>${esc(EMISSOR.organizacao)}</b> · ${esc(EMISSOR.curso)}</p>
+        <p><b>${esc(EMISSOR.organizacao)}</b> · ${esc(EMISSOR.curso)} · <a href="#/novidades">Versão ${esc(VERSAO)} · Novidades</a></p>
         <p><a href="#/validar">Validar certificado</a> · <a href="#/termos">Termos de uso</a> · <a href="#/privacidade">Privacidade e cookies</a> · <a href="#/licenca">Licença (AGPL-3.0 e CC BY-SA 4.0)</a> · <a href="${REPOSITORIO}" target="_blank" rel="noopener noreferrer">Código no GitHub</a></p>
       </footer>
     </div>`;

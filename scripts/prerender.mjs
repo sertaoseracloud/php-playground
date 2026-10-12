@@ -6,7 +6,11 @@
 //   - gera dist/sitemap.xml.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { metaTags, sitemap } from '../src/seo.js';
-import { renderLanding } from '../src/ui/landing.js';
+import { versaoDoPacote } from './plugin-historico.mjs';
+
+// Mesma versão que o Vite injeta no site (a landing lê __VERSAO__).
+globalThis.__VERSAO__ = versaoDoPacote();
+const { renderLanding } = await import('../src/ui/landing.js');
 
 export function prerender(html) {
   const seo = /<!-- seo:inicio -->[\s\S]*?<!-- seo:fim -->/;

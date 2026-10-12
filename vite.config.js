@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { chavePublicaDe } from './src/ed25519.js';
+import { pluginHistorico, versaoDoPacote } from './scripts/plugin-historico.mjs';
 
 const stub = fileURLToPath(new URL('./src/php-stub.js', import.meta.url));
 
@@ -70,11 +71,12 @@ export default defineConfig(({ command }) => {
   const chavePublica = chavePublicaDe(semente);
   return {
     base: './',
-    plugins: [semIntl, ativosPhp, publicarChave(chavePublica)],
+    plugins: [semIntl, ativosPhp, publicarChave(chavePublica), pluginHistorico()],
     define: {
       __CHAVE_CERTIFICADO__: JSON.stringify(derivar('certificado', valor)),
       __SEMENTE_ED25519__: JSON.stringify(semente),
       __CHAVE_PUBLICA_ED25519__: JSON.stringify(chavePublica),
+      __VERSAO__: JSON.stringify(versaoDoPacote()),
     },
     assetsInclude: [/\.dat$/, /\.wasm$/, /\.so$/, /\.la$/],
     optimizeDeps: { exclude: ['@php-wasm/web'] },

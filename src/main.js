@@ -16,6 +16,8 @@ import { renderPrivacidade, iniciarAvisoPrivacidade } from './ui/privacidade.js'
 import { renderLanding } from './ui/landing.js';
 import { renderValidador } from './ui/validador.js';
 import { renderLicenca, renderTermos } from './ui/paginas-legais.js';
+import { renderNovidades } from './ui/novidades.js';
+import { VERSAO } from './novidades.js';
 import { iniciarMenu, iniciarFlutuantes } from './ui/menu.js';
 import { renderInicio, resumoProgresso } from './ui/inicio.js';
 import { criarTelaItem } from './ui/item.js';
@@ -41,6 +43,7 @@ const telaLanding = $('tela-landing');
 const telaValidador = $('tela-validador');
 const telaLicenca = $('tela-licenca');
 const telaTermos = $('tela-termos');
+const telaNovidades = $('tela-novidades');
 
 function mostrarTela(tela) {
   telaInicio.hidden = tela !== telaInicio;
@@ -51,6 +54,7 @@ function mostrarTela(tela) {
   telaValidador.hidden = tela !== telaValidador;
   telaLicenca.hidden = tela !== telaLicenca;
   telaTermos.hidden = tela !== telaTermos;
+  telaNovidades.hidden = tela !== telaNovidades;
 }
 
 const definirStatus = (texto) => { $('status').textContent = texto; };
@@ -121,6 +125,14 @@ function navegar() {
       descricao: 'Confira se um certificado ou badge do PHP Playground, emitido pela Sertão será cloud, é autêntico.',
     });
     telaValidador.scrollTop = 0;
+    return;
+  }
+  if (rota.tela === 'novidades') {
+    renderNovidades(telaNovidades);
+    mostrarTela(telaNovidades);
+    marcarMenu('');
+    definirPagina({ titulo: `Novidades (v${VERSAO}) · ${NOME}`, descricao: 'Todas as alterações do PHP Playground, versão por versão.' });
+    telaNovidades.scrollTop = 0;
     return;
   }
   if (rota.tela === 'licenca' || rota.tela === 'termos') {
