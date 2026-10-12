@@ -10,6 +10,8 @@ import {
 } from '../progresso.js';
 import { EditorArquivos } from './editor.js';
 import { iniciarLeitura } from './acessibilidade.js';
+import { jornadaAtual } from './inicio.js';
+import { LIMITE_DESBLOQUEIO } from '../gamificacao.js';
 import { $, esc } from './util.js';
 
 export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }) {
@@ -126,8 +128,12 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
   // ---------- descrição e solução ----------
   function renderDescricao() {
     const item = estado.item;
+    const moduloNoCaminho = jornadaAtual().modulos.find((m) => m.id === item.modulo);
+    const avisoBloqueio = moduloNoCaminho && !moduloNoCaminho.desbloqueado ? `
+      <div class="etapa-info">🔒 Este módulo ainda está bloqueado no caminho: resolva ${LIMITE_DESBLOQUEIO}% do módulo anterior.
+        Você pode praticar aqui, mas siga a trilha na ordem para aproveitar melhor.</div>` : '';
     if (item.tipo !== 'problema') {
-      el.enunciado.innerHTML = item.resumo;
+      el.enunciado.innerHTML = avisoBloqueio + item.resumo;
       return;
     }
     const etapa = item.projeto ? `
@@ -142,6 +148,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
       <div class="caso-exemplo"><span class="rotulo">Teste:</span> ${esc(t.descricao ?? `${t.metodo ?? 'GET'} ${t.url}`)}</div>`).join('');
     const ocultos = item.testes.filter((t) => t.oculto).length;
     el.enunciado.innerHTML = `
+      ${avisoBloqueio}
       ${etapa}
       ${item.enunciado}
       ${exemplos ? `<h2>Casos de teste</h2>${exemplos}` : ''}
@@ -392,6 +399,13 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
       marcar(estado.item.id, aprovado ? 'resolvido' : 'tentado');
       renderCabecalho();
       aoMudarProgresso();
+      const modulo = jornadaAtual().modulos.find((m) => m.id === estado.item.modulo);
+      if (aprovado && modulo?.concluido) {
+        el.testes.insertAdjacentHTML('afterbegin', `
+          <div class="comemoracao" role="status">🏆 Você concluiu o módulo <b>${esc(modulo.titulo)}</b>!
+            Seu certificado da Sertão será cloud está liberado.
+            <a class="btn btn-roxo btn-pequeno" href="#/">Ver no caminho</a></div>`);
+      }
       definirStatus(aprovado ? 'Aceito! 🎉' : 'Resposta errada');
     } catch (erro) {
       tratarErro(erro);

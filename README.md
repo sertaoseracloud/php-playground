@@ -56,9 +56,23 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
 - **Compartilhar**: link com o código embutido. Nada é enviado a servidor.
 - **Proteção contra laço infinito**: o PHP roda num Web Worker e é reiniciado depois de 8 s.
 
+### Trilha gamificada e certificados
+
+- A tela inicial é um **caminho** em zigue-zague. Cada item vale **XP**: lição 5, fácil 10, médio 20 e difícil 40.
+  O aluno sobe de **nível** (Iniciante → Mestre do PHP) e ganha uma **sequência de dias** 🔥.
+- O próximo módulo **desbloqueia quando o atual chega a 70%**.
+- Ao concluir 100% de um módulo, o 🏆 libera o **certificado do módulo**. Com todos os módulos
+  (inclusive Projetos), o 🎓 libera o **certificado final**. Os certificados são emitidos pela
+  **Sertão será cloud** e assinados por **Cláudio Raposo**.
+- Na página do certificado: **Imprimir / salvar PDF** (A4 paisagem), **Adicionar ao perfil do LinkedIn**
+  (seção Licenças e certificados), **Publicar no LinkedIn** e copiar o link.
+- O certificado é gerado no navegador e codificado no link (`#/certificado/...`), com um código
+  `SSC-AAAA-XXXXXX`. Não há servidor que valide o código: ele serve de registro da conclusão,
+  não de prova contra falsificação.
+
 ### Links diretos para a aula
 
-- Lista de problemas: `https://sertaoseracloud.github.io/php-playground/`
+- Trilha: `https://sertaoseracloud.github.io/php-playground/`
 - Um problema: `.../php-playground/#/p/pdo-filtro-curso`
 - Playground livre: `.../php-playground/#/livre`
 

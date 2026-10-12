@@ -1,15 +1,20 @@
-// Tela inicial: a trilha com os módulos, o progresso e a lista de problemas.
+// Tela inicial em formato de caminho (gamificação): painel do jogador com nível,
+// XP, sequência de dias e certificados; e a trilha em zigue-zague, com unidades
+// que desbloqueiam aos 70% e um troféu (certificado) no fim de cada módulo.
 import { modulos, problemas, DIFICULDADES } from '../conteudo/trilha.js';
 import { linkItem } from '../compartilhar.js';
-import { statusDe } from '../progresso.js';
-import { esc } from './util.js';
+import { calcularJornada, sequenciaDeDias, LIMITE_DESBLOQUEIO, NIVEIS } from '../gamificacao.js';
+import { CERTIFICADOS, linkCertificado } from '../certificados.js';
+import { statusDe, dataDe, diasAtivos, hoje, lerNome, gravarNome } from '../progresso.js';
+import { esc, $ } from './util.js';
 
-const ICONES = { resolvido: '✅', tentado: '◐' };
+// Deslocamento horizontal dos nós, para o caminho serpentear.
+const ZIGUEZAGUE = [0, 44, 76, 44, 0, -44, -76, -44];
 
-function iconeStatus(item) {
-  const status = statusDe(item.id);
-  if (item.tipo === 'licao') return status ? '✔️' : '📖';
-  return ICONES[status] ?? '○';
+const ICONE = { licao: '📖', facil: '⭐', medio: '🔥', dificil: '💎' };
+
+export function jornadaAtual() {
+  return calcularJornada({ modulos, statusDe, dataDe });
 }
 
 export function resumoProgresso() {
@@ -17,69 +22,194 @@ export function resumoProgresso() {
   return { resolvidos: resolvidos.length, total: problemas.length, lista: resolvidos };
 }
 
-function cartaoNumero(valor, rotulo, cor) {
-  return `<div class="cartao-numero"><div class="valor" style="color:${cor}">${valor}</div><div class="rotulo">${rotulo}</div></div>`;
+// ---------- nome do aluno (para os certificados) ----------
+
+export function pedirNome({ obrigatorio = false } = {}) {
+  const dialogo = $('dialogo-nome');
+  const campo = $('campo-nome');
+  campo.value = lerNome();
+  dialogo.showModal();
+  campo.focus();
+  return new Promise((resolve) => {
+    dialogo.addEventListener('close', () => {
+      const nome = campo.value.trim();
+      if (dialogo.returnValue === 'salvar' && nome) {
+        gravarNome(nome);
+        resolve(nome);
+      } else {
+        resolve(obrigatorio ? null : lerNome() || null);
+      }
+    }, { once: true });
+  });
 }
 
-export function renderInicio(el) {
-  const { resolvidos, total, lista } = resumoProgresso();
-  const porDificuldade = (d) => {
-    const todos = problemas.filter((p) => p.dificuldade === d).length;
-    const feitos = lista.filter((p) => p.dificuldade === d).length;
-    return `${feitos}/${todos}`;
-  };
+async function abrirCertificado(modulo, data) {
+  const nome = lerNome() || await pedirNome({ obrigatorio: true });
+  if (nome) location.hash = linkCertificado({ nome, modulo, data });
+}
 
-  const blocos = modulos.map((m, i) => {
-    const doModulo = m.itens.filter((x) => x.tipo === 'problema');
-    const feitos = doModulo.filter((p) => statusDe(p.id) === 'resolvido').length;
-    const pct = Math.round((feitos / doModulo.length) * 100);
-    const linha = (item) => {
-      const direita = item.tipo === 'licao'
-        ? '<span class="licao-chip">Lição</span>'
-        : `<span class="dificuldade ${item.dificuldade}">${DIFICULDADES[item.dificuldade]}</span>`;
-      return `
-        <a class="linha-item ${item.tipo}" href="${linkItem(item.id)}">
-          <span class="icone-status">${iconeStatus(item)}</span>
-          <span class="titulo">${esc(item.titulo)}</span>
-          ${direita}
-        </a>`;
-    };
-    // Projetos: um bloco por projeto, com o progresso das etapas.
-    const linhas = m.grupos
-      ? m.grupos.map((g) => {
-        const doGrupo = m.itens.filter((x) => x.grupo === g.id);
-        const etapas = doGrupo.filter((x) => x.tipo === 'problema');
-        const prontas = etapas.filter((x) => statusDe(x.id) === 'resolvido').length;
-        return `
-          <div class="grupo-cabecalho" id="projeto-${g.id}">
-            <h3>${g.icone} ${esc(g.titulo)} <span class="contagem">${prontas}/${etapas.length} etapas</span></h3>
-            <p>${esc(g.descricao)}</p>
-          </div>
-          ${doGrupo.map(linha).join('')}`;
-      }).join('')
-      : m.itens.map(linha).join('');
-    return `
-      <section class="modulo" id="modulo-${m.id}">
-        <div class="modulo-cabecalho">
-          <h2>${m.icone} ${esc(m.titulo)} <span class="passo">${m.extra ? 'módulo extra' : `módulo ${i + 1}`}</span></h2>
-          <p>${esc(m.descricao)}</p>
-          <div class="barra-progresso"><span style="width:${pct}%"></span></div>
-          <div class="contagem">${feitos}/${doModulo.length} ${m.extra ? 'etapas concluídas' : 'problemas resolvidos'}</div>
-        </div>
-        ${linhas}
-      </section>`;
-  }).join('');
+// ---------- pedaços da tela ----------
 
-  el.innerHTML = `
-    <div class="inicio">
-      <h1>Trilha: do HTML ao banco de dados</h1>
-      <p class="sub">Leia a lição, resolva os problemas e clique em <b>Enviar</b> para conferir. Tudo roda no seu navegador.</p>
-      <div class="resumo-geral">
-        ${cartaoNumero(`${resolvidos}/${total}`, 'problemas resolvidos', 'var(--roxo)')}
-        ${cartaoNumero(porDificuldade('facil'), 'Fácil', 'var(--verde)')}
-        ${cartaoNumero(porDificuldade('medio'), 'Médio', 'var(--laranja)')}
-        ${cartaoNumero(porDificuldade('dificil'), 'Difícil', 'var(--vermelho)')}
+function no(item, i) {
+  const deslocamento = ZIGUEZAGUE[i % ZIGUEZAGUE.length];
+  const icone = item.estado === 'concluido' ? '✔' : item.estado === 'bloqueado' ? '🔒' : ICONE[item.tipo === 'licao' ? 'licao' : item.dificuldade];
+  const tipo = item.tipo === 'licao' ? 'Lição' : DIFICULDADES[item.dificuldade];
+  const rotulo = `${item.titulo} · ${tipo} · ${item.xp} XP${item.estado === 'concluido' ? ' · concluído' : item.estado === 'bloqueado' ? ' · bloqueado' : ''}`;
+  const conteudo = `
+      <span class="circulo" aria-hidden="true">${icone}</span>
+      ${item.ehProximo ? `<span class="balao" aria-hidden="true">${item.estado === 'tentado' ? 'CONTINUAR' : 'COMEÇAR'}</span>` : ''}
+      <span class="legenda">${esc(item.titulo)}</span>`;
+  const alvo = item.estado === 'bloqueado'
+    ? `<button type="button" class="alvo" aria-disabled="true" data-bloqueado title="${esc(rotulo)}" aria-label="${esc(rotulo)}">${conteudo}</button>`
+    : `<a class="alvo" href="${linkItem(item.id)}" title="${esc(rotulo)}" aria-label="${esc(rotulo)}">${conteudo}</a>`;
+  return `<li class="no ${item.tipo} estado-${item.estado}${item.ehProximo ? ' eh-proximo' : ''}" style="--d:${deslocamento}px">${alvo}</li>`;
+}
+
+function trofeu(m, rotulo = CERTIFICADOS[m.id].titulo) {
+  const texto = m.concluido ? 'Ver certificado' : `${m.resolvidos}/${m.total}`;
+  return `
+    <li class="no trofeu ${m.concluido ? 'conquistado' : ''}" style="--d:0px">
+      <button type="button" class="alvo" data-certificado="${m.id}" data-data="${m.concluidoEm ?? ''}"
+        ${m.concluido ? '' : 'aria-disabled="true"'} aria-label="Certificado: ${esc(rotulo)} (${texto})">
+        <span class="circulo" aria-hidden="true">🏆</span>
+        <span class="legenda">${m.concluido ? '🎉 Certificado liberado!' : `Certificado · ${texto}`}</span>
+      </button>
+    </li>`;
+}
+
+function unidade(m, anterior) {
+  const bloqueio = !m.desbloqueado && anterior
+    ? `<p class="aviso-bloqueio">🔒 Resolva ${LIMITE_DESBLOQUEIO}% de ${esc(anterior.titulo)} para desbloquear (agora: ${anterior.pct}%).</p>`
+    : '';
+  const cabecalho = `
+    <header class="unidade" data-modulo="${m.id}">
+      <div>
+        <p class="unidade-numero">${m.extra ? 'Módulo extra' : `Unidade ${m.indice + 1}`}</p>
+        <h2>${m.icone} ${esc(m.titulo)}</h2>
+        <p class="unidade-desc">${esc(m.descricao)}</p>
+        ${bloqueio}
       </div>
-      ${blocos}
+      <div class="unidade-progresso" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${m.pct}" aria-label="Progresso em ${esc(m.titulo)}">
+        <span class="anel" style="--pct:${m.pct}"><b>${m.pct}%</b></span>
+        <span class="unidade-contagem">${m.resolvidos}/${m.total}</span>
+      </div>
+    </header>`;
+
+  let nos;
+  if (m.grupos) {
+    nos = m.grupos.map((g) => {
+      const doGrupo = m.itens.filter((x) => x.grupo === g.id);
+      const prontas = doGrupo.filter((x) => x.tipo === 'problema' && x.estado === 'concluido').length;
+      const etapas = doGrupo.filter((x) => x.tipo === 'problema').length;
+      return `
+        <li class="subunidade"><span>${g.icone} ${esc(g.titulo)}</span> <small>${prontas}/${etapas} etapas</small></li>
+        ${doGrupo.map(no).join('')}`;
+    }).join('');
+  } else {
+    nos = m.itens.map(no).join('');
+  }
+  return `
+    <section class="bloco-unidade ${m.desbloqueado ? '' : 'bloqueada'}" id="unidade-${m.id}" aria-labelledby="titulo-${m.id}">
+      ${cabecalho.replace('<h2>', `<h2 id="titulo-${m.id}">`)}
+      <ol class="trilha">${nos}${trofeu(m)}</ol>
+    </section>`;
+}
+
+function painelJogador(j) {
+  const nome = lerNome();
+  const sequencia = sequenciaDeDias(diasAtivos(), hoje());
+  const certificados = [...j.modulos, { id: 'final', concluido: j.final.concluido, concluidoEm: j.final.concluidoEm }];
+  const emitidos = certificados.filter((c) => c.concluido).length;
+  const proximoNivel = j.nivel.proximo
+    ? `${j.nivel.faltam} XP para <b>${esc(j.nivel.proximo.nome)}</b>`
+    : 'Nível máximo! 🎉';
+
+  return `
+    <aside class="painel-jogador" aria-label="Seu progresso">
+      <div class="jogador">
+        <span class="avatar" aria-hidden="true">${nome ? esc(nome.trim()[0].toUpperCase()) : '🐘'}</span>
+        <div>
+          <p class="jogador-nome">${nome ? esc(nome) : 'Estudante'}
+            <button type="button" class="btn-link" id="btn-nome">${nome ? 'editar' : 'informar nome'}</button></p>
+          <p class="jogador-nivel">Nível ${j.nivel.numero} · ${esc(j.nivel.nome)}</p>
+        </div>
+      </div>
+      <div class="barra-xp" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${j.nivel.pct}" aria-label="Progresso até o próximo nível">
+        <span style="width:${j.nivel.pct}%"></span>
+      </div>
+      <p class="xp-legenda">${proximoNivel}</p>
+
+      <div class="estatisticas">
+        <div><span class="valor">⭐ ${j.xp}</span><span class="rotulo">XP</span></div>
+        <div><span class="valor">🔥 ${sequencia}</span><span class="rotulo">${sequencia === 1 ? 'dia seguido' : 'dias seguidos'}</span></div>
+        <div><span class="valor">🏆 ${emitidos}/${certificados.length}</span><span class="rotulo">certificados</span></div>
+      </div>
+
+      ${j.proximo
+        ? `<a class="btn btn-verde btn-continuar" href="${linkItem(j.proximo.id)}">▶ Continuar<small>${esc(j.proximo.titulo)}</small></a>`
+        : '<p class="tudo-feito">🎓 Você concluiu tudo!</p>'}
+
+      <h2 class="titulo-certificados">Certificados</h2>
+      <ul class="lista-certificados">
+        ${certificados.map((c) => `
+          <li>
+            <button type="button" class="certificado-slot ${c.concluido ? 'emitido' : ''}" data-certificado="${c.id}" data-data="${c.concluidoEm ?? ''}"
+              ${c.concluido ? '' : 'aria-disabled="true"'}>
+              <span aria-hidden="true">${c.id === 'final' ? '🎓' : c.concluido ? '🏆' : '🔒'}</span>
+              <span>${esc(CERTIFICADOS[c.id].titulo)}</span>
+            </button>
+          </li>`).join('')}
+      </ul>
+      <p class="nota-niveis">Níveis: ${NIVEIS.map((n) => esc(n.nome)).join(' → ')}</p>
+    </aside>`;
+}
+
+function diploma(j) {
+  const total = j.modulos.length;
+  const prontos = j.modulos.filter((m) => m.concluido).length;
+  return `
+    <section class="bloco-final" aria-label="Certificado final">
+      <button type="button" class="diploma ${j.final.concluido ? 'conquistado' : ''}" data-certificado="final" data-data="${j.final.concluidoEm ?? ''}"
+        ${j.final.concluido ? '' : 'aria-disabled="true"'}>
+        <span class="circulo" aria-hidden="true">🎓</span>
+        <span class="diploma-titulo">${esc(CERTIFICADOS.final.titulo)}</span>
+        <span class="diploma-sub">${j.final.concluido ? 'Emitir certificado de conclusão total' : `${prontos}/${total} módulos concluídos`}</span>
+      </button>
+    </section>`;
+}
+
+// ---------- render ----------
+
+export function renderInicio(el) {
+  const j = jornadaAtual();
+  el.innerHTML = `
+    <div class="caminho-pagina">
+      ${painelJogador(j)}
+      <div class="caminho">
+        <h1 class="caminho-titulo">Trilha: do HTML ao banco de dados</h1>
+        ${j.modulos.map((m, i) => unidade(m, j.modulos[i - 1])).join('')}
+        ${diploma(j)}
+      </div>
     </div>`;
+
+  el.querySelectorAll('[data-certificado]').forEach((b) => {
+    b.addEventListener('click', () => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      abrirCertificado(b.dataset.certificado, b.dataset.data || hoje());
+    });
+  });
+  el.querySelectorAll('[data-bloqueado]').forEach((b) => {
+    b.addEventListener('click', () => {
+      const unidadeBloqueada = b.closest('.bloco-unidade').querySelector('.aviso-bloqueio');
+      unidadeBloqueada?.classList.remove('chacoalhar');
+      void unidadeBloqueada?.offsetWidth;
+      unidadeBloqueada?.classList.add('chacoalhar');
+    });
+  });
+  $('btn-nome')?.addEventListener('click', async () => {
+    await pedirNome();
+    renderInicio(el);
+  });
+  // Rola até o próximo passo, como nos apps de idiomas.
+  el.querySelector('.eh-proximo')?.scrollIntoView({ block: 'center' });
 }

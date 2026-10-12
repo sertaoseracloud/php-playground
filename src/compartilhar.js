@@ -3,14 +3,15 @@
 //   #/p/<id>      lição ou problema
 //   #/livre       playground livre
 //   #/s/<código>  código compartilhado (arquivos guardados no próprio link)
+//   #/certificado/<código>  certificado (nome, módulo e data no próprio link)
 
-function paraBase64Url(bytes) {
+export function paraBase64Url(bytes) {
   let binario = '';
   bytes.forEach((b) => { binario += String.fromCharCode(b); });
   return btoa(binario).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-function deBase64Url(texto) {
+export function deBase64Url(texto) {
   const base64 = texto.replace(/-/g, '+').replace(/_/g, '/');
   return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
 }
@@ -36,6 +37,7 @@ export function lerRota(hash) {
   const caminho = hash.replace(/^#\/?/, '');
   if (caminho === 'livre') return { tela: 'item', id: 'livre' };
   if (caminho.startsWith('p/')) return { tela: 'item', id: decodeURIComponent(caminho.slice(2)) };
+  if (caminho.startsWith('certificado/')) return { tela: 'certificado', codigo: caminho.slice(12) };
   if (caminho.startsWith('s/')) {
     const dados = decodificar(caminho.slice(2));
     if (dados) return { tela: 'item', id: dados.item, arquivos: dados.arquivos };

@@ -23,12 +23,36 @@ function remover(chave) {
 // ---------- progresso: 'resolvido' | 'tentado' ----------
 export const statusDe = (id) => ler('progresso', {})[id];
 
+/** Data local no formato AAAA-MM-DD. */
+export const hoje = () => new Date().toLocaleDateString('sv-SE');
+
 export function marcar(id, status) {
+  registrarAtividade();
   const progresso = ler('progresso', {});
   if (progresso[id] === 'resolvido') return; // nunca rebaixa um problema resolvido
   progresso[id] = status;
   gravar('progresso', progresso);
+  if (status === 'resolvido') {
+    const datas = ler('datas', {});
+    datas[id] = hoje();
+    gravar('datas', datas);
+  }
 }
+
+/** Dia em que o item foi resolvido (vira a data do certificado). */
+export const dataDe = (id) => ler('datas', {})[id] ?? (statusDe(id) === 'resolvido' ? hoje() : null);
+
+// ---------- dias com atividade (sequência 🔥) ----------
+function registrarAtividade() {
+  const dias = new Set(ler('atividade', []));
+  dias.add(hoje());
+  gravar('atividade', [...dias].sort().slice(-400));
+}
+export const diasAtivos = () => ler('atividade', []);
+
+// ---------- nome que aparece nos certificados ----------
+export const lerNome = () => ler('nome', '');
+export const gravarNome = (nome) => gravar('nome', nome.trim());
 
 // ---------- rascunhos de código ----------
 export const lerRascunho = (id) => ler(`rascunho:${id}`);

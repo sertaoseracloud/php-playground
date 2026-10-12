@@ -6,6 +6,9 @@
   <meta name="theme-color" content="#21222c">
   <title>PHP Playground</title>
   <meta name="description" content="Trilha de exercícios de HTML, W3.CSS, PHP e PDO que roda direto no navegador, para usar em aula.">
+  <meta property="og:title" content="PHP Playground · Sertão será cloud">
+  <meta property="og:description" content="Trilha gamificada do HTML ao banco de dados, com certificados emitidos pela Sertão será cloud.">
+  <meta property="og:type" content="website">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐘</text></svg>">
 </head>
 <body>
@@ -14,7 +17,7 @@
   <header class="topo">
     <a href="#/" class="marca">🐘 PHP Playground</a>
     <nav class="menu" aria-label="Principal">
-      <a href="#/" data-menu="inicio">Problemas</a>
+      <a href="#/" data-menu="inicio">🗺️ Trilha</a>
       <a href="#/livre" data-menu="livre">Playground livre</a>
     </nav>
     <span id="progresso-topo" class="progresso-topo" aria-label="Problemas resolvidos"></span>
@@ -27,6 +30,7 @@
 
   <div id="conteudo" class="conteudo" tabindex="-1">
     <main id="tela-inicio" class="tela-inicio" hidden></main>
+    <main id="tela-certificado" class="tela-certificado" hidden></main>
 
     <main id="tela-item" class="tela-item" hidden>
       <div class="barra-item">
@@ -117,6 +121,20 @@
       <button class="btn btn-fantasma" id="tutorial-voltar">‹ Voltar</button>
       <button class="btn btn-roxo" id="tutorial-avancar">Próximo ›</button>
     </div>
+  </dialog>
+
+  <!-- Nome que aparece nos certificados -->
+  <dialog id="dialogo-nome" class="dialogo" aria-labelledby="nome-titulo">
+    <form method="dialog">
+      <h2 id="nome-titulo">🎓 Seu nome no certificado</h2>
+      <p>Digite seu nome completo, do jeito que deve aparecer nos certificados.</p>
+      <label for="campo-nome" class="sr">Nome completo</label>
+      <input id="campo-nome" class="campo-texto" maxlength="80" autocomplete="name" placeholder="Nome completo">
+      <div class="dialogo-rodape">
+        <button class="btn btn-fantasma" value="cancelar" formnovalidate>Cancelar</button>
+        <button class="btn btn-roxo" value="salvar">Salvar</button>
+      </div>
+    </form>
   </dialog>
 
   <!-- Ferramentas de acessibilidade -->

@@ -5,12 +5,14 @@ import '@fontsource/fira-code/latin-700.css';
 import '@fontsource/atkinson-hyperlegible/latin-400.css';
 import '@fontsource/atkinson-hyperlegible/latin-700.css';
 import './estilo.css';
+import './caminho.css';
 
 import { MotorPHP } from './php/motor.js';
 import { lerRota } from './compartilhar.js';
 import { iniciarAcessibilidade } from './ui/acessibilidade.js';
 import { renderInicio, resumoProgresso } from './ui/inicio.js';
 import { criarTelaItem } from './ui/item.js';
+import { renderCertificado } from './ui/certificado.js';
 import { criarLayout } from './ui/layout.js';
 import { iniciarTutorial } from './ui/tutorial.js';
 import { $ } from './ui/util.js';
@@ -20,6 +22,13 @@ iniciarAcessibilidade();
 
 const telaInicio = $('tela-inicio');
 const telaItem = $('tela-item');
+const telaCertificado = $('tela-certificado');
+
+function mostrarTela(tela) {
+  telaInicio.hidden = tela !== telaInicio;
+  telaItem.hidden = tela !== telaItem;
+  telaCertificado.hidden = tela !== telaCertificado;
+}
 
 const definirStatus = (texto) => { $('status').textContent = texto; };
 
@@ -54,16 +63,22 @@ function marcarMenu(nome) {
 function navegar() {
   const rota = lerRota(location.hash);
   if (rota.tela === 'item' && telaDoItem.abrir(rota.id, rota.arquivos)) {
-    telaInicio.hidden = true;
-    telaItem.hidden = false;
+    mostrarTela(telaItem);
     layout.aplicar();
     marcarMenu(rota.id === 'livre' ? 'livre' : '');
     document.title = `${$('item-titulo').textContent} · PHP Playground`;
     return;
   }
+  if (rota.tela === 'certificado') {
+    const cert = renderCertificado(telaCertificado, rota.codigo, { definirStatus });
+    mostrarTela(telaCertificado);
+    marcarMenu('');
+    document.title = cert ? `Certificado de ${cert.nome} · Sertão será cloud` : 'Certificado · PHP Playground';
+    telaCertificado.scrollTop = 0;
+    return;
+  }
+  mostrarTela(telaInicio);
   renderInicio(telaInicio);
-  telaItem.hidden = true;
-  telaInicio.hidden = false;
   marcarMenu('inicio');
   document.title = 'PHP Playground';
 }

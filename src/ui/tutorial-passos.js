@@ -13,21 +13,30 @@ export const PASSOS = [
   },
   {
     tela: 'inicio',
-    alvo: '#tela-inicio .modulo',
-    titulo: 'A trilha',
-    texto: `<p>São 4 módulos, nesta ordem: HTML → W3.CSS → PHP → PHP + PDO.</p>
+    alvo: '#tela-inicio .bloco-unidade',
+    titulo: 'O caminho',
+    texto: `<p>A trilha é um caminho: HTML → W3.CSS → PHP → PHP + PDO e, de bônus, os Projetos.</p>
       <ul>
-        <li>📖 <b>Lições</b> explicam o conceito com um exemplo pronto.</li>
-        <li>○ <b>Problemas</b> têm dificuldade <span class="dificuldade facil">Fácil</span>,
-          <span class="dificuldade medio">Médio</span> ou <span class="dificuldade dificil">Difícil</span>.</li>
-        <li>✅ resolvido · ◐ tentado. Seu progresso fica salvo neste navegador.</li>
+        <li>📖 <b>lições</b> e problemas ⭐ <span class="dificuldade facil">fácil</span>,
+          🔥 <span class="dificuldade medio">médio</span> e 💎 <span class="dificuldade dificil">difícil</span>;</li>
+        <li>o nó que pisca com <b>COMEÇAR</b> é o seu próximo passo;</li>
+        <li>🔒 o próximo módulo abre quando você resolve <b>70%</b> do atual.</li>
       </ul>`,
   },
   {
     tela: 'inicio',
+    alvo: '.painel-jogador',
+    titulo: 'XP, nível e certificados',
+    texto: `<p>Cada lição e problema resolvido dá <b>XP</b> e sobe o seu <b>nível</b>. Estudar em dias seguidos
+      aumenta a sua sequência 🔥.</p>
+      <p>Ao concluir um módulo, o 🏆 libera um <b>certificado</b> emitido pela <b>Sertão será cloud</b>, que você pode
+      salvar em PDF e compartilhar no LinkedIn. Concluindo tudo, ganha o certificado final 🎓.</p>`,
+  },
+  {
+    tela: 'inicio',
     alvo: '.menu',
-    titulo: 'Problemas e Playground livre',
-    texto: `<p><b>Problemas</b> volta para esta lista. O <b>Playground livre</b> é para experimentar
+    titulo: 'Trilha e Playground livre',
+    texto: `<p><b>Trilha</b> volta para este caminho. O <b>Playground livre</b> é para experimentar
       à vontade, com um banco de dados que fica salvo.</p>`,
   },
   {
