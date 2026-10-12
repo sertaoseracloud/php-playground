@@ -448,3 +448,9 @@
 .aviso-privacidade a { text-decoration: none; }
 .nota-nome { font-size: 0.85em; color: var(--suave); }
 .nota-nome a { color: var(--roxo); }
+
+/* celular: o anel de progresso da unidade vai para baixo do texto, em linha */
+@media (max-width: 560px) {
+  .unidade { flex-wrap: wrap; }
+  .unidade-progresso { flex-direction: row; gap: 10px; width: 100%; justify-content: flex-start; }
+}
