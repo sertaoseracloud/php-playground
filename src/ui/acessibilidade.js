@@ -96,7 +96,9 @@ export function iniciarLeitura(botao, obterTexto) {
   const parar = () => {
     speechSynthesis.cancel();
     botao.setAttribute('aria-pressed', 'false');
-    botao.textContent = '🔊 Ouvir';
+    botao.textContent = '🔊';
+    botao.title = 'Ouvir: ler a descrição em voz alta';
+    botao.setAttribute('aria-label', 'Ouvir a descrição em voz alta');
   };
   botao.onclick = () => {
     if (speechSynthesis.speaking) {
@@ -111,7 +113,9 @@ export function iniciarLeitura(botao, obterTexto) {
     fala.onerror = parar;
     speechSynthesis.speak(fala);
     botao.setAttribute('aria-pressed', 'true');
-    botao.textContent = '⏹ Parar';
+    botao.textContent = '⏹';
+    botao.title = 'Parar a leitura';
+    botao.setAttribute('aria-label', 'Parar a leitura');
   };
   return { parar };
 }
