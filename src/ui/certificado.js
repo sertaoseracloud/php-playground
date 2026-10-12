@@ -84,6 +84,7 @@ export function renderCertificado(el, codigo, { definirStatus = () => {} } = {})
             <button type="button" class="btn btn-fantasma" id="btn-copiar-certificado">🔗 Copiar link</button>
             <button type="button" class="btn btn-fantasma" id="btn-copiar-texto">📝 Copiar texto do post</button>
             <button type="button" class="btn btn-fantasma" id="btn-imprimir">🖨️ Imprimir / PDF</button>
+            <a class="btn btn-fantasma" href="#/validar/${esc(codigo)}">🔎 Validar</a>
           </div>
         </div>
       </section>

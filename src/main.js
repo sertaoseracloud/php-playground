@@ -14,6 +14,7 @@ import { iniciarAcessibilidade } from './ui/acessibilidade.js';
 import { iniciarRegua, iniciarPausa } from './ui/neuro.js';
 import { renderPrivacidade, iniciarAvisoPrivacidade } from './ui/privacidade.js';
 import { renderLanding } from './ui/landing.js';
+import { renderValidador } from './ui/validador.js';
 import { iniciarMenu } from './ui/menu.js';
 import { renderInicio, resumoProgresso } from './ui/inicio.js';
 import { criarTelaItem } from './ui/item.js';
@@ -35,6 +36,7 @@ const telaItem = $('tela-item');
 const telaCertificado = $('tela-certificado');
 const telaPrivacidade = $('tela-privacidade');
 const telaLanding = $('tela-landing');
+const telaValidador = $('tela-validador');
 
 function mostrarTela(tela) {
   telaInicio.hidden = tela !== telaInicio;
@@ -42,6 +44,7 @@ function mostrarTela(tela) {
   telaCertificado.hidden = tela !== telaCertificado;
   telaPrivacidade.hidden = tela !== telaPrivacidade;
   telaLanding.hidden = tela !== telaLanding;
+  telaValidador.hidden = tela !== telaValidador;
 }
 
 const definirStatus = (texto) => { $('status').textContent = texto; };
@@ -101,6 +104,17 @@ function navegar() {
     marcarMenu('');
     definirPagina(PRINCIPAL);
     telaLanding.scrollTop = 0;
+    return;
+  }
+  if (rota.tela === 'validar') {
+    renderValidador(telaValidador, rota.codigo);
+    mostrarTela(telaValidador);
+    marcarMenu('validar');
+    definirPagina({
+      titulo: `Validar certificado · ${NOME}`,
+      descricao: 'Confira se um certificado ou badge do PHP Playground, emitido pela Sertão será cloud, é autêntico.',
+    });
+    telaValidador.scrollTop = 0;
     return;
   }
   if (rota.tela === 'privacidade') {

@@ -135,7 +135,7 @@ export function renderLanding(el) {
 
       <footer class="rodape-landing">
         <p><b>${esc(EMISSOR.organizacao)}</b> · ${esc(EMISSOR.curso)} · Responsável: ${esc(CONTROLADOR.responsavel)}</p>
-        <p><a href="#/privacidade">Privacidade e cookies</a> · <a href="${REPOSITORIO}" target="_blank" rel="noopener noreferrer">Código no GitHub</a></p>
+        <p><a href="#/validar">Validar certificado</a> · <a href="#/privacidade">Privacidade e cookies</a> · <a href="${REPOSITORIO}" target="_blank" rel="noopener noreferrer">Código no GitHub</a></p>
       </footer>
     </div>`;
 }

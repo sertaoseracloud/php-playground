@@ -483,3 +483,34 @@
 .cadeia li small { grid-column: 1 / -1; color: var(--suave); }
 .no.trofeu.em-espera .circulo { filter: grayscale(0.3); opacity: 0.85; border: 3px dashed var(--ciano); }
 .no.trofeu.em-espera .legenda { color: var(--ciano); }
+
+/* validador de certificados (#/validar) */
+.cartao-validacao { margin: 22px 0; padding: 4px 18px 16px; border: 1px solid var(--linha); border-radius: 12px; background: var(--fundo-escuro); }
+.form-validacao { display: grid; gap: 10px; }
+.form-validacao label { display: grid; gap: 4px; font-size: 0.9rem; color: var(--suave); }
+.form-validacao input, .form-validacao select, .form-validacao textarea {
+  font: inherit;
+  color: var(--texto);
+  background: var(--fundo);
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+  padding: 9px 10px;
+}
+.form-validacao textarea, .form-validacao input[name="selo"], .form-validacao input[name="anterior"] { font-family: var(--fonte-codigo); font-size: 0.85rem; }
+.form-validacao .btn { justify-self: start; }
+.grade-validacao { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); align-items: end; }
+.grade-validacao .largo { grid-column: 1 / -1; }
+.resultado-validacao { margin-top: 14px; padding: 12px 16px; border-radius: 10px; border: 2px solid var(--linha); }
+.resultado-validacao h2 { margin: 0 0 6px !important; }
+.resultado-validacao.valido { border-color: var(--verde); background: color-mix(in srgb, var(--verde) 9%, var(--fundo)); }
+.resultado-validacao.valido h2 { color: var(--verde) !important; }
+.resultado-validacao.invalido { border-color: var(--vermelho); background: color-mix(in srgb, var(--vermelho) 9%, var(--fundo)); }
+.resultado-validacao.invalido h2 { color: var(--vermelho) !important; }
+.resultado-validacao.antigo { border-color: var(--ciano); }
+.dados-validacao { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 18px; margin: 12px 0; }
+.dados-validacao dt { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--suave); }
+.dados-validacao dd { margin: 2px 0 0; font-weight: 600; }
+.dados-validacao .largo { grid-column: 1 / -1; }
+.hash-longo { font-family: var(--fonte-codigo); font-size: 0.8rem; color: var(--amarelo); overflow-wrap: anywhere; font-weight: 400; }
+.nota-validacao { font-size: 0.85rem; color: var(--suave); }
+.validador h3 { margin: 14px 0 0; font-size: 0.95rem; }

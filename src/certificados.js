@@ -212,3 +212,37 @@ ${tags}`;
 /** Abre a caixa de publicação do LinkedIn com o texto pronto; o link gera a prévia com o badge. */
 export const linkLinkedInPublicar = (cert, url = linkPublico(cert)) =>
   `https://www.linkedin.com/feed/?shareActive=true&text=${encodeURIComponent(textoPublicacao(cert, url))}`;
+
+// ---------- validador (#/validar) ----------
+
+/** Tira o código de um link de certificado, de um link de badge ou do próprio código colado. */
+export function extrairCodigo(texto) {
+  const t = String(texto ?? '').trim();
+  const doHash = t.match(/#\/(?:certificado|validar)\/([A-Za-z0-9_-]+)/);
+  if (doHash) return doHash[1];
+  const doBadge = t.match(/[?&]c=([A-Za-z0-9_-]+)/);
+  if (doBadge) return doBadge[1];
+  return /^[A-Za-z0-9_-]{20,}$/.test(t) ? t : null;
+}
+
+const limparHash = (h) => String(h ?? '').toLowerCase().replace(/[^0-9a-f]/g, '');
+
+/**
+ * Confere um certificado impresso: com nome, módulo, data, selo e (a partir do
+ * segundo da cadeia) o hash anterior, recalcula aquele elo e compara com o selo.
+ * Devolve { valido, motivo }.
+ */
+export function validarImpresso({ nome, modulo, data, selo, anterior }) {
+  if (!String(nome ?? '').trim()) return { valido: false, motivo: 'Informe o nome como está no certificado.' };
+  if (!(modulo in CERTIFICADOS)) return { valido: false, motivo: 'Escolha qual certificado é.' };
+  if (!DATA.test(data ?? '')) return { valido: false, motivo: 'Informe a data de conclusão.' };
+  const h = limparHash(selo);
+  if (h.length !== 64) return { valido: false, motivo: 'O selo tem 64 caracteres (letras de a a f e números).' };
+  const primeiro = anteriores(modulo).length === 0;
+  const a = limparHash(anterior);
+  if (!primeiro && a.length !== 64) return { valido: false, motivo: 'Este certificado tem o campo "Anterior" (64 caracteres). Copie-o também.' };
+  const esperado = hashCertificado({ nome, modulo, data }, primeiro ? '' : a);
+  return esperado === h
+    ? { valido: true, motivo: 'O selo confere com o nome, o certificado, a data e o elo anterior informados.' }
+    : { valido: false, motivo: 'O selo não confere. Confira se digitou tudo exatamente como no certificado, inclusive acentos.' };
+}

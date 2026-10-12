@@ -105,6 +105,10 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
   isso um certificado só é liberado quando todos os anteriores também foram conquistados (na trilha
   aparece "🔗 Falta o certificado de …"). Links de módulos seguintes emitidos antes da cadeia
   aparecem como antigos, com orientação para gerar de novo; os de HTML continuam valendo.
+- **🔎 Validador** (`#/validar`): cole o link do certificado, o link do badge do LinkedIn ou o código, e a
+  página recalcula a cadeia e diz se é válido, mostrando aluno, certificado, data, código, selo e os
+  blocos da cadeia. Para certificado **impresso ou em PDF**, digite nome, certificado, data, selo e o
+  hash "Anterior" do rodapé. Cada certificado tem um botão "🔎 Validar" (`#/validar/<código>`).
 - **A palavra secreta nunca entra no código nem no site.** Ela fica no secret
   `CERTIFICADO_SEGREDO` do GitHub Actions; o build injeta só um SHA-256 derivado dela
   (`vite.config.js`), e falha se o secret não existir. Para gerar o build localmente:
@@ -169,6 +173,7 @@ O texto é informativo e vale uma revisão jurídica antes de uso institucional.
 
 - Landing: `https://sertaoseracloud.github.io/php-playground/`
 - Trilha: `.../php-playground/#/trilha`
+- Validar certificado: `.../php-playground/#/validar`
 - Um problema: `.../php-playground/#/p/pdo-filtro-curso`
 - Playground livre: `.../php-playground/#/livre`
 
