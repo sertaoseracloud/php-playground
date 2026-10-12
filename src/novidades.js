@@ -10,6 +10,32 @@ export const REPOSITORIO = 'https://github.com/sertaoseracloud/php-playground';
 /** Releases, da mais nova para a mais antiga. Escritas para quem usa o site, sem jargão. */
 export const RELEASES = [
   {
+    versao: '1.1.0',
+    data: '2026-10-12',
+    titulo: 'Validador de certificados novo',
+    resumo: 'A página de validar certificados ficou mais clara, mostra o resultado primeiro e funciona melhor no celular.',
+    grupos: [
+      {
+        titulo: '🔎 Validar certificado',
+        itens: [
+          'Quem abre um link de validação vê o resultado primeiro, com o badge e os certificados da trilha numa linha do tempo.',
+          'As três formas de validar (link, impresso e arquivo XML) ficam em abas.',
+          'Cores diferentes para "válido", "alterado", "não consegui ler" e "link antigo".',
+          'Contador de caracteres no selo e resultado que some quando você muda o texto.',
+        ],
+      },
+      {
+        titulo: '🐛 Correções',
+        itens: [
+          'A página de validação não passa mais da largura da tela no celular.',
+          'O botão "Abrir o certificado" voltou a mostrar o texto.',
+          'O resultado não é mais anunciado duas vezes por leitores de tela.',
+          'A mensagem de execução do exercício não aparece mais nas outras páginas.',
+        ],
+      },
+    ],
+  },
+  {
     versao: '1.0.0',
     data: '2026-10-12',
     titulo: 'Primeira versão oficial',

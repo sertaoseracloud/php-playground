@@ -58,6 +58,8 @@ function mostrarTela(tela) {
 }
 
 const definirStatus = (texto) => { $('status').textContent = texto; };
+/** Status das telas que não são exercício: a situação do PHP (carregando, pronto ou erro). */
+let statusPadrao = '';
 
 function atualizarProgressoTopo() {
   const { resolvidos, total, licoesLidas, totalLicoes } = resumoProgresso();
@@ -72,15 +74,23 @@ let telaDoItem;
 
 const motor = new MotorPHP({
   aoMudarEstado(situacao, erro) {
-    if (situacao === 'carregando') definirStatus('Carregando o PHP… (só demora na primeira vez)');
-    else if (situacao === 'pronto') definirStatus('PHP 8.4 pronto');
-    else definirStatus(`Não foi possível carregar o PHP: ${erro}`);
+    if (situacao === 'carregando') statusPadrao = 'Carregando o PHP… (só demora na primeira vez)';
+    else if (situacao === 'pronto') statusPadrao = 'PHP 8.4 pronto';
+    else statusPadrao = `Não foi possível carregar o PHP: ${erro}`;
+    definirStatus(statusPadrao);
     telaDoItem?.aoMudarEstadoPhp(situacao === 'pronto');
   },
 });
 
 const layout = criarLayout();
-telaDoItem = criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso: atualizarProgressoTopo });
+// O exercício só escreve no status enquanto está na tela: uma execução que termina depois que
+// o aluno foi para outra página não deixa "Executado em 12 ms" no validador, por exemplo.
+telaDoItem = criarTelaItem({
+  motor,
+  layout,
+  definirStatus: (texto) => { if (!telaItem.hidden) definirStatus(texto); },
+  aoMudarProgresso: atualizarProgressoTopo,
+});
 
 function marcarMenu(nome) {
   document.querySelectorAll('[data-menu]').forEach((a) => {
@@ -108,6 +118,8 @@ function navegar() {
     });
     return;
   }
+  // Fora do exercício, o status volta à situação do PHP.
+  definirStatus(statusPadrao);
   if (rota.tela === 'landing') {
     renderLanding(telaLanding);
     mostrarTela(telaLanding);

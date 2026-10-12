@@ -105,10 +105,14 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
   isso um certificado só é liberado quando todos os anteriores também foram conquistados (na trilha
   aparece "🔗 Falta o certificado de …"). Links de módulos seguintes emitidos antes da cadeia
   aparecem como antigos, com orientação para gerar de novo; os de HTML continuam valendo.
-- **🔎 Validador** (`#/validar`): cole o link do certificado, o link do badge do LinkedIn ou o código, e a
-  página recalcula a cadeia e diz se é válido, mostrando aluno, certificado, data, código, selo e os
-  blocos da cadeia. Para certificado **impresso ou em PDF**, digite nome, certificado, data, selo e o
-  hash "Anterior" do rodapé. Cada certificado tem um botão "🔎 Validar" (`#/validar/<código>`).
+- **🔎 Validador** (`#/validar`): três abas. Em **link ou código**, cole o link do certificado, o link do
+  badge do LinkedIn ou o código, e a página recalcula a cadeia. Em **impresso ou PDF**, digite nome,
+  certificado, data, selo e o hash "Anterior" do rodapé (com contador de caracteres). Em **arquivo XML**,
+  use o arquivo baixado na página do certificado. Quem abre um link de validação
+  (`#/validar/<código>`, botão "🔎 Validar" de cada certificado) vê o resultado primeiro, com o badge,
+  os dados e a cadeia como linha do tempo. As cores separam "válido" (verde), "alterado" (vermelho),
+  "não consegui ler / faltam dados" (âmbar) e "link antigo" (ciano), e mudar o texto apaga o resultado
+  anterior.
 - **📄 XML do certificado** (botão na página do certificado): traz aluno, emissor, empresa, módulo, data,
   código, selo, selo anterior, a cadeia inteira (cada bloco com selo, anterior e a mensagem assinada) e o
   link de validação, **sem o segredo nem a chave**. Outras páginas conferem sozinhas se a cadeia é
