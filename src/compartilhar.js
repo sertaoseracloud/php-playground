@@ -4,6 +4,7 @@
 //   #/livre       playground livre
 //   #/s/<código>  código compartilhado (arquivos guardados no próprio link)
 //   #/certificado/<código>  certificado (nome, módulo e data no próprio link)
+//   #/privacidade privacidade, cookies e LGPD
 
 export function paraBase64Url(bytes) {
   let binario = '';
@@ -36,6 +37,7 @@ export const linkCompartilhado = (estado) => `#/s/${codificar(estado)}`;
 export function lerRota(hash) {
   const caminho = hash.replace(/^#\/?/, '');
   if (caminho === 'livre') return { tela: 'item', id: 'livre' };
+  if (caminho === 'privacidade') return { tela: 'privacidade' };
   if (caminho.startsWith('p/')) return { tela: 'item', id: decodeURIComponent(caminho.slice(2)) };
   if (caminho.startsWith('certificado/')) return { tela: 'certificado', codigo: caminho.slice(12) };
   if (caminho.startsWith('s/')) {

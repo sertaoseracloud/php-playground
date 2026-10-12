@@ -107,6 +107,28 @@ npm run badges
 
 e faça commit de `public/`. O teste `tests/badges.test.js` falha se algum arquivo estiver faltando.
 
+### Privacidade, cookies e LGPD
+
+A página **🔒 Privacidade** (`#/privacidade`) explica, em linguagem simples, como os dados são tratados:
+
+- **Sem cookies e sem rastreamento**: não há analytics, anúncios nem servidor próprio. Por isso não
+  existe banner de aceite; um aviso discreto na primeira visita só informa.
+- **Dados só no navegador** (`localStorage`, prefixo `php-playground:`): progresso, datas, dias de
+  estudo, nome do certificado, código, tarefas marcadas, banco do playground livre e preferências.
+  A tabela completa fica em [`src/privacidade.js`](src/privacidade.js), e um teste falha se o código
+  passar a gravar uma chave que não está documentada.
+- **Cookies dos exercícios** (`PHPSESSID` dos projetos com login) são simulados na memória da aba.
+- **Terceiros**: GitHub Pages (hospedagem), W3Schools (w3.css no preview), picsum.photos (imagens dos
+  exercícios), GitHub (logo do certificado), LinkedIn (só ao clicar) e a voz do navegador (🔊 Ouvir).
+  Outro teste falha se o conteúdo passar a baixar algo de um domínio que não está na lista.
+- **LGPD**: finalidade e necessidade, base legal do nome (consentimento), segurança, direitos do art. 18
+  com botões **📥 Baixar meus dados** (JSON) e **🗑️ Apagar meus dados**, e cuidado com menores (art. 14).
+- **Nome no certificado**: o diálogo avisa que o nome vai no link e sugere só o primeiro nome para menores.
+
+O canal de contato é o GitHub Issues do projeto (`CONTROLADOR.contato` em `src/privacidade.js`).
+Se a Sertão será cloud tiver um e-mail de contato ou um encarregado de dados (DPO), troque lá.
+O texto é informativo e vale uma revisão jurídica antes de uso institucional.
+
 ### Links diretos para a aula
 
 - Trilha: `https://sertaoseracloud.github.io/php-playground/`

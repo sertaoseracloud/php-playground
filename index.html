@@ -23,6 +23,7 @@
     <nav class="menu" aria-label="Principal">
       <a href="#/" data-menu="inicio">🗺️ Trilha</a>
       <a href="#/livre" data-menu="livre">Playground livre</a>
+      <a href="#/privacidade" data-menu="privacidade">🔒 Privacidade</a>
     </nav>
     <span id="progresso-topo" class="progresso-topo" aria-label="Problemas resolvidos"></span>
     <span id="status" class="status" role="status">Carregando o PHP…</span>
@@ -35,6 +36,7 @@
   <div id="conteudo" class="conteudo" tabindex="-1">
     <main id="tela-inicio" class="tela-inicio" hidden></main>
     <main id="tela-certificado" class="tela-certificado" hidden></main>
+    <main id="tela-privacidade" class="tela-privacidade" hidden></main>
 
     <main id="tela-item" class="tela-item" hidden>
       <div class="barra-item">
@@ -131,7 +133,10 @@
   <dialog id="dialogo-nome" class="dialogo" aria-labelledby="nome-titulo">
     <form method="dialog">
       <h2 id="nome-titulo">🎓 Seu nome no certificado</h2>
-      <p>Digite seu nome completo, do jeito que deve aparecer nos certificados.</p>
+      <p>Digite seu nome do jeito que deve aparecer nos certificados.</p>
+      <p class="nota-nome">🔒 O nome fica salvo só neste navegador e vai dentro do link do certificado:
+        quem tiver o link vê o nome. Se você for menor de idade, use só o primeiro nome.
+        <a href="#/privacidade" target="_blank" rel="noopener">Privacidade</a></p>
       <label for="campo-nome" class="sr">Nome completo</label>
       <input id="campo-nome" class="campo-texto" maxlength="80" autocomplete="name" placeholder="Nome completo" required>
       <div class="dialogo-rodape">
@@ -192,6 +197,8 @@
 
   <!-- Régua de leitura (opção do painel de acessibilidade) -->
   <div id="regua-leitura" class="regua-leitura" aria-hidden="true"></div>
+  <!-- Aviso de privacidade (primeira visita) -->
+  <div id="aviso-privacidade" class="aviso-privacidade" role="region" aria-label="Aviso de privacidade" hidden></div>
   <!-- Lembrete de pausa -->
   <div id="lembrete-pausa" class="lembrete-pausa" role="status" hidden></div>
 

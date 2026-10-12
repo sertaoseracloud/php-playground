@@ -11,6 +11,7 @@ import { MotorPHP } from './php/motor.js';
 import { lerRota } from './compartilhar.js';
 import { iniciarAcessibilidade } from './ui/acessibilidade.js';
 import { iniciarRegua, iniciarPausa } from './ui/neuro.js';
+import { renderPrivacidade, iniciarAvisoPrivacidade } from './ui/privacidade.js';
 import { renderInicio, resumoProgresso } from './ui/inicio.js';
 import { criarTelaItem } from './ui/item.js';
 import { renderCertificado } from './ui/certificado.js';
@@ -26,11 +27,13 @@ iniciarPausa({ ativo: () => acessibilidade.atuais().lembretePausa });
 const telaInicio = $('tela-inicio');
 const telaItem = $('tela-item');
 const telaCertificado = $('tela-certificado');
+const telaPrivacidade = $('tela-privacidade');
 
 function mostrarTela(tela) {
   telaInicio.hidden = tela !== telaInicio;
   telaItem.hidden = tela !== telaItem;
   telaCertificado.hidden = tela !== telaCertificado;
+  telaPrivacidade.hidden = tela !== telaPrivacidade;
 }
 
 const definirStatus = (texto) => { $('status').textContent = texto; };
@@ -72,6 +75,14 @@ function navegar() {
     document.title = `${$('item-titulo').textContent} · PHP Playground`;
     return;
   }
+  if (rota.tela === 'privacidade') {
+    renderPrivacidade(telaPrivacidade, { definirStatus });
+    mostrarTela(telaPrivacidade);
+    marcarMenu('privacidade');
+    document.title = 'Privacidade e cookies · PHP Playground';
+    telaPrivacidade.scrollTop = 0;
+    return;
+  }
   if (rota.tela === 'certificado') {
     const cert = renderCertificado(telaCertificado, rota.codigo, { definirStatus });
     mostrarTela(telaCertificado);
@@ -103,4 +114,5 @@ window.addEventListener('preferencias', () => {
 atualizarProgressoTopo();
 navegar();
 
+iniciarAvisoPrivacidade();
 iniciarTutorial({ telaAtual: () => (telaItem.hidden ? 'inicio' : 'item') });

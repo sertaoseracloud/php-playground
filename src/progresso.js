@@ -98,3 +98,27 @@ export const apagarBancoLivre = () => remover('banco:livre');
 // ---------- preferências (layout, acessibilidade, tutorial) ----------
 export const lerPreferencia = (chave, padrao = null) => ler(`pref:${chave}`, padrao);
 export const gravarPreferencia = (chave, valor) => gravar(`pref:${chave}`, valor);
+
+// ---------- direitos do titular (LGPD, art. 18): ver, levar e apagar ----------
+
+function chavesDoSite() {
+  try {
+    return Object.keys(localStorage).filter((k) => k.startsWith(PREFIXO));
+  } catch {
+    return [];
+  }
+}
+
+/** Tudo o que o site guardou neste navegador, para baixar (portabilidade). */
+export function exportarDados() {
+  const dados = {};
+  for (const chave of chavesDoSite()) dados[chave.slice(PREFIXO.length)] = ler(chave.slice(PREFIXO.length));
+  return dados;
+}
+
+/** Apaga tudo o que o site guardou neste navegador. Devolve quantos itens apagou. */
+export function apagarDados() {
+  const chaves = chavesDoSite();
+  chaves.forEach((chave) => remover(chave.slice(PREFIXO.length)));
+  return chaves.length;
+}

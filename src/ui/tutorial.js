@@ -115,7 +115,7 @@ export function iniciarTutorial({ telaAtual }) {
   $('btn-tutorial').onclick = abrir;
 
   // Primeira visita: abre sozinho (exceto para quem chega por link de código ou de certificado).
-  if (!lerPreferencia('tutorial-visto') && !/^#\/(s|certificado)\//.test(location.hash)) abrir();
+  if (!lerPreferencia('tutorial-visto') && !/^#\/(s\/|certificado\/|privacidade)/.test(location.hash)) abrir();
 
   return { abrir };
 }

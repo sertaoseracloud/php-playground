@@ -345,3 +345,59 @@
   background: color-mix(in srgb, var(--amarelo) 15%, var(--fundo));
   animation: brilhar 2.4s infinite;
 }
+
+/* =========================================================
+   Privacidade e cookies (#/privacidade) e aviso da primeira visita
+   ========================================================= */
+.tela-privacidade { flex: 1; overflow: auto; }
+.pagina-texto {
+  max-width: 78ch;
+  margin: 0 auto;
+  padding: 16px 16px 40px;
+  font-family: var(--fonte-texto);
+  font-size: calc(15px * var(--escala));
+  line-height: var(--altura-linha);
+}
+.pagina-texto h1 { margin: 0; color: var(--roxo); font-size: 1.6rem; }
+.pagina-texto h2 { margin: 26px 0 8px; color: var(--ciano); font-size: 1.1rem; }
+.pagina-texto .atualizada { margin: 4px 0 16px; color: var(--suave); font-size: 0.85rem; }
+.pagina-texto li { margin: 4px 0; }
+.pagina-texto a { color: var(--roxo); }
+.resumo-privacidade {
+  padding: 4px 18px 16px;
+  border: 2px solid var(--verde);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--verde) 8%, var(--fundo));
+}
+.resumo-privacidade h2 { margin-top: 14px; color: var(--verde); }
+.resumo-privacidade ul { list-style: none; padding: 0; }
+.acoes-privacidade { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.tabela-privacidade { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.tabela-privacidade th, .tabela-privacidade td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--linha); vertical-align: top; }
+.tabela-privacidade th { color: var(--suave); font-weight: 600; }
+.lista-terceiros li { margin: 8px 0; }
+
+.aviso-privacidade {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 55;
+  max-width: min(560px, calc(100vw - 32px));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: var(--texto);
+  background: var(--fundo-escuro);
+  border: 1px solid var(--roxo);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.4);
+  font-family: var(--fonte-texto);
+  font-size: calc(13px * var(--escala));
+  line-height: var(--altura-linha);
+}
+.aviso-privacidade p { margin: 0; flex: 1 1 260px; }
+.aviso-privacidade a { text-decoration: none; }
+.nota-nome { font-size: 0.85em; color: var(--suave); }
+.nota-nome a { color: var(--roxo); }
