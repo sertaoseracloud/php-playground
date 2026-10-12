@@ -55,6 +55,7 @@ export function dadosEstruturados() {
         image: IMAGEM,
         inLanguage: 'pt-BR',
         isAccessibleForFree: true,
+        license: 'https://creativecommons.org/licenses/by-sa/4.0/',
         educationalLevel: 'Iniciante',
         teaches: Object.values(CERTIFICADOS).filter((c) => c !== CERTIFICADOS.final).map((c) => c.titulo),
         provider: { '@id': `${SITE}#organizacao` },

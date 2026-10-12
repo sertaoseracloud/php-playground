@@ -119,6 +119,7 @@ export function renderPrivacidade(el, { definirStatus = () => {} } = {}) {
       <section aria-labelledby="priv-mudancas">
         <h2 id="priv-mudancas">9. Mudanças nesta política</h2>
         <p>Se o site passar a tratar dados de outro jeito, esta página será atualizada antes, com nova data no topo.</p>
+        <p>Veja também os <a href="#/termos">termos de uso</a> e a <a href="#/licenca">licença</a>.</p>
       </section>
     </article>`;
 

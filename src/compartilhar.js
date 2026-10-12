@@ -6,6 +6,7 @@
 //   #/s/<código>  código compartilhado (arquivos guardados no próprio link)
 //   #/certificado/<código>  certificado (nome, módulo e data no próprio link)
 //   #/privacidade privacidade, cookies e LGPD
+//   #/licenca     licença (copyleft)   #/termos  termos de uso
 //   #/validar[/<código>]  validador de certificados
 
 export function paraBase64Url(bytes) {
@@ -41,6 +42,8 @@ export function lerRota(hash) {
   if (caminho === 'livre') return { tela: 'item', id: 'livre' };
   if (caminho === 'trilha') return { tela: 'inicio' };
   if (caminho === 'privacidade') return { tela: 'privacidade' };
+  if (caminho === 'licenca') return { tela: 'licenca' };
+  if (caminho === 'termos') return { tela: 'termos' };
   if (caminho === 'validar') return { tela: 'validar', codigo: '' };
   if (caminho.startsWith('validar/')) return { tela: 'validar', codigo: caminho.slice(8) };
   if (caminho.startsWith('p/')) return { tela: 'item', id: decodeURIComponent(caminho.slice(2)) };

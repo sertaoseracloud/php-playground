@@ -260,3 +260,21 @@ Editor (CodeMirror) ──arquivos + seed SQL──▶ Web Worker: PHP 8.4 (WebA
 
 O PHP vem do [WordPress Playground](https://github.com/WordPress/wordpress-playground)
 (`@php-wasm/web`, licença GPL-2.0-or-later).
+
+## Licença
+
+O PHP Playground é **software livre com copyleft**:
+
+- **Código**: [GNU AGPL-3.0-or-later](LICENSE). Pode usar, estudar, modificar e distribuir; quem
+  distribuir ou **oferecer pela internet** uma versão modificada precisa publicar o código dela sob a
+  mesma licença. A AGPL também é compatível com o PHP no navegador (`@php-wasm`, GPL-2.0-or-later).
+- **Conteúdo didático** (lições, exercícios, projetos, glossário): [CC BY-SA 4.0](LICENSE-CONTEUDO.md).
+  Crédito sugerido: "PHP Playground, Sertão será cloud (CC BY-SA 4.0)".
+- **Fora da licença**: o nome, a marca e o logotipo da Sertão será cloud e a emissão de certificados
+  em nome dela.
+
+No site: [Licença](https://sertaoseracloud.github.io/php-playground/#/licenca) e
+[Termos de uso](https://sertaoseracloud.github.io/php-playground/#/termos). A lista de componentes de
+terceiros fica em `src/licenca.js`, e um teste confere a licença de cada dependência.
+
+Copyright (C) 2026 Sertão será cloud.

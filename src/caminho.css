@@ -219,7 +219,8 @@
 .subunidade { align-self: stretch; display: flex; justify-content: space-between; padding: 6px 12px; border-radius: 8px; background: var(--fundo-escuro); color: var(--ciano); font-weight: 700; font-size: 0.9rem; }
 .subunidade small { color: var(--suave); font-weight: 400; }
 
-.bloco-unidade.bloqueada .trilha { opacity: 0.75; }
+/* Módulo bloqueado: só os círculos ficam apagados; o texto mantém o contraste. */
+.bloco-unidade.bloqueada .trilha .circulo { opacity: 0.6; }
 
 .bloco-final { display: flex; justify-content: center; padding: 12px 0 24px; }
 .diploma {

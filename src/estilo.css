@@ -79,7 +79,7 @@
   --linha-atual: #41444d66;
   --selecao: #474b57;
   --texto: #dedcd5;
-  --suave: #9a9fb0;
+  --suave: #b4b8c6; /* ≥ 4,5:1 também sobre os cabeçalhos coloridos */
   --ciano: #93b9c4;
   --verde: #9fc49b;
   --laranja: #d6b38f;

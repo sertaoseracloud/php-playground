@@ -134,7 +134,7 @@ export function renderLanding(el) {
 
       <footer class="rodape-landing">
         <p><b>${esc(EMISSOR.organizacao)}</b> · ${esc(EMISSOR.curso)}</p>
-        <p><a href="#/validar">Validar certificado</a> · <a href="#/privacidade">Privacidade e cookies</a> · <a href="${REPOSITORIO}" target="_blank" rel="noopener noreferrer">Código no GitHub</a></p>
+        <p><a href="#/validar">Validar certificado</a> · <a href="#/termos">Termos de uso</a> · <a href="#/privacidade">Privacidade e cookies</a> · <a href="#/licenca">Licença (AGPL-3.0 e CC BY-SA 4.0)</a> · <a href="${REPOSITORIO}" target="_blank" rel="noopener noreferrer">Código no GitHub</a></p>
       </footer>
     </div>`;
 }

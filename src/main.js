@@ -15,6 +15,7 @@ import { iniciarRegua, iniciarPausa } from './ui/neuro.js';
 import { renderPrivacidade, iniciarAvisoPrivacidade } from './ui/privacidade.js';
 import { renderLanding } from './ui/landing.js';
 import { renderValidador } from './ui/validador.js';
+import { renderLicenca, renderTermos } from './ui/paginas-legais.js';
 import { iniciarMenu } from './ui/menu.js';
 import { renderInicio, resumoProgresso } from './ui/inicio.js';
 import { criarTelaItem } from './ui/item.js';
@@ -37,6 +38,8 @@ const telaCertificado = $('tela-certificado');
 const telaPrivacidade = $('tela-privacidade');
 const telaLanding = $('tela-landing');
 const telaValidador = $('tela-validador');
+const telaLicenca = $('tela-licenca');
+const telaTermos = $('tela-termos');
 
 function mostrarTela(tela) {
   telaInicio.hidden = tela !== telaInicio;
@@ -45,6 +48,8 @@ function mostrarTela(tela) {
   telaPrivacidade.hidden = tela !== telaPrivacidade;
   telaLanding.hidden = tela !== telaLanding;
   telaValidador.hidden = tela !== telaValidador;
+  telaLicenca.hidden = tela !== telaLicenca;
+  telaTermos.hidden = tela !== telaTermos;
 }
 
 const definirStatus = (texto) => { $('status').textContent = texto; };
@@ -115,6 +120,18 @@ function navegar() {
       descricao: 'Confira se um certificado ou badge do PHP Playground, emitido pela Sertão será cloud, é autêntico.',
     });
     telaValidador.scrollTop = 0;
+    return;
+  }
+  if (rota.tela === 'licenca' || rota.tela === 'termos') {
+    const licenca = rota.tela === 'licenca';
+    const tela = licenca ? telaLicenca : telaTermos;
+    (licenca ? renderLicenca : renderTermos)(tela);
+    mostrarTela(tela);
+    marcarMenu('');
+    definirPagina(licenca
+      ? { titulo: `Licença · ${NOME}`, descricao: 'O PHP Playground é software livre (AGPL-3.0) com conteúdo aberto (CC BY-SA 4.0).' }
+      : { titulo: `Termos de uso · ${NOME}`, descricao: 'Termos de uso do PHP Playground, da Sertão será cloud.' });
+    tela.scrollTop = 0;
     return;
   }
   if (rota.tela === 'privacidade') {
