@@ -71,12 +71,14 @@
 
       <div class="area" id="area">
         <section class="painel painel-descricao" id="painel-descricao" aria-label="Descrição">
-          <div class="abas" role="tablist" aria-label="Descrição">
+          <div class="abas">
+            <div class="abas-grupo" role="tablist" aria-label="Descrição">
             <button class="aba ativa" data-desc="enunciado" role="tab" aria-selected="true">Descrição</button>
             <button class="aba" data-desc="banco" id="aba-banco" role="tab" aria-selected="false">🗄️ Banco</button>
             <button class="aba" data-desc="solucao" id="aba-solucao" role="tab" aria-selected="false">Solução</button>
             <button class="aba" data-desc="testes" id="aba-testes" role="tab" aria-selected="false" aria-controls="desc-testes">
               🧪 Testes <span id="resumo-testes" class="resumo-testes" aria-live="polite"></span></button>
+            </div>
             <button class="aba aba-direita" id="btn-ouvir" title="Ouvir: ler a descrição em voz alta" aria-label="Ouvir a descrição em voz alta" aria-pressed="false">🔊</button>
           </div>
           <div class="conteudo-desc" id="desc-enunciado" role="tabpanel"></div>
@@ -88,7 +90,7 @@
         </section>
 
         <section class="painel painel-codigo" aria-label="Código">
-          <div class="abas" id="abas-arquivos" role="tablist" aria-label="Arquivos"></div>
+          <div class="abas" id="abas-arquivos" role="toolbar" aria-label="Arquivos"></div>
           <div id="editor" class="editor"></div>
         </section>
 
@@ -198,14 +200,14 @@
   </dialog>
 
   <!-- Botões flutuantes (canto inferior direito): ajuda e preferências, em qualquer tela -->
-  <div class="flutuantes" role="group" aria-label="Ajuda e preferências">
+  <aside class="flutuantes" aria-label="Ajuda e preferências">
     <button type="button" id="btn-tutorial" class="flutuante" aria-haspopup="dialog" aria-label="Tutorial" data-rotulo="Tutorial">
       <span aria-hidden="true">❓</span></button>
     <button type="button" id="btn-acessibilidade" class="flutuante" aria-haspopup="dialog" aria-label="Acessibilidade" data-rotulo="Acessibilidade">
       <span aria-hidden="true">♿</span></button>
     <a href="#/privacidade" class="flutuante" data-menu="privacidade" aria-label="Privacidade e cookies" data-rotulo="Privacidade e cookies">
       <span aria-hidden="true">🔒</span></a>
-  </div>
+  </aside>
 
   <!-- Régua de leitura (opção do painel de acessibilidade) -->
   <div id="regua-leitura" class="regua-leitura" aria-hidden="true"></div>

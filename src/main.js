@@ -148,6 +148,17 @@ document.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('hashchange', navegar);
+// Abas (role="tab"): ← e → passam para a aba vizinha, como pede o padrão de acessibilidade.
+document.addEventListener('keydown', (e) => {
+  const aba = e.target.closest?.('[role="tab"]');
+  if (!aba || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+  const abas = [...aba.closest('[role="tablist"]').querySelectorAll('[role="tab"]')].filter((a) => !a.hidden);
+  const i = abas.indexOf(aba);
+  const alvo = { ArrowLeft: abas[i - 1] ?? abas.at(-1), ArrowRight: abas[i + 1] ?? abas[0], Home: abas[0], End: abas.at(-1) }[e.key];
+  e.preventDefault();
+  alvo.focus();
+  alvo.click();
+});
 // Opções como modo foco e lista de tarefas mudam o conteúdo: redesenha a tela aberta.
 window.addEventListener('preferencias', () => {
   if (!telaInicio.hidden) renderInicio(telaInicio);

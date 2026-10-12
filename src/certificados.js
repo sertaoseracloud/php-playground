@@ -250,7 +250,7 @@ export function validarImpresso({ nome, modulo, data, selo, anterior }) {
 
 const XML_NS = `${SITE}certificado/v1`;
 /** Onde a chave pública oficial fica publicada (gerada no build, vite.config.js). */
-export const URL_CHAVE_PUBLICA = `${SITE}chave-publica-ed25519.txt`;
+const URL_CHAVE_PUBLICA = `${SITE}chave-publica-ed25519.txt`;
 const escXml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[c]);
 
 /** Mensagem exata que o selo (HMAC-SHA256) assina: um array JSON. Não contém a chave. */

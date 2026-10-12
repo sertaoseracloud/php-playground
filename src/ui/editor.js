@@ -62,27 +62,34 @@ export class EditorArquivos {
   #renderAbas() {
     this.elAbas.replaceChildren();
     for (const nome of Object.keys(this.arquivos)) {
+      const grupo = document.createElement('span');
+      grupo.className = 'aba-arquivo';
       const aba = document.createElement('button');
+      aba.type = 'button';
       aba.className = 'aba' + (nome === this.atual ? ' ativa' : '');
       aba.textContent = nome;
+      if (nome === this.atual) aba.setAttribute('aria-current', 'true');
       aba.onclick = () => this.abrir(nome);
+      grupo.append(aba);
+      // Excluir é um botão próprio (antes era um <span> dentro da aba, inacessível pelo teclado).
       if (nome !== this.principal) {
-        const fechar = document.createElement('span');
-        fechar.className = 'fechar';
-        fechar.textContent = '×';
-        fechar.title = `Excluir ${nome}`;
-        fechar.onclick = (e) => {
-          e.stopPropagation();
-          this.#excluir(nome);
-        };
-        aba.append(fechar);
+        const excluir = document.createElement('button');
+        excluir.type = 'button';
+        excluir.className = 'btn-excluir-arquivo';
+        excluir.textContent = '×';
+        excluir.title = `Excluir ${nome}`;
+        excluir.setAttribute('aria-label', `Excluir ${nome}`);
+        excluir.onclick = () => this.#excluir(nome);
+        grupo.append(excluir);
       }
-      this.elAbas.append(aba);
+      this.elAbas.append(grupo);
     }
     const novo = document.createElement('button');
+    novo.type = 'button';
     novo.className = 'aba';
     novo.textContent = '+';
     novo.title = 'Novo arquivo';
+    novo.setAttribute('aria-label', 'Novo arquivo');
     novo.onclick = () => this.#novo();
     this.elAbas.append(novo);
   }

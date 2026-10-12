@@ -11,7 +11,9 @@
   --linha-atual: #44475a55;
   --selecao: #44475a;
   --texto: #f8f8f2;
-  --suave: #6272a4;
+  /* Texto secundário. O "comment" do Dracula (#6272a4) não chega a 4,5:1 nos fundos
+     do site; este tom mantém a cara do tema e passa em todos (ver auditoria de contraste). */
+  --suave: #a9b1d6;
   --ciano: #8be9fd;
   --verde: #50fa7b;
   --laranja: #ffb86c;
@@ -257,7 +259,11 @@ kbd {
 .menu { order: 1; display: flex; gap: 4px; }
 .menu a { color: var(--texto); text-decoration: none; padding: 5px 12px; border-radius: 6px; }
 .menu a:hover { background: var(--linha); }
-.menu a.ativo { background: var(--linha); color: var(--rosa); }
+.menu a.ativo {
+  color: var(--texto);
+  background: color-mix(in srgb, var(--rosa) 18%, var(--fundo-escuro));
+  box-shadow: inset 0 -3px 0 var(--rosa);
+}
 .progresso-topo { order: 2; color: var(--verde); white-space: nowrap; }
 .status { order: 3; margin-left: auto; color: var(--suave); font-size: 0.85rem; white-space: nowrap; }
 .btn-menu { display: none; }
@@ -343,7 +349,8 @@ kbd {
   padding: 1px 8px;
   border-radius: 10px;
   font-size: 0.78rem;
-  background: var(--linha);
+  background: var(--fundo-escuro);
+  border: 1px solid var(--linha);
   color: var(--texto);
   white-space: nowrap;
 }
@@ -451,6 +458,11 @@ kbd {
 .aba:hover { color: var(--texto); }
 .aba.ativa { color: var(--texto); border-bottom-color: var(--rosa); background: var(--fundo); }
 .aba-direita { margin-left: auto; }
+.abas-grupo { display: flex; flex-wrap: wrap; align-items: stretch; }
+.aba-arquivo { display: inline-flex; align-items: stretch; }
+.aba-arquivo .aba { padding-right: 6px; }
+.btn-excluir-arquivo { font: inherit; border: 0; background: transparent; color: var(--suave); cursor: pointer; padding: 0 8px; }
+.btn-excluir-arquivo:hover, .btn-excluir-arquivo:focus-visible { color: var(--vermelho); }
 .aba[aria-pressed="true"] { color: var(--rosa); }
 .aba .fechar { margin-left: 6px; opacity: 0.6; }
 .aba .fechar:hover { opacity: 1; color: var(--vermelho); }

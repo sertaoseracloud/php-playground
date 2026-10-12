@@ -45,7 +45,7 @@
 .estatisticas .valor { display: block; font-weight: 700; }
 .estatisticas .rotulo { font-size: 0.72rem; color: var(--suave); }
 .btn-continuar { display: flex; flex-direction: column; align-items: center; text-decoration: none; padding: 10px; font-size: 1.05rem; border-radius: 10px; }
-.btn-continuar small { font-weight: 400; font-size: 0.78rem; opacity: 0.85; white-space: normal; text-align: center; }
+.btn-continuar small { font-weight: 400; font-size: 0.8rem; color: inherit; white-space: normal; text-align: center; }
 .tudo-feito { text-align: center; font-weight: 700; color: var(--verde); }
 .titulo-certificados { font-size: 0.95rem; color: var(--roxo); margin: 18px 0 8px; }
 .lista-certificados { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -85,7 +85,8 @@
   align-items: center;
   padding: 16px 18px;
   border-radius: 14px;
-  background: color-mix(in srgb, var(--cor) 22%, var(--fundo));
+  /* 14%: com mais cor, o rótulo e o texto secundário ficam abaixo de 4,5:1 de contraste */
+  background: color-mix(in srgb, var(--cor) 14%, var(--fundo));
   border: 2px solid var(--cor);
 }
 .unidade[data-modulo="html"] { --cor: var(--laranja); }
@@ -267,6 +268,8 @@
 .acoes-certificado a { text-decoration: none; }
 .btn-linkedin { background: #0a66c2; border-color: #0a66c2; color: #fff; font-weight: 600; }
 .btn-linkedin-contorno { background: transparent; border: 1px solid #70b5f9; color: #70b5f9; font-weight: 600; }
+/* no tema claro, o azul claro some no fundo creme: usa o azul do LinkedIn */
+:root[data-tema="claro"] .btn-linkedin-contorno { border-color: #0a66c2; color: #0a66c2; }
 
 /* página do badge, no estilo da Credly */
 .badge-credly {
@@ -381,7 +384,6 @@
 .selo-nao-confere { color: var(--vermelho); }
 .selo-detalhes { margin-top: 12px; font-size: 0.85rem; color: var(--suave); }
 .selo-detalhes summary { cursor: pointer; color: var(--texto); }
-.selo-hash code { font-family: var(--fonte-codigo); color: var(--amarelo); overflow-wrap: anywhere; }
 
 /* impressão: só o certificado, em A4 paisagem */
 @page { size: A4 landscape; margin: 0; }
@@ -522,7 +524,6 @@
 .dados-validacao dt { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--suave); }
 .dados-validacao dd { margin: 2px 0 0; font-weight: 600; }
 .dados-validacao .largo { grid-column: 1 / -1; }
-.hash-longo { font-family: var(--fonte-codigo); font-size: 0.8rem; color: var(--amarelo); overflow-wrap: anywhere; font-weight: 400; }
 .nota-validacao { font-size: 0.85rem; color: var(--suave); }
 .validador h3 { margin: 14px 0 0; font-size: 0.95rem; }
 
