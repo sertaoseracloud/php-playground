@@ -22,7 +22,7 @@ export const CONTEUDO = {
   spdx: 'CC-BY-SA-4.0',
   url: 'https://creativecommons.org/licenses/by-sa/4.0/deed.pt-br',
   arquivo: `${REPOSITORIO}/blob/main/LICENSE-CONTEUDO.md`,
-  atribuicao: 'PHP Playground, Sertão será cloud (CC BY-SA 4.0)',
+  atribuicao: 'DivergePHP, Sertão será cloud (CC BY-SA 4.0)',
 };
 
 /** Componentes de terceiros que vão junto com o site, com a licença de cada um. */

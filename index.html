@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#21222c">
   <!-- seo:inicio -->
   <!-- No build, este bloco é trocado pelas meta tags de src/seo.js (scripts/prerender.mjs). -->
-  <title>PHP Playground: aprenda PHP, HTML e W3.CSS no navegador</title>
+  <title>DivergePHP: aprenda PHP, HTML e W3.CSS no navegador</title>
   <meta name="description" content="Aprenda PHP do zero, grátis e no navegador: trilha com exercícios de HTML, W3.CSS, PHP e PDO corrigidos na hora e certificados.">
   <!-- seo:fim -->
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -18,10 +18,12 @@
 </head>
 <body>
   <a class="pular" href="#conteudo">Pular para o conteúdo</a>
-  <noscript><p class="sem-js">O PHP Playground roda o PHP no seu navegador e precisa de JavaScript ativado.</p></noscript>
+  <!-- Avisos para leitores de tela (src/ui/anuncios.js): o resultado de cada ação, falado. -->
+  <div id="anuncio" class="sr" role="status" aria-live="polite"></div>
+  <noscript><p class="sem-js">O DivergePHP roda o PHP no seu navegador e precisa de JavaScript ativado.</p></noscript>
 
   <header class="topo">
-    <a href="#/" class="marca"><span aria-hidden="true">🐘</span> PHP Playground</a>
+    <a href="#/" class="marca"><span aria-hidden="true">🐘</span> DivergePHP</a>
     <!-- No celular, a navegação fica no painel do botão ☰; no desktop, em linha. Ajuda e preferências ficam nos botões flutuantes. -->
     <button type="button" id="btn-menu" class="btn-menu" aria-expanded="false" aria-controls="menu-topo" aria-label="Abrir menu">
       <span aria-hidden="true">☰</span>
@@ -35,7 +37,7 @@
       </nav>
     </div>
     <span id="progresso-topo" class="progresso-topo"></span>
-    <span id="status" class="status" role="status">Carregando o PHP…</span>
+    <span id="status" class="status">Carregando o PHP…</span>
   </header>
 
   <div id="conteudo" class="conteudo" tabindex="-1">
@@ -48,6 +50,7 @@
     <main id="tela-termos" class="tela-privacidade" hidden></main>
     <main id="tela-novidades" class="tela-privacidade" hidden></main>
     <main id="tela-instrutor" class="tela-privacidade" hidden></main>
+    <main id="tela-acessibilidade" class="tela-privacidade" hidden></main>
 
     <main id="tela-item" class="tela-item" hidden>
       <div class="barra-item">
@@ -82,7 +85,7 @@
             <button class="aba" data-desc="banco" id="aba-banco" role="tab" aria-selected="false">🗄️ Banco</button>
             <button class="aba" data-desc="solucao" id="aba-solucao" role="tab" aria-selected="false">Solução</button>
             <button class="aba" data-desc="testes" id="aba-testes" role="tab" aria-selected="false" aria-controls="desc-testes">
-              🧪 Testes <span id="resumo-testes" class="resumo-testes" aria-live="polite"></span></button>
+              🧪 Testes <span id="resumo-testes" class="resumo-testes"></span></button>
             </div>
             <button class="aba aba-direita" id="btn-ouvir" title="Ouvir: ler a descrição em voz alta" aria-label="Ouvir a descrição em voz alta" aria-pressed="false">🔊</button>
           </div>
@@ -96,6 +99,7 @@
 
         <section class="painel painel-codigo" aria-label="Código">
           <div class="abas" id="abas-arquivos" role="toolbar" aria-label="Arquivos"></div>
+          <p id="ajuda-editor" class="sr">Control Enter roda o código e os testes visíveis. Control Shift Enter envia. Tab sai do editor; para recuar a linha, use Control colchete. Control F procura e Control Alt G vai para uma linha.</p>
           <div id="editor" class="editor"></div>
         </section>
 
@@ -145,7 +149,7 @@
       <p>Digite seu nome do jeito que deve aparecer nos certificados.</p>
       <p class="nota-nome">🔒 O nome fica salvo só neste navegador e vai dentro do link do certificado:
         quem tiver o link vê o nome. Se você for menor de idade, use só o primeiro nome.
-        <a href="#/privacidade" target="_blank" rel="noopener">Privacidade</a></p>
+        <a href="#/privacidade" target="_blank" rel="noopener noreferrer">Privacidade</a></p>
       <label for="campo-nome" class="sr">Nome completo</label>
       <input id="campo-nome" class="campo-texto" maxlength="80" autocomplete="name" placeholder="Nome completo" required>
       <div class="dialogo-rodape">
@@ -195,6 +199,7 @@
           <dt><kbd>←</kbd> <kbd>→</kbd> no divisor</dt><dd>Redimensionar código e preview</dd>
           <dt><kbd>Esc</kbd></dt><dd>Fechar janelas como esta</dd>
         </dl>
+        <p><a href="#/acessibilidade">Todos os atalhos e recursos de acessibilidade</a></p>
       </details>
 
       <div class="dialogo-rodape">

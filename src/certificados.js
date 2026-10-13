@@ -25,7 +25,7 @@ export const EMISSOR = {
   organizacao: 'Sertão será cloud',
   responsavel: 'Cláudio Raposo',
   cargo: 'Instrutor responsável',
-  curso: 'PHP Playground: do HTML ao banco de dados',
+  curso: 'DivergePHP: do HTML ao banco de dados',
   logo: 'https://github.com/sertaoseracloud.png?size=160',
 };
 
@@ -331,7 +331,7 @@ ${elos.map(bloco).join('\n')}
 export function lerCertificadoXml(texto, parser = new DOMParser()) {
   const doc = parser.parseFromString(String(texto ?? ''), 'application/xml');
   if (doc.querySelector('parsererror') || doc.documentElement?.localName !== 'certificado') {
-    return { erro: 'O arquivo não é um XML de certificado do PHP Playground.' };
+    return { erro: 'O arquivo não é um XML de certificado do DivergePHP.' };
   }
   const pega = (nome) => doc.getElementsByTagNameNS(XML_NS, nome)[0]?.textContent?.trim() ?? '';
   const codigo = pega('codigoDoLink');

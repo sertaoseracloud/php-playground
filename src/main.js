@@ -18,6 +18,8 @@ import { renderValidador } from './ui/validador.js';
 import { renderLicenca, renderTermos } from './ui/paginas-legais.js';
 import { renderNovidades } from './ui/novidades.js';
 import { renderInstrutor } from './ui/instrutor.js';
+import { renderDeclaracaoAcessibilidade } from './ui/declaracao-acessibilidade.js';
+import { anunciar } from './ui/anuncios.js';
 import { VERSAO } from './novidades.js';
 import { iniciarMenu, iniciarFlutuantes } from './ui/menu.js';
 import { renderInicio, resumoProgresso } from './ui/inicio.js';
@@ -46,6 +48,7 @@ const telaLicenca = $('tela-licenca');
 const telaTermos = $('tela-termos');
 const telaNovidades = $('tela-novidades');
 const telaInstrutor = $('tela-instrutor');
+const telaAcessibilidade = $('tela-acessibilidade');
 
 function mostrarTela(tela) {
   telaInicio.hidden = tela !== telaInicio;
@@ -58,9 +61,17 @@ function mostrarTela(tela) {
   telaTermos.hidden = tela !== telaTermos;
   telaNovidades.hidden = tela !== telaNovidades;
   telaInstrutor.hidden = tela !== telaInstrutor;
+  telaAcessibilidade.hidden = tela !== telaAcessibilidade;
 }
 
-const definirStatus = (texto) => { $('status').textContent = texto; };
+/**
+ * Texto da barra de status. O leitor de tela fala o mesmo texto ou, com `falar`, um
+ * mais completo (o resultado dos testes, por exemplo); `falar: false` não fala nada.
+ */
+const definirStatus = (texto, { falar = texto } = {}) => {
+  $('status').textContent = texto;
+  if (falar) anunciar(falar);
+};
 /** Status das telas que não são exercício: a situação do PHP (carregando, pronto ou erro). */
 let statusPadrao = '';
 
@@ -91,7 +102,7 @@ const layout = criarLayout();
 telaDoItem = criarTelaItem({
   motor,
   layout,
-  definirStatus: (texto) => { if (!telaItem.hidden) definirStatus(texto); },
+  definirStatus: (texto, opcoes) => { if (!telaItem.hidden) definirStatus(texto, opcoes); },
   aoMudarProgresso: atualizarProgressoTopo,
 });
 
@@ -122,7 +133,7 @@ function navegar() {
     return;
   }
   // Fora do exercício, o status volta à situação do PHP.
-  definirStatus(statusPadrao);
+  definirStatus(statusPadrao, { falar: false });
   if (rota.tela === 'landing') {
     renderLanding(telaLanding);
     mostrarTela(telaLanding);
@@ -140,6 +151,17 @@ function navegar() {
       descricao: `Confira se um certificado ou badge do ${NOME}, emitido pela Sertão será cloud, é autêntico.`,
     });
     telaValidador.scrollTop = 0;
+    return;
+  }
+  if (rota.tela === 'acessibilidade') {
+    renderDeclaracaoAcessibilidade(telaAcessibilidade);
+    mostrarTela(telaAcessibilidade);
+    marcarMenu('');
+    definirPagina({
+      titulo: `Acessibilidade · ${NOME}`,
+      descricao: `Como o ${NOME} atende pessoas cegas, surdas, mudas e neurodivergentes: leitor de tela, teclado, Libras (VLibras) e perfis prontos.`,
+    });
+    telaAcessibilidade.scrollTop = 0;
     return;
   }
   if (rota.tela === 'instrutor') {
@@ -203,7 +225,29 @@ document.addEventListener('keydown', (e) => {
   $(e.shiftKey ? 'btn-enviar' : 'btn-executar').click();
 });
 
-window.addEventListener('hashchange', navegar);
+/**
+ * Leva o foco para o título da tela aberta: quem usa leitor de tela ouve em que página
+ * está, e o Tab continua dali (e não do link clicado, que sumiu).
+ */
+function focarTitulo() {
+  const tela = [...document.querySelectorAll('#conteudo > main')].find((m) => !m.hidden);
+  const alvo = (location.hash === '#/apoie' && $('apoio-titulo')) || tela?.querySelector('h1') || $('conteudo');
+  if (!alvo.hasAttribute('tabindex')) alvo.setAttribute('tabindex', '-1');
+  alvo.focus({ preventScroll: alvo !== $('apoio-titulo') });
+}
+
+window.addEventListener('hashchange', () => {
+  // Âncoras da própria página (#conteudo, por exemplo) não são rotas: só rolam até lá.
+  if (!location.hash.startsWith('#/') && location.hash.length > 1 && document.getElementById(location.hash.slice(1))) return;
+  navegar();
+  focarTitulo();
+});
+// "Pular para o conteúdo" vai para o título da tela aberta sem mudar o endereço (as
+// rotas ficam no #: com o href puro, o link levava para a página inicial).
+document.querySelector('.pular').addEventListener('click', (e) => {
+  e.preventDefault();
+  focarTitulo();
+});
 // Abas (role="tab"): ← e → passam para a aba vizinha, como pede o padrão de acessibilidade.
 document.addEventListener('keydown', (e) => {
   const aba = e.target.closest?.('[role="tab"]');

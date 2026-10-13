@@ -18,6 +18,7 @@ import { jornadaAtual, certificadosDaJornada } from './inicio.js';
 import { CERTIFICADOS } from '../certificados.js';
 import { LIMITE_DESBLOQUEIO } from '../gamificacao.js';
 import { $, esc } from './util.js';
+import { anunciar, falaDosTestes, leitorDeTela, frase } from './anuncios.js';
 
 const semPressao = () => document.documentElement.classList.contains('a11y-sem-pressao');
 
@@ -156,7 +157,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     el.enunciado.innerHTML = `
       ${avisoBloqueio}
       ${etapa}
-      <ol class="roteiro" aria-label="Como resolver">
+      <ol class="roteiro" aria-label="Como resolver" tabindex="0">
         <li>Leia o que fazer</li><li>Faça uma parte</li><li>▶ Executar</li><li>Confira os ✅</li><li>⬆ Enviar</li>
       </ol>
       <section class="secao secao-fazer"><h2>🎯 O que fazer</h2>${item.enunciado}</section>
@@ -308,7 +309,20 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
         Verifique se algum laço (for/while) nunca termina.</p>`;
     }
     mostrarErros(String(erro?.message ?? erro));
-    definirStatus('Erro ao executar');
+    definirStatus('Erro ao executar', { falar: frase(`Erro ao executar: ${erro?.message ?? erro}`) });
+  }
+
+  /** O resultado da execução, falado: HTTP, título da página gerada e erros do PHP. */
+  function falaDoPhp(r) {
+    const titulo = r.html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1]?.trim();
+    const erros = r.erros.trim().split('\n').map((l) => l.trim()).filter(Boolean);
+    const lidos = leitorDeTela() ? erros.slice(0, 5) : erros.slice(0, 1);
+    return [
+      `Página gerada: HTTP ${r.status}${titulo ? `, título ${titulo}` : ''}.`,
+      erros.length ? `O PHP mostrou ${erros.length} ${erros.length === 1 ? 'mensagem' : 'mensagens'} de erro.` : 'Sem erros do PHP.',
+      ...lidos.map(frase),
+      'O resultado está na aba Resultado e o HTML em HTML gerado.',
+    ].join(' ');
   }
 
   const executarNoMotor = (arquivos, req, banco, opcoes) => motor.executar(arquivos, req, banco, opcoes);
@@ -319,7 +333,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
    * como num site de verdade: o post publicado continua lá no próximo clique.
    */
   /** Executar pedido pelo aluno (botão ou Ctrl+Enter): mostra a aba de testes com o resultado. */
-  const executarPeloAluno = () => executar(undefined, { abrirTestes: true });
+  const executarPeloAluno = () => executar(undefined, { abrirTestes: true, falar: true });
 
   /** Abre a aba 🧪 Testes (e a descrição, se estiver oculta). */
   function abrirAbaTestes() {
@@ -328,11 +342,13 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     mostrarDesc('testes');
   }
 
-  async function executar(req = { url: estado.url }, { navegacao = false, abrirTestes = false } = {}) {
+  // `falar`: só quando a pessoa pediu (botão, atalho ou clique na prévia); as execuções
+  // automáticas (abrir o exercício, restaurar) não interrompem o leitor de tela.
+  async function executar(req = { url: estado.url }, { navegacao = false, abrirTestes = false, falar = navegacao } = {}) {
     if (!estado.phpPronto || !estado.item) return;
     const item = estado.item;
     const arquivos = { ...editor.arquivos };
-    definirStatus('Executando…');
+    definirStatus('Executando…', { falar: false });
     try {
       const banco = bancoAtual();
       const continuar = navegacao && estado.previewAtivo;
@@ -349,7 +365,9 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
       el.resultado.srcdoc = r.html + SCRIPT_PONTE;
       el.fonte.textContent = r.html;
       mostrarErros(r.erros.trim());
-      definirStatus(`PHP 8.4 · ${req.metodo === 'POST' ? 'POST ' : ''}HTTP ${r.status} · ${r.ms} ms`);
+      const fala = falaDoPhp(r);
+      const comTestes = item.tipo === 'problema' && !navegacao;
+      definirStatus(`PHP 8.4 · ${req.metodo === 'POST' ? 'POST ' : ''}HTTP ${r.status} · ${r.ms} ms`, { falar: falar && !comTestes && fala });
 
       if (ehLivre() && r.bancoBytes) {
         gravarBancoLivre(r.bancoBytes);
@@ -359,9 +377,11 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
         marcar(item.id, 'resolvido');
         aoMudarProgresso();
       }
-      if (item.tipo === 'problema' && !navegacao) {
-        await rodarTestes({ incluirOcultos: false });
-        if (abrirTestes && estado.item === item) abrirAbaTestes();
+      if (comTestes) {
+        const resultado = await rodarTestes({ incluirOcultos: false });
+        if (estado.item !== item) return;
+        if (falar) anunciar(`${fala} ${falarTestes(resultado, false)}`);
+        if (abrirTestes) abrirAbaTestes();
       }
       if (!el.banco.hidden) renderBanco();
     } catch (erro) {
@@ -505,6 +525,20 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     );
   }
 
+  /** O que o leitor de tela fala sobre os testes (com os nomes da aba Testes). */
+  function falarTestes(resultado, envio, extras = {}) {
+    const testes = estado.item.testes;
+    const nomes = nomesDosCasos(testes);
+    const rodados = envio ? testes : testes.filter((t) => !t.oculto);
+    return falaDosTestes(resultado, {
+      envio,
+      gentil: semPressao(),
+      detalhado: leitorDeTela(),
+      nomes: rodados.map((t) => nomes[testes.indexOf(t)]),
+      ...extras,
+    });
+  }
+
   async function enviar() {
     if (!estado.phpPronto || !ehProblema() || estado.ocupado) return;
     estado.ocupado = true;
@@ -514,7 +548,9 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     definirResumo('rodando…');
     definirStatus('Enviando…');
     try {
-      const { aprovado } = await rodarTestes({ incluirOcultos: true });
+      const resultado = await rodarTestes({ incluirOcultos: true });
+      const { aprovado } = resultado;
+      let conquista = '';
       marcar(estado.item.id, aprovado ? 'resolvido' : 'tentado');
       renderCabecalho();
       aoMudarProgresso();
@@ -526,12 +562,15 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
         const aviso = cert?.liberado
           ? 'Seu certificado da Sertão será cloud está liberado.'
           : `Os certificados são liberados na ordem da trilha: conclua também <b>${esc(CERTIFICADOS[cert?.falta]?.titulo ?? '')}</b> para receber o seu.`;
+        conquista = `Você concluiu o módulo ${modulo.titulo}! ${aviso.replace(/<[^>]+>/g, '')}`;
         el.testes.insertAdjacentHTML('afterbegin', `
-          <div class="comemoracao" role="status">🏆 Você concluiu o módulo <b>${esc(modulo.titulo)}</b>!
+          <div class="comemoracao">🏆 Você concluiu o módulo <b>${esc(modulo.titulo)}</b>!
             ${aviso}
             <a class="btn btn-roxo btn-pequeno" href="#/trilha">Ver no caminho</a></div>`);
       }
-      definirStatus(aprovado ? 'Aceito! 🎉' : semPressao() ? 'Ainda não passou: veja o que falta' : 'Resposta errada');
+      definirStatus(aprovado ? 'Aceito! 🎉' : semPressao() ? 'Ainda não passou: veja o que falta' : 'Resposta errada', {
+        falar: `${falarTestes(resultado, true)} ${conquista}`.trim(),
+      });
     } catch (erro) {
       tratarErro(erro);
       el.testes.innerHTML = `<p class="veredito falha">Erro</p><p class="veredito-sub">${esc(erro.message)}</p>`;

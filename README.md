@@ -1,10 +1,12 @@
-# 🐘 PHP Playground
+# 🐘 DivergePHP
 
 Trilha de exercícios no estilo LeetCode para ensinar **HTML → W3.CSS → PHP → PHP + PDO** em aula.
 O PHP 8.4 roda **dentro do navegador** (WebAssembly), inclusive com banco de dados **SQLite via PDO**.
 Não há servidor, instalação nem custo: o site é estático e fica no GitHub Pages.
 
 **Acesse:** https://sertaoseracloud.github.io/php-playground/
+
+**Acessível para todas as pessoas.** O nome vem de *neurodivergente*: a plataforma foi feita para pessoas cegas (o leitor de tela fala o resultado de cada teste), surdas e mudas (nada depende de som ou de voz, com tradução para Libras pelo VLibras) e neurodivergentes (perfis para TDAH, dislexia, autismo e ansiedade). A meta é a WCAG 2.2 nível AA, conferida com o axe-core a cada versão. Detalhes na página **Acessibilidade** do site (`#/acessibilidade`).
 
 ## O que tem
 
@@ -286,13 +288,13 @@ O PHP vem do [WordPress Playground](https://github.com/WordPress/wordpress-playg
 
 ## Licença
 
-O PHP Playground é **software livre com copyleft**:
+O DivergePHP é **software livre com copyleft**:
 
 - **Código**: [GNU AGPL-3.0-or-later](LICENSE). Pode usar, estudar, modificar e distribuir; quem
   distribuir ou **oferecer pela internet** uma versão modificada precisa publicar o código dela sob a
   mesma licença. A AGPL também é compatível com o PHP no navegador (`@php-wasm`, GPL-2.0-or-later).
 - **Conteúdo didático** (lições, exercícios, projetos, glossário): [CC BY-SA 4.0](LICENSE-CONTEUDO.md).
-  Crédito sugerido: "PHP Playground, Sertão será cloud (CC BY-SA 4.0)".
+  Crédito sugerido: "DivergePHP, Sertão será cloud (CC BY-SA 4.0)".
 - **Fora da licença**: o nome, a marca e o logotipo da Sertão será cloud e a emissão de certificados
   em nome dela.
 

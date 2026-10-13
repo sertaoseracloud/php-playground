@@ -85,6 +85,6 @@ export default defineConfig(({ command }) => {
       alias: [{ find: /^@php-wasm\/web-(5-2|7-4|8-0|8-1|8-2|8-3|8-5)$/, replacement: stub }],
     },
     worker: { format: 'es', plugins: () => [semIntl, ativosPhp] },
-    build: { target: 'es2022', chunkSizeWarningLimit: 4000 },
+    build: { target: 'es2022', chunkSizeWarningLimit: 1500 },
   };
 });

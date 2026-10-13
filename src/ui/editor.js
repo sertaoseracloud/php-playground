@@ -23,7 +23,7 @@ export class EditorArquivos {
         { key: 'Mod-Enter', run: () => { aoExecutar(); return true; } },
         { key: 'Mod-Shift-Enter', run: () => { aoEnviar(); return true; } },
       ])),
-      EditorView.contentAttributes.of({ 'aria-label': 'Editor de código' }),
+      EditorView.contentAttributes.of({ 'aria-label': 'Editor de código PHP e HTML', tabindex: '0', 'aria-describedby': 'ajuda-editor' }),
       EditorView.updateListener.of((u) => {
         if (u.docChanged) {
           this.arquivos[this.atual] = u.state.doc.toString();
