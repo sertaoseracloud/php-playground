@@ -134,6 +134,10 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
   os dados e a cadeia como linha do tempo. As cores separam "válido" (verde), "alterado" (vermelho),
   "não consegui ler / faltam dados" (âmbar) e "link antigo" (ciano), e mudar o texto apaga o resultado
   anterior.
+- **↩️ Restaurar o progresso pelo certificado**: ao validar um certificado válido pelo link ou código,
+  quem tem neste navegador o **mesmo nome** do certificado (acentos e maiúsculas contam) restaura o
+  módulo e os anteriores da cadeia, nas datas do certificado. O certificado emitido de novo é o mesmo;
+  nada do que já está no navegador é apagado (`src/restaurar.js`).
 - **📄 XML do certificado** (botão na página do certificado): traz aluno, emissor, empresa, módulo, data,
   código, selo, selo anterior, a cadeia inteira (cada bloco com selo, anterior e a mensagem assinada) e o
   link de validação, **sem o segredo nem a chave**. Outras páginas conferem sozinhas se a cadeia é
