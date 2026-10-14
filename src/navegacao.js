@@ -1,3 +1,5 @@
+// Cópia da W3.CSS 5.01 (w3schools.com/w3css, de uso livre) em .txt: o ?raw lê igual no Vite e no vitest.
+import W3CSS from './vendor/w3css-5.01.txt?raw';
 // A página do aluno roda num iframe isolado (sandbox). Este script é anexado ao
 // HTML gerado: em vez de o iframe navegar, ele avisa o playground, que executa
 // o PHP de novo com a nova URL ou com o corpo do POST.
@@ -21,6 +23,16 @@ export const SCRIPT_PONTE = `<script>(function () {
     avisar({ tipo: 'link', metodo: 'GET', acao: href, campos: [] });
   }, true);
 })();</script>`;
+
+// A W3.CSS que as páginas pedem ao w3schools bloqueia a pintura até chegar, e o iframe
+// isolado nem sempre aproveita o cache: quando o site deles demora, o preview fica em
+// branco. O preview usa esta cópia (W3.CSS 5.01, de uso livre) embutida na página; a aba
+// "HTML gerado" continua mostrando o <link> que o aluno escreveu.
+const LINK_W3CSS = /<link\b[^>]*\bhref\s*=\s*["']?(?:https?:)?\/\/www\.w3schools\.com\/w3css\/(?:\d+\/)?w3\.css["']?[^>]*>/gi;
+
+export function paraOPreview(html) {
+  return html.replace(LINK_W3CSS, () => `<style data-w3css>${W3CSS}</style>`);
+}
 
 const ORIGEM = 'http://localhost';
 

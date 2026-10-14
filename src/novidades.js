@@ -10,6 +10,21 @@ export const REPOSITORIO = 'https://github.com/sertaoseracloud/php-playground';
 /** Releases, da mais nova para a mais antiga. Escritas para quem usa o site, sem jargão. */
 export const RELEASES = [
   {
+    versao: '1.5.1',
+    data: '2026-10-14',
+    titulo: 'Preview sem ficar em branco',
+    resumo: 'A página do exercício aparece na hora, mesmo quando o site da W3.CSS está lento.',
+    grupos: [
+      {
+        titulo: '🛠️ Correções',
+        itens: [
+          'O preview podia ficar em branco depois de validar e ir para o próximo exercício: a página esperava a W3.CSS chegar do site do w3schools. Agora o preview usa uma cópia da W3.CSS que já vem com o DivergePHP.',
+          'A aba "HTML gerado" continua mostrando o <link> da W3.CSS que você escreveu.',
+        ],
+      },
+    ],
+  },
+  {
     versao: '1.5.0',
     data: '2026-10-13',
     titulo: 'Agora é DivergePHP: acessível para todas as pessoas',

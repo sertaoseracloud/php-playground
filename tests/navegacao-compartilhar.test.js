@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { montarRequisicao, normalizarUrl } from '../src/navegacao.js';
+import { montarRequisicao, normalizarUrl, paraOPreview } from '../src/navegacao.js';
 import { codificar, decodificar, lerRota, linkItem, linkCompartilhado } from '../src/compartilhar.js';
 
 describe('normalizarUrl', () => {
@@ -68,5 +68,32 @@ describe('rotas', () => {
     const estado = { item: 'html-links', arquivos: { 'index.html': '<a href="#">x</a>' } };
     expect(lerRota(linkCompartilhado(estado))).toEqual({ tela: 'item', id: 'html-links', arquivos: estado.arquivos });
     expect(lerRota('#/s/@@@')).toEqual({ tela: 'landing' });
+  });
+});
+
+describe('paraOPreview', () => {
+  // A W3.CSS do w3schools bloqueia a pintura até chegar: o preview usa uma cópia local embutida.
+  it('troca o link da W3.CSS por uma cópia embutida e mantém o resto da página', () => {
+    const html = '<head><link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css"><title>Oi</title></head><body><p>x</p></body>';
+    const preview = paraOPreview(html);
+    expect(preview).not.toContain('w3schools.com');
+    expect(preview).toContain('<style data-w3css>');
+    expect(preview).toContain('.w3-container');
+    expect(preview).toContain('<title>Oi</title></head><body><p>x</p></body>');
+  });
+
+  it('vale para outras versões e outras formas de escrever o link', () => {
+    for (const link of [
+      "<link href='https://www.w3schools.com/w3css/4/w3.css' rel='stylesheet'>",
+      '<LINK REL="stylesheet" HREF="//www.w3schools.com/w3css/5/w3.css" />',
+      '<link rel="stylesheet" href="http://www.w3schools.com/w3css/w3.css">',
+    ]) {
+      expect(paraOPreview(link)).toMatch(/^<style data-w3css>[\s\S]*<\/style>$/);
+    }
+  });
+
+  it('não mexe em outras folhas de estilo', () => {
+    const html = '<link rel="stylesheet" href="estilo.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">';
+    expect(paraOPreview(html)).toBe(html);
   });
 });

@@ -2,7 +2,7 @@
 import { minutosDoItem } from '../cargaHoraria.js';
 import { buscarItem, modulos, vizinhos, DIFICULDADES } from '../conteudo/trilha.js';
 import { TempoEsgotado } from '../php/motor.js';
-import { SCRIPT_PONTE, montarRequisicao, normalizarUrl } from '../navegacao.js';
+import { SCRIPT_PONTE, montarRequisicao, normalizarUrl, paraOPreview } from '../navegacao.js';
 import { linkItem, linkCompartilhado } from '../compartilhar.js';
 import { corrigir } from '../corrigir.js';
 import {
@@ -362,7 +362,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
       estado.previewAtivo = true;
       estado.url = r.url ?? req.url ?? `/${editor.principal}`;
       el.url.value = estado.url;
-      el.resultado.srcdoc = r.html + SCRIPT_PONTE;
+      el.resultado.srcdoc = paraOPreview(r.html) + SCRIPT_PONTE;
       el.fonte.textContent = r.html;
       mostrarErros(r.erros.trim());
       const fala = falaDoPhp(r);
