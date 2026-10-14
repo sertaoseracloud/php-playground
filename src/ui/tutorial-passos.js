@@ -46,7 +46,7 @@ export const PASSOS = [
     alvo: '#painel-descricao',
     titulo: 'O enunciado',
     texto: `<p>Leia o que o problema pede. Nas abas há o <b>🗄️ Banco</b> (tabelas, nos problemas de PDO)
-      e a <b>Solução</b>, para quando você travar.</p>
+      e a <b>Solução</b>, que aparece depois do tempo estimado do exercício (o ⏱), se você ainda não resolveu.</p>
       <p>O botão <b>🔊 Ouvir</b> lê o enunciado em voz alta.</p>`,
   },
   {
