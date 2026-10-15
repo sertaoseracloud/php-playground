@@ -1,6 +1,7 @@
 // 🖨️ Tipografia: papel creme, tábuas da oficina, a prensa e a caixa de tipos (o HTML é texto marcado).
 import { sprite, passo } from './pixel.js';
 import { pessoa } from './comuns.js';
+import { oficina as casaOficina } from './casas.js';
 
 const prensa = sprite({ k: '#3a3a3a', g: '#9a9a9a', m: '#7a5a3a', p: '#f4efe4' }, `
 ................
@@ -63,9 +64,10 @@ export const tipografia = {
   estrada: { cores: ['#8a6a48', '#6e5338', '#a3815d'], padrao: 'tabuas' },
   bloqueio: { cor: '#1f2a44', borda: '#0d1426', brilho: '#4a5f8f' },
   objetos: [prensa, caixaDeTipos],
+  casa: casaOficina,
   personagens: [
-    { id: 'tipografa', movimento: 'andar', quadros: pessoa({ cabeca: 'justo', chapeu: '#5a3825', pele: '#c68b59', roupa: '#3d5a80', calca: '#2b2b2b' }) },
-    { id: 'aprendiz', movimento: 'andar', quadros: pessoa({ cabeca: 'aba', chapeu: '#6b6b6b', pele: '#e0ac80', roupa: '#a33b2e', calca: '#4a3b2a' }) },
-    { id: 'letra', movimento: 'saltar', quadros: [letra, passo(letra, 'saltar')] },
+    { id: 'tipografa', movimento: 'andar', tipo: 'pessoa', quadros: pessoa({ cabeca: 'justo', chapeu: '#5a3825', pele: '#c68b59', roupa: '#3d5a80', calca: '#2b2b2b' }) },
+    { id: 'aprendiz', movimento: 'andar', tipo: 'pessoa', quadros: pessoa({ cabeca: 'aba', chapeu: '#6b6b6b', pele: '#e0ac80', roupa: '#a33b2e', calca: '#4a3b2a' }) },
+    { id: 'letra', movimento: 'saltar', tipo: 'animal', quadros: [letra, passo(letra, 'saltar')] },
   ],
 };

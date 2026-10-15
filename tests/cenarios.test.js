@@ -7,6 +7,7 @@ import { LADO } from '../src/ui/cenarios/pixel.js';
 
 const IDS = ['tipografia', 'feira', 'forja', 'arquivo', 'cidade'];
 const COM_BLOQUEIO = ['tipografia', 'feira', 'forja', 'arquivo'];
+const PESSOAS = ['tipografa', 'aprendiz', 'costureira', 'vendedor', 'ferreira', 'ajudante', 'arquivista', 'mensageiro', 'operaria'];
 const camada = (id, semente) => {
   const div = document.createElement('div');
   div.innerHTML = htmlDoCenario(id, semente);
@@ -34,6 +35,13 @@ describe('cenários', () => {
       expect(p.quadros).toHaveLength(2);
       expect(p.quadros.every(spriteValido)).toBe(true);
     }
+    expect(spriteValido(c.casa)).toBe(true);
+    for (const p of c.personagens) expect(['pessoa', 'animal']).toContain(p.tipo);
+  });
+
+  it('quem é pessoa em cada cenário', () => {
+    const pessoas = Object.values(CENARIOS).flatMap((c) => c.personagens.filter((p) => p.tipo === 'pessoa').map((p) => p.id)).sort();
+    expect(pessoas).toEqual(PESSOAS.sort());
   });
 
   it.each(IDS)('%s: no máximo 12 KB', (id) => {

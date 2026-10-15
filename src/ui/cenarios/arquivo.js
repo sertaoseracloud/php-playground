@@ -1,6 +1,7 @@
 // 🗄️ Arquivo: assoalho de madeira, pilhas de pastas, o gaveteiro e o fichário (o PDO guarda e busca os dados).
 import { sprite, passo } from './pixel.js';
 import { pessoa } from './comuns.js';
+import { chale as casaChale } from './casas.js';
 
 const gaveteiro = sprite({ g: '#7d8794', e: '#4f5862', h: '#c9d1d9' }, `
 ................
@@ -63,9 +64,10 @@ export const arquivo = {
   estrada: { cores: ['#6e5338', '#5a4330', '#806246'], padrao: 'tabuas' },
   bloqueio: { cor: '#e8c35a', borda: '#a0822c', brilho: '#fff2b8' },
   objetos: [gaveteiro, fichario],
+  casa: casaChale,
   personagens: [
-    { id: 'arquivista', movimento: 'andar', quadros: pessoa({ cabeca: 'justo', chapeu: '#9a9a9a', pele: '#c68b59', roupa: '#5a3e6b', calca: '#2b2b2b' }) },
-    { id: 'mensageiro', movimento: 'andar', quadros: pessoa({ cabeca: 'aba', chapeu: '#2f3e5c', pele: '#8d5a3b', roupa: '#3d6fb5', calca: '#3b2a20' }) },
-    { id: 'coruja', movimento: 'voar', quadros: [coruja, passo(coruja, 'voar')] },
+    { id: 'arquivista', movimento: 'andar', tipo: 'pessoa', quadros: pessoa({ cabeca: 'justo', chapeu: '#9a9a9a', pele: '#c68b59', roupa: '#5a3e6b', calca: '#2b2b2b' }) },
+    { id: 'mensageiro', movimento: 'andar', tipo: 'pessoa', quadros: pessoa({ cabeca: 'aba', chapeu: '#2f3e5c', pele: '#8d5a3b', roupa: '#3d6fb5', calca: '#3b2a20' }) },
+    { id: 'coruja', movimento: 'voar', tipo: 'animal', quadros: [coruja, passo(coruja, 'voar')] },
   ],
 };
