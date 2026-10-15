@@ -21,7 +21,7 @@ describe('pixel art', () => {
   });
 
   it('o 2º quadro da caminhada é diferente do 1º e continua 16×16', () => {
-    const s = CENARIOS.sertao.personagens[0].quadros[0];
+    const s = CENARIOS.tipografia.personagens[0].quadros[0];
     const b = passo(s, 'andar');
     expect(b.linhas).toHaveLength(LADO);
     expect(b.linhas.every((l) => l.length === LADO)).toBe(true);
@@ -38,8 +38,8 @@ describe('mapa', () => {
   });
 
   it('a mesma semente gera o mesmo mapa', () => {
-    expect(mapaDe('sertao')).toEqual(mapaDe('sertao'));
-    expect(mapaDe('sertao', 40, 25, 'outro')).not.toEqual(mapaDe('sertao'));
+    expect(mapaDe('tipografia')).toEqual(mapaDe('tipografia'));
+    expect(mapaDe('tipografia', 40, 25, 'outro')).not.toEqual(mapaDe('tipografia'));
   });
 
   it('a estrada cobre a faixa dos nós (±112px do centro)', () => {
