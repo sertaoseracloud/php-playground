@@ -59,6 +59,13 @@ describe('cenários', () => {
     expect(el.querySelector('.cenario-palco')).not.toBeNull();
   });
 
+  it('a camada leva os exercícios feitos (a vila sai deles)', () => {
+    expect(camada(IDS[0], 'basico').dataset.feitos).toBe('0');
+    const div = document.createElement('div');
+    div.innerHTML = htmlDoCenario(IDS[0], 'basico', 7);
+    expect(div.firstElementChild.dataset.feitos).toBe('7');
+  });
+
   it('id desconhecido não quebra a trilha', () => {
     expect(htmlDoCenario('inventado')).toBe('');
     expect(htmlDoCenario(undefined)).toBe('');
