@@ -138,6 +138,9 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
   quem tem neste navegador o **mesmo nome** do certificado (acentos e maiúsculas contam) restaura o
   módulo e os anteriores da cadeia, nas datas do certificado. O certificado emitido de novo é o mesmo;
   nada do que já está no navegador é apagado (`src/restaurar.js`).
+- **🗺️ Cenários da trilha**: cada módulo tem um mapa em tiles de pixel art (como nos RPGs clássicos), com
+  personagens andando de tile em tile, sem pisar na água nem no caminho (`src/ui/cenarios/`). É só decoração:
+  o leitor de tela não lê, e os personagens param com "reduzir movimento" e no alto contraste.
 - **📄 XML do certificado** (botão na página do certificado): traz aluno, emissor, empresa, módulo, data,
   código, selo, selo anterior, a cadeia inteira (cada bloco com selo, anterior e a mensagem assinada) e o
   link de validação, **sem o segredo nem a chave**. Outras páginas conferem sozinhas se a cadeia é
