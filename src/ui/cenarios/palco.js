@@ -90,11 +90,13 @@ function desenharMapa(canvas, mapa, cen, semente) {
       }
     }
   }
-  // Meio-fio: uma linha escura de cada lado da estrada.
-  const estrada = mapa.tiles.slice(0, mapa.colunas).map((t, c) => (t.tipo === 'estrada' ? c : null)).filter((c) => c !== null);
+  // Meio-fio: uma linha escura na borda da estrada, em cada linha do mapa (a estrada faz curvas).
   ctx.fillStyle = contorno ?? cen.estrada.cores[1];
-  ctx.fillRect(Math.min(...estrada) * TILE, 0, 2, mapa.linhas * TILE);
-  ctx.fillRect((Math.max(...estrada) + 1) * TILE - 2, 0, 2, mapa.linhas * TILE);
+  for (let l = 0; l < mapa.linhas; l++) {
+    const [de, ate] = mapa.estrada[l];
+    ctx.fillRect(de * TILE, l * TILE, 2, TILE);
+    ctx.fillRect((ate + 1) * TILE - 2, l * TILE, 2, TILE);
+  }
 }
 
 // ---------- personagens ----------
