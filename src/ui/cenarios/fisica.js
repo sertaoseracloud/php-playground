@@ -35,13 +35,17 @@ export function proximoPasso(p, mapa, sortear) {
   return { ...p, parado: true };
 }
 
-/** Onde cada personagem começa: os pares à esquerda da estrada da linha, os ímpares à direita. */
+/**
+ * Onde cada personagem começa: os pares à esquerda da estrada da linha, os ímpares à direita. Sem
+ * lugar do seu lado (toda a água do outro lado, para quem nada ou salta), tenta o outro.
+ */
 export function posicoesIniciais(mapa, personagens, sortear) {
   return personagens.map((per, i) => {
-    for (let tentativa = 0; tentativa < 200; tentativa++) {
+    for (let tentativa = 0; tentativa < 400; tentativa++) {
       const l = Math.floor(sortear() * mapa.linhas);
       const [primeira, ultima] = mapa.estrada[l];
-      const [de, ate] = i % 2 ? [ultima + 1, mapa.colunas - 1] : [0, primeira - 1];
+      const direita = (i + (tentativa >= 200 ? 1 : 0)) % 2 === 1;
+      const [de, ate] = direita ? [ultima + 1, mapa.colunas - 1] : [0, primeira - 1];
       if (ate < de) continue;
       const c = de + Math.floor(sortear() * (ate - de + 1));
       if (podePisar(mapa, per.movimento, c, l)) return { c, l, movimento: per.movimento, direcao: null, quadro: 0, parado: true };
