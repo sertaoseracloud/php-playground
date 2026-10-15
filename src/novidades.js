@@ -10,6 +10,16 @@ export const REPOSITORIO = 'https://github.com/sertaoseracloud/php-playground';
 /** Releases, da mais nova para a mais antiga. Escritas para quem usa o site, sem jargão. */
 export const RELEASES = [
   {
+    versao: '1.8.0',
+    data: '2026-10-15',
+    titulo: 'Cenários com a cara de cada módulo',
+    resumo: 'Os mapas da trilha agora falam do assunto de cada módulo: uma tipografia no HTML, uma feira de tecidos no W3.CSS, uma forja no PHP e um arquivo no PDO.',
+    grupos: [
+      { titulo: '🗺️ Cenários', itens: ['HTML numa tipografia (texto marcado, como na prensa), W3.CSS numa feira de tecidos (o estilo veste a página), PHP numa forja e PDO num arquivo de pastas e gavetas. Projetos continua na cidade à noite.', 'Personagens novos: tipógrafa e a letra A pulando na tinta, costureira e borboleta, ferreira e o elefantinho azul do PHP, arquivista e coruja.'] },
+      { titulo: '♿ Acessibilidade', itens: ['Continua só decoração: o leitor de tela não lê os cenários, e o caminho mantém as cores e o contraste em todos os temas.'] },
+    ],
+  },
+  {
     versao: '1.7.0',
     data: '2026-10-15',
     titulo: 'A trilha virou um mapa',
