@@ -1,6 +1,6 @@
 {
   "name": "php-playground",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "DivergePHP: PHP, HTML e banco de dados no navegador, com acessibilidade para pessoas cegas, surdas e neurodivergentes",
   "scripts": {
     "dev": "vite",
