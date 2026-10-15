@@ -1,6 +1,7 @@
 // 🧵 Feira de tecidos: lona colorida, calçamento de pedra, rolos de pano, a barraca e o carretel (o W3.CSS veste a página).
 import { sprite, passo } from './pixel.js';
 import { pessoa } from './comuns.js';
+import { lona as casaLona } from './casas.js';
 
 const barraca = sprite({ r: '#d64545', w: '#f4efe4', m: '#7a5232', t: '#a3784e', g: '#4f9a5a', b: '#3d6fb5', y: '#e6b422' }, `
 ................
@@ -63,9 +64,10 @@ export const feira = {
   estrada: { cores: ['#9b948a', '#857e74', '#b0a99f'], padrao: 'pedras' },
   bloqueio: { cor: '#8e3b8f', borda: '#5a1f5c', brilho: '#e9a6e8' },
   objetos: [barraca, carretel],
+  casa: casaLona,
   personagens: [
-    { id: 'costureira', movimento: 'andar', quadros: pessoa({ cabeca: 'justo', chapeu: '#2b1d14', pele: '#8d5a3b', roupa: '#4f9a5a', calca: '#3b2a20' }) },
-    { id: 'vendedor', movimento: 'andar', quadros: pessoa({ cabeca: 'aba', chapeu: '#e6b422', pele: '#c68b59', roupa: '#f4efe4', calca: '#2f3e5c' }) },
-    { id: 'borboleta', movimento: 'voar', quadros: [borboleta, passo(borboleta, 'voar')] },
+    { id: 'costureira', movimento: 'andar', tipo: 'pessoa', quadros: pessoa({ cabeca: 'justo', chapeu: '#2b1d14', pele: '#8d5a3b', roupa: '#4f9a5a', calca: '#3b2a20' }) },
+    { id: 'vendedor', movimento: 'andar', tipo: 'pessoa', quadros: pessoa({ cabeca: 'aba', chapeu: '#e6b422', pele: '#c68b59', roupa: '#f4efe4', calca: '#2f3e5c' }) },
+    { id: 'borboleta', movimento: 'voar', tipo: 'animal', quadros: [borboleta, passo(borboleta, 'voar')] },
   ],
 };

@@ -1,6 +1,7 @@
 // ⚒️ Forja: pedra escura, brasas, a bigorna e o martelo, e o elefantinho azul do PHP passeando.
 import { sprite, passo } from './pixel.js';
 import { pessoa } from './comuns.js';
+import { pedra as casaPedra } from './casas.js';
 
 const bigorna = sprite({ k: '#2f2f33', g: '#5a5a63', h: '#8a8a94' }, `
 ................
@@ -63,9 +64,10 @@ export const forja = {
   estrada: { cores: ['#2e2b29', '#232120', '#3a3735'], padrao: 'pedras' },
   bloqueio: { cor: '#e0521b', borda: '#7a1f0e', brilho: '#ffd23f' },
   objetos: [bigorna, martelo],
+  casa: casaPedra,
   personagens: [
-    { id: 'ferreira', movimento: 'andar', quadros: pessoa({ cabeca: 'justo', chapeu: '#2b1d14', pele: '#b97a4e', roupa: '#6b4a35', calca: '#3b2a20' }) },
-    { id: 'ajudante', movimento: 'andar', quadros: pessoa({ cabeca: 'aba', chapeu: '#4a3b2a', pele: '#e0ac80', roupa: '#8a8a94', calca: '#2f3e5c' }) },
-    { id: 'elefante', movimento: 'andar', quadros: [elefante, passo(elefante, 'andar')] },
+    { id: 'ferreira', movimento: 'andar', tipo: 'pessoa', quadros: pessoa({ cabeca: 'justo', chapeu: '#2b1d14', pele: '#b97a4e', roupa: '#6b4a35', calca: '#3b2a20' }) },
+    { id: 'ajudante', movimento: 'andar', tipo: 'pessoa', quadros: pessoa({ cabeca: 'aba', chapeu: '#4a3b2a', pele: '#e0ac80', roupa: '#8a8a94', calca: '#2f3e5c' }) },
+    { id: 'elefante', movimento: 'andar', tipo: 'animal', quadros: [elefante, passo(elefante, 'andar')] },
   ],
 };
