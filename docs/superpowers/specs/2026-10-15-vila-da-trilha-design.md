@@ -44,7 +44,7 @@ alto contraste valem como hoje.
 - **Sem nós medidos** (testes no happy-dom, módulo vazio): a curva é a linha reta do centro, ou seja,
   o comportamento de hoje.
 - Manchas de bloqueio e objetos continuam fora da estrada, agora espalhados nos dois lados do mapa
-  largo; quem anda continua sem pisar na estrada fora dos cruzamentos (regras de `fisica.js` iguais).
+  largo; quem anda continua sem pisar na estrada (regras de `fisica.js` iguais).
 
 ## 3. Vila
 
