@@ -2,15 +2,13 @@
 // módulo, com personagens andando de tile em tile. É pura decoração: a camada fica escondida do
 // leitor de tela (aria-hidden) e não recebe clique nem foco. Quem desenha o mapa e move os
 // personagens é o palco (palco.js), depois que a trilha é renderizada.
-import { sertao } from './sertao.js';
-import { vale } from './vale.js';
-import { gelo } from './gelo.js';
-import { fogo } from './fogo.js';
-import { rio } from './rio.js';
+import { tipografia } from './tipografia.js';
+import { feira } from './feira.js';
+import { forja } from './forja.js';
+import { arquivo } from './arquivo.js';
 import { cidade } from './cidade.js';
-import { jardim } from './jardim.js';
 
-export const CENARIOS = Object.fromEntries([sertao, vale, gelo, fogo, rio, cidade, jardim].map((c) => [c.id, c]));
+export const CENARIOS = Object.fromEntries([tipografia, feira, forja, arquivo, cidade].map((c) => [c.id, c]));
 
 /**
  * Camada decorativa do cenário (ou '' se o módulo não tem cenário). A semente (o id do módulo)

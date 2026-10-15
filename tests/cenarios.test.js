@@ -5,8 +5,8 @@ import { describe, it, expect } from 'vitest';
 import { CENARIOS, htmlDoCenario } from '../src/ui/cenarios/index.js';
 import { LADO } from '../src/ui/cenarios/pixel.js';
 
-const IDS = ['sertao', 'vale', 'gelo', 'fogo', 'rio', 'cidade', 'jardim'];
-const COM_BLOQUEIO = ['sertao', 'vale', 'gelo', 'fogo', 'rio'];
+const IDS = ['tipografia', 'feira', 'forja', 'arquivo', 'cidade'];
+const COM_BLOQUEIO = ['tipografia', 'feira', 'forja', 'arquivo'];
 const camada = (id, semente) => {
   const div = document.createElement('div');
   div.innerHTML = htmlDoCenario(id, semente);
@@ -16,7 +16,7 @@ const spriteValido = (s) => s.linhas.length === LADO
   && s.linhas.every((l) => l.length === LADO && [...l].every((ch) => ch === '.' || ch in s.paleta));
 
 describe('cenários', () => {
-  it('existem os 7 cenários', () => {
+  it('existem os 5 cenários do site', () => {
     expect(Object.keys(CENARIOS).sort()).toEqual([...IDS].sort());
   });
 

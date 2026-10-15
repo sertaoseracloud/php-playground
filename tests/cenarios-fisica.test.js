@@ -35,10 +35,10 @@ describe('física', () => {
     });
   });
 
-  it('quem anda nunca entra na água; voadores podem; peixe e jangadeiro nunca saem dela', () => {
-    const { mapa } = simular('rio', 1);
-    const agua = mapa.tiles.findIndex((t) => t.tipo === 'bloqueio');
-    const [c, l] = [agua % mapa.colunas, Math.floor(agua / mapa.colunas)];
+  it('quem anda nunca entra na tinta derramada; voadores podem; a letra que salta nunca sai dela', () => {
+    const { mapa } = simular('tipografia', 1);
+    const tinta = mapa.tiles.findIndex((t) => t.tipo === 'bloqueio');
+    const [c, l] = [tinta % mapa.colunas, Math.floor(tinta / mapa.colunas)];
     expect(podePisar(mapa, 'andar', c, l)).toBe(false);
     expect(podePisar(mapa, 'voar', c, l)).toBe(true);
     expect(podePisar(mapa, 'nadar', c, l)).toBe(true);
@@ -47,11 +47,11 @@ describe('física', () => {
   });
 
   it('os personagens se mexem (não ficam parados para sempre) e viram para onde andam', () => {
-    const { historico } = simular('sertao', 200);
-    const vaqueiro = historico[0];
-    const andou = new Set(vaqueiro.map((p) => `${p.c},${p.l}`)).size;
+    const { historico } = simular('tipografia', 200);
+    const tipografa = historico[0];
+    const andou = new Set(tipografa.map((p) => `${p.c},${p.l}`)).size;
     expect(andou).toBeGreaterThan(10);
-    const passo = vaqueiro.find((p, i) => i > 0 && !p.parado);
+    const passo = tipografa.find((p, i) => i > 0 && !p.parado);
     expect(Math.abs(passo.direcao[0]) + Math.abs(passo.direcao[1])).toBe(1);
   });
 });
