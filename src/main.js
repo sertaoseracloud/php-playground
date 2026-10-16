@@ -74,7 +74,8 @@ const definirStatus = (texto, { falar = texto } = {}) => {
   if (falar) anunciar(falar);
 };
 /** Status das telas que não são exercício: a situação do PHP (carregando, pronto ou erro). */
-let statusPadrao = '';
+// Antes do primeiro exercício o PHP nem começa a carregar (MotorPHP.garantir).
+let statusPadrao = 'PHP 8.4 (carrega no 1º exercício)';
 
 function atualizarProgressoTopo() {
   const { resolvidos, total, licoesLidas, totalLicoes } = resumoProgresso();
@@ -84,7 +85,7 @@ function atualizarProgressoTopo() {
   topo.setAttribute('aria-label', topo.title);
 }
 
-// Declarado antes do motor: ele avisa "carregando" já no construtor.
+// Declarado antes do motor: ele avisa "carregando" assim que alguém chama garantir().
 let telaDoItem;
 
 const motor = new MotorPHP({
@@ -120,6 +121,7 @@ function navegar() {
   document.documentElement.classList.remove('rota-interna');
   const rota = lerRota(location.hash);
   if (rota.tela === 'item' && telaDoItem.abrir(rota.id, rota.arquivos)) {
+    motor.garantir(); // o PHP só começa a carregar aqui, no primeiro exercício
     mostrarTela(telaItem);
     layout.aplicar();
     marcarMenu(rota.id === 'livre' ? 'livre' : '');

@@ -1,23 +1,32 @@
 export class TempoEsgotado extends Error {}
 
+const workerDoSite = () => new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
+
 /**
  * Cliente do worker PHP. Executa uma tarefa por vez; se uma execução passar
  * do limite (ex.: laço infinito), o worker é descartado e um novo é iniciado.
  */
 export class MotorPHP {
-  constructor({ aoMudarEstado = () => {}, limiteMs = 8000 } = {}) {
+  constructor({ aoMudarEstado = () => {}, limiteMs = 8000, criarWorker = workerDoSite } = {}) {
     this.aoMudarEstado = aoMudarEstado;
     this.limiteMs = limiteMs;
+    this.criarWorker = criarWorker;
     this.fila = Promise.resolve();
     this.proximoId = 1;
-    this.iniciar();
+    // O worker só nasce na primeira necessidade (garantir): a landing e a trilha não baixam o PHP.
+  }
+
+  /** Abre o worker na primeira chamada; as seguintes devolvem o mesmo carregamento. */
+  garantir() {
+    if (!this.worker) this.iniciar();
+    return this.pronto;
   }
 
   iniciar() {
     this.worker?.terminate();
     this.pendentes = new Map();
     this.aoMudarEstado('carregando');
-    this.worker = new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });
+    this.worker = this.criarWorker();
     this.pronto = new Promise((resolve, reject) => {
       this.worker.onmessage = ({ data }) => {
         if (data.tipo === 'pronto') {
@@ -36,6 +45,8 @@ export class MotorPHP {
         reject(new Error(e.message));
       };
     });
+    // A falha já foi avisada por aoMudarEstado; quem executar depois recebe o erro.
+    this.pronto.catch(() => {});
   }
 
   /** Grava os arquivos, prepara o banco e atende uma requisição HTTP simulada. */
@@ -55,7 +66,7 @@ export class MotorPHP {
   }
 
   async #rodar(mensagem) {
-    await this.pronto;
+    await this.garantir();
     const id = this.proximoId++;
     const inicio = performance.now();
     return new Promise((resolve, reject) => {
