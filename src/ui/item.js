@@ -138,7 +138,13 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
   async function renderBanco() {
     if (!estado.item?.banco || el.banco.hidden) return;
     if (!estado.phpPronto) {
-      el.banco.innerHTML = '<p>Carregando o PHP…</p>';
+      el.banco.innerHTML = `
+        <div class="skeleton-tabela" role="status" aria-busy="true">
+          <div class="skeleton-linha"></div>
+          <div class="skeleton-linha"></div>
+          <div class="skeleton-linha"></div>
+          <p class="sr-only">Carregando o interpretador PHP…</p>
+        </div>`;
       return;
     }
     try {

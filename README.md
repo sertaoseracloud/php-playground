@@ -168,7 +168,8 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
   independente, mas não impede quem extrair a semente de assinar. Para isso, só assinando num servidor.
 - **A palavra secreta nunca entra no código nem no site.** Ela fica no secret
   `CERTIFICADO_SEGREDO` do GitHub Actions; o build injeta só um SHA-256 derivado dela
-  (`vite.config.js`), e falha se o secret não existir. Para gerar o build localmente:
+  (`vite.config.js`), e falha se o secret não existir. A homologação usa o secret separado
+  `CERTIFICADO_SEGREDO_HOMOLOGACAO`. Para gerar o build localmente:
   `CERTIFICADO_SEGREDO='...' npm run build`. Trocar a palavra invalida os selos já emitidos.
 - **Limite:** sem servidor, a chave derivada vai no JavaScript do site. O selo pega alterações no
   link, mas quem estudar o código publicado consegue gerar selos. Para impedir isso de verdade
@@ -281,8 +282,20 @@ npm run build    # gera dist/
 npm run badges   # regenera as imagens e páginas dos badges em public/
 ```
 
-A cada push na `main`, o GitHub Actions ([`.github/workflows/pages.yml`](.github/workflows/pages.yml))
-roda o lint e os testes, faz o build e publica no GitHub Pages.
+Pull requests para `develop` e `main` rodam os testes e o lint e validam os builds de produção e
+homologação. A branch `main` publica em produção;
+`develop` publica em `/homologacao/`, com dados do navegador isolados, certificados de outra chave e
+`noindex`. Depois de um push em `develop`, o GitHub Actions testa os dois endereços publicados e abre
+ou reabre automaticamente um PR de `develop` para `main`; produção só muda quando esse PR é mesclado.
+Configure os secrets `CERTIFICADO_SEGREDO` e `CERTIFICADO_SEGREDO_HOMOLOGACAO` em cada repositório,
+configure os rulesets para exigir o check `qualidade` em `develop` e `main`, permita que o GitHub
+Actions crie pull requests e publique pelo GitHub Pages nas configurações do repositório. Se `develop`
+não existir, o workflow de feature cria a branch a partir de `main`.
+
+Ao receber push em `feature/*`, o workflow [feature-pr.yml](.github/workflows/feature-pr.yml)
+incrementa a versão patch acima da versão de `develop` (uma vez por versão-base) e abre ou atualiza o
+PR para `develop`. Configure também o secret `FEATURE_PR_TOKEN` com acesso de escrita a Contents e
+Pull requests; o token permite que o PR criado automaticamente dispare os checks obrigatórios.
 
 ## Como funciona
 

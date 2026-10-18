@@ -81,10 +81,13 @@ export function iniciarAcessibilidade() {
   $('a11y-maior').onclick = () => passo(1);
   $('a11y-padrao').onclick = () => mudar({ ...PADRAO });
 
-  $('btn-acessibilidade').onclick = () => {
+  const btnAbrir = $('btn-acessibilidade');
+  btnAbrir.onclick = () => {
     sincronizar();
     dialogo.showModal();
   };
+  // Restaurar foco no botão que abriu o diálogo ao fechar (WCAG 2.4.3).
+  dialogo.addEventListener('close', () => { btnAbrir.focus(); });
   // Clicar fora da janela, ou num link para outra página do site, fecha.
   dialogo.addEventListener('click', (e) => {
     if (e.target === dialogo || e.target.closest('a[href^="#/"]')) dialogo.close();
@@ -100,12 +103,23 @@ export function iniciarLeitura(botao, obterTexto) {
     botao.hidden = true;
     return { parar() {} };
   }
+  // Região live para anunciar mudanças de estado ao leitor de tela (WCAG 4.1.3).
+  let liveRegion = document.getElementById('leitura-status');
+  if (!liveRegion) {
+    liveRegion = document.createElement('div');
+    liveRegion.id = 'leitura-status';
+    liveRegion.setAttribute('aria-live', 'polite');
+    liveRegion.setAttribute('aria-atomic', 'true');
+    liveRegion.className = 'sr-only';
+    botao.parentNode?.insertBefore(liveRegion, botao.nextSibling);
+  }
   const parar = () => {
     speechSynthesis.cancel();
     botao.setAttribute('aria-pressed', 'false');
     botao.textContent = '🔊';
     botao.title = 'Ouvir: ler a descrição em voz alta';
     botao.setAttribute('aria-label', 'Ouvir a descrição em voz alta');
+    liveRegion.textContent = 'Leitura parada.';
   };
   botao.onclick = () => {
     if (speechSynthesis.speaking) {
@@ -123,6 +137,7 @@ export function iniciarLeitura(botao, obterTexto) {
     botao.textContent = '⏹';
     botao.title = 'Parar a leitura';
     botao.setAttribute('aria-label', 'Parar a leitura');
+    liveRegion.textContent = 'Leitura em voz alta iniciada.';
   };
   return { parar };
 }
