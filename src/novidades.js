@@ -10,6 +10,16 @@ export const REPOSITORIO = 'https://github.com/sertaoseracloud/php-playground';
 /** Releases, da mais nova para a mais antiga. Escritas para quem usa o site, sem jargão. */
 export const RELEASES = [
   {
+    versao: '1.9.4',
+    data: '2026-10-18',
+    titulo: 'Dependências seguras',
+    resumo: 'Correção de vulnerabilidades transitivas nas dependências de auditoria e melhoria contínua dos workflows.',
+    grupos: [
+      { titulo: '🔒 Segurança', itens: ['Overrides adicionados para resolver 17 vulnerabilidades transitivas do Lighthouse CLI.'] },
+      { titulo: '⚙️ CI/CD', itens: ['Workflow de PR da feature corrigido e pipelines validadas.'] },
+    ],
+  },
+  {
     versao: '1.9.3',
     data: '2026-10-16',
     titulo: 'Mais leve no celular',
