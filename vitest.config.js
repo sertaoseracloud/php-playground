@@ -14,5 +14,5 @@ export default defineConfig({
     __CHAVE_PUBLICA_ED25519__: JSON.stringify(chavePublicaDe(SEMENTE_TESTES)),
     __VERSAO__: JSON.stringify(versaoDoPacote()),
   },
-  test: { testTimeout: 60000, hookTimeout: 120000, exclude: ['tests/e2e/**'] },
+  test: { testTimeout: 60000, hookTimeout: 120000, exclude: ['**/node_modules/**', 'tests/e2e/**'] },
 });
