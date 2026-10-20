@@ -1,16 +1,20 @@
 {
   "name": "php-playground",
-  "version": "1.9.5",
+  "version": "1.10.0",
   "description": "DivergePHP: PHP, HTML e banco de dados no navegador, com acessibilidade para pessoas cegas, surdas e neurodivergentes",
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:cobertura": "vitest run --coverage",
     "test:e2e": "playwright test",
     "lighthouse": "lhci autorun --collect.settings.chromeFlags=\"--no-sandbox\" --upload.target=filesystem --upload.outputDir=.lighthouseci",
     "badges": "node scripts/gerar-badges.mjs",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "comuns": "node scripts/comuns.mjs",
+    "comuns:copiar": "node scripts/comuns.mjs copiar",
+    "comuns:comparar": "node scripts/comuns.mjs comparar"
   },
   "type": "module",
   "dependencies": {
