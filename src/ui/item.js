@@ -156,7 +156,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
         ${tabelas.map((t) => `
           <div class="tabela-banco">
             <h3>${esc(t.nome)} <small>(${t.total} ${t.total === 1 ? 'linha' : 'linhas'})</small></h3>
-            <div class="tabela-rolagem"><table>
+            <div class="tabela-rolagem" tabindex="0" role="region" aria-label="Tabela ${esc(t.nome)}"><table>
               <tr>${t.colunas.map((c) => `<th>${c.pk ? '🔑 ' : ''}${esc(c.nome)}<span class="tipo">${esc(c.tipo)}</span></th>`).join('')}</tr>
               ${t.linhas.map((l) => `<tr>${l.map((v) => `<td class="${typeof v === 'number' ? 'numero' : ''}">${valor(v)}</td>`).join('')}</tr>`).join('')}
             </table></div>
@@ -520,7 +520,7 @@ export function criarTelaItem({ motor, layout, definirStatus, aoMudarProgresso }
     el.resumoTestes.textContent = curto;
     el.resumoTestes.className = `resumo-testes ${classe}`;
     el.abaTestes.title = `Testes funcionais: ${texto}`;
-    el.abaTestes.setAttribute('aria-label', `Testes funcionais: ${texto}`);
+    el.abaTestes.setAttribute('aria-label', `Testes: ${texto}`); // começa pelo texto visível (WCAG 2.5.3)
   }
 
   /** Antes de executar: lista todos os casos como pendentes. */
