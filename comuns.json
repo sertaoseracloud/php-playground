@@ -8,6 +8,7 @@
   "arquivos": {
     ".github/workflows/feature-pr.yml": "8fc36956b5d888c186b8e5eaf31e6b3c53ffc546c9bf231f43f2c430376a5d8c",
     "docs/debito-tecnico.md": "150cfc6740431132ad9cdb49b85991da8954fdb7dafe84aec76a48c3e1ffa835",
+    "playwright.config.js": "d2f29c4d42a1095d7d398610b71229e18a7e7b84de6ecb02f3d5bdd397df8e74",
     "scripts/comuns.mjs": "c0250e7a9a6346c936a82fb9f8b886842b355c95024b52a8a6e3a0aa375011e8",
     "scripts/notas-release.mjs": "ba6643d9d650207d67d4d6cb99b0515b45b073a93b4a50f8d84f96b4e5b461e4",
     "scripts/plugin-historico.mjs": "d0dbd87128b8508a53b5f6e4b061509a126414e794b8a2337f637d60ea2981b8",
@@ -31,6 +32,7 @@
     "tests/comuns.test.js": "9e7ff17fa23e75fb242504076428ed945e786646f8c8aea272aef1e1c3513cc5",
     "tests/e2e/acessibilidade.spec.js": "653c6a6086a760bd58bfe84b4dec405fcef83127ae3e1369d40840242e03bfd1",
     "tests/e2e/celular.spec.js": "f326b21c0a5948046c01442b143cd9480576033f03f2db784a9e78573f2e1e46",
+    "tests/e2e/certificado.spec.js": "4461ee222003b8f4282cc120ad9988bb81be021eef5241f9fba54bf12c349c9f",
     "tests/e2e/smoke.spec.js": "e80e26fdfc4f542315f1071832a09d8bc321c3b57ec9c324b0fc9f6258fa8c08",
     "tests/e2e/tela-exercicio.spec.js": "47d612d7f7d489de0dcecf32b83898b41ad6291cb2d24b201450684654a68034",
     "tests/flutuantes.test.js": "a26e1b0035e753496bc6153119b8a73d8ad2535766dff97490142ccf5c5e2dc2",
