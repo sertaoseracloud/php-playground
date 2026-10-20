@@ -40,6 +40,6 @@
     "tests/notas-release.test.js": "9e169953d7135dbb804fbd5561e08e352fe2e36c4413c04293df19065ebe5bfc",
     "tests/restaurar-ui.test.js": "900650fa8a3c646256e7f0ba026e0de1b691556dc97bc6a9560f3142b3d8a84e",
     "tests/sha256.test.js": "d83e1a3e99b0f2b195ae9a8ff350ce95736ef8169268498491361bf4ecdd4e8f",
-    "tests/trofeu.test.js": "8d54c838ef1d1ad44c9a6041c98ab73805787be5c3e8364d659d0a83dd345f76"
+    "tests/trofeu.test.js": "ecf3d9c7e8c4f0d1c54751649a16dc4598c270f94a84ed587b741bff4f10e1cd"
   }
 }

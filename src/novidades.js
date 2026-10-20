@@ -16,7 +16,7 @@ export const RELEASES = [
     resumo: 'Na tela do exercício, o tutorial e o aviso de privacidade não cobrem mais o código, e o troféu da trilha fala o mesmo que mostra.',
     grupos: [
       { titulo: '🧭 Tela do exercício', itens: ['O tutorial de boas-vindas abre sozinho só na trilha. Quem chega por um link direto para um exercício vê o código na hora; o tutorial continua no botão ❓.', 'O aviso de privacidade fica dentro da coluna da descrição e não cobre mais o editor.', 'A coluna da descrição tem pelo menos 320 pixels de largura, para o texto continuar fácil de ler.'] },
-      { titulo: '♿ Acessibilidade', itens: ['O botão do troféu de cada módulo tem como nome o mesmo texto que aparece na tela. Quem usa comando de voz pode falar o que vê, como "Certificado liberado", e o botão responde.'] },
+      { titulo: '♿ Acessibilidade', itens: ['O botão do troféu de cada módulo e os passos da trilha têm como nome o mesmo texto que aparece na tela. Quem usa comando de voz pode falar o que vê, como "Certificado liberado" ou "Começar", e o botão responde.'] },
     ],
   },
   {

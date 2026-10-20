@@ -105,13 +105,15 @@ function no(item, i) {
   const tipo = item.tipo === 'licao' ? 'Lição' : DIFICULDADES[item.dificuldade];
   const situacao = { concluido: licao ? ' · lição lida' : ' · exercício resolvido', bloqueado: ' · bloqueado' }[item.estado] ?? '';
   const rotulo = `${item.titulo} · ${tipo} · ${item.xp} XP${situacao}`;
+  // Sem aria-label: o nome do link é o texto que aparece (balão e título), e o tipo, o XP e a
+  // situação vêm depois, só para leitores de tela. Quem usa comando de voz fala o que vê.
   const conteudo = `
       <span class="circulo" aria-hidden="true">${icone}</span>
-      ${item.ehProximo ? `<span class="balao" aria-hidden="true">${item.estado === 'tentado' ? 'CONTINUAR' : 'COMEÇAR'}</span>` : ''}
-      <span class="legenda">${esc(item.titulo)}</span>`;
+      ${item.ehProximo ? `<span class="balao">${item.estado === 'tentado' ? 'CONTINUAR' : 'COMEÇAR'}</span>` : ''}
+      <span class="legenda">${esc(item.titulo)}</span><span class="sr"> · ${tipo} · ${item.xp} XP${situacao}</span>`;
   const alvo = item.estado === 'bloqueado'
-    ? `<button type="button" class="alvo" aria-disabled="true" data-bloqueado title="${esc(rotulo)}" aria-label="${esc(rotulo)}">${conteudo}</button>`
-    : `<a class="alvo" href="${linkItem(item.id)}" title="${esc(rotulo)}" aria-label="${esc(rotulo)}">${conteudo}</a>`;
+    ? `<button type="button" class="alvo" aria-disabled="true" data-bloqueado title="${esc(rotulo)}">${conteudo}</button>`
+    : `<a class="alvo" href="${linkItem(item.id)}" title="${esc(rotulo)}">${conteudo}</a>`;
   return `<li class="no ${item.tipo} estado-${item.estado}${item.ehProximo ? ' eh-proximo' : ''}" style="--d:${deslocamento}px">${alvo}</li>`;
 }
 
