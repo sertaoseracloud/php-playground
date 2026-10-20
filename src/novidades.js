@@ -10,7 +10,7 @@ export const REPOSITORIO = 'https://github.com/sertaoseracloud/php-playground';
 /** Releases, da mais nova para a mais antiga. Escritas para quem usa o site, sem jargão. */
 export const RELEASES = [
   {
-    versao: '1.10.0',
+    versao: '1.11.0',
     data: '2026-10-20',
     titulo: 'Mais fácil para quem está começando, e para quem usa leitor de tela',
     resumo: 'A barra do exercício ficou mais simples, o aviso de apoio parou de interromper, e o site ficou melhor para o teclado e para o leitor de tela.',
@@ -39,22 +39,40 @@ export const RELEASES = [
     ],
   },
   {
+    versao: '1.10.0',
+    data: '2026-10-20',
+    titulo: 'Exercício sem nada por cima',
+    resumo: 'Na tela do exercício, o tutorial e o aviso de privacidade não cobrem mais o código, e o troféu da trilha fala o mesmo que mostra.',
+    grupos: [
+      { titulo: '🧭 Tela do exercício', itens: ['O tutorial de boas-vindas abre sozinho só na trilha. Quem chega por um link direto para um exercício vê o código na hora; o tutorial continua no botão ❓.', 'O aviso de privacidade fica dentro da coluna da descrição e não cobre mais o editor.', 'A coluna da descrição tem pelo menos 320 pixels de largura, para o texto continuar fácil de ler.'] },
+      { titulo: '♿ Acessibilidade', itens: ['O botão do troféu de cada módulo e os passos da trilha têm como nome o mesmo texto que aparece na tela. Quem usa comando de voz pode falar o que vê, como "Certificado liberado" ou "Começar", e o botão responde.'] },
+    ],
+  },
+  {
+    versao: '1.9.7',
+    data: '2026-10-20',
+    titulo: 'Evolução coordenada dos playgrounds',
+    resumo: 'As instruções de desenvolvimento com IA passam a comparar decisões entre os playgrounds de PHP, Python, Terraform e Kubernetes.',
+    grupos: [
+      { titulo: 'Manutenção', itens: ['Cada demanda deve consultar o conhecimento compartilhado, justificar diferenças entre projetos e registrar as decisões com suas evidências.', 'As instruções orientam a atualização do conhecimento junto à entrega do projeto, sem publicar conteúdo privado.'] },
+    ],
+  },
+  {
     versao: '1.9.5',
     data: '2026-10-19',
-    titulo: 'CI verde e PRs automatizados',
-    resumo: 'Secrets de homologação configurados, permissões de workflow ajustadas e PRs reabertos sem conflitos.',
+    titulo: 'Publicação mais confiável',
+    resumo: 'Ajustes nos bastidores para cada nova versão do site ser testada e publicada sem tropeços.',
     grupos: [
-      { titulo: '⚙️ CI/CD', itens: ['Secret CERTIFICADO_SEGREDO_HOMOLOGACAO criado em ambos os repositórios.', 'Permissões de workflow alteradas para write, permitindo criação automática de PRs pelo GitHub Actions.', 'Push vazio para reacinar o CI após configuração dos secrets.'] },
+      { titulo: '⚙️ Bastidores', itens: ['A versão de testes do site voltou a ser publicada junto com a principal.', 'Cada mudança proposta passa pelos testes automáticos antes de entrar no site.'] },
     ],
   },
   {
     versao: '1.9.4',
     data: '2026-10-18',
-    titulo: 'Dependências seguras',
-    resumo: 'Correção de vulnerabilidades transitivas nas dependências de auditoria e melhoria contínua dos workflows.',
+    titulo: 'Ferramentas mais seguras',
+    resumo: 'As ferramentas que medem a qualidade do site foram atualizadas para versões sem falhas de segurança conhecidas.',
     grupos: [
-      { titulo: '🔒 Segurança', itens: ['Overrides adicionados para resolver 17 vulnerabilidades transitivas do Lighthouse CLI.'] },
-      { titulo: '⚙️ CI/CD', itens: ['Workflow de PR da feature corrigido e pipelines validadas.'] },
+      { titulo: '🔒 Segurança', itens: ['As ferramentas de medição de desempenho e acessibilidade usam versões corrigidas.'] },
     ],
   },
   {
