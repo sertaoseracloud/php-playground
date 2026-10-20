@@ -10,7 +10,7 @@ export const REPOSITORIO = 'https://github.com/sertaoseracloud/php-playground';
 /** Releases, da mais nova para a mais antiga. Escritas para quem usa o site, sem jargão. */
 export const RELEASES = [
   {
-    versao: '1.9.6',
+    versao: '1.9.7',
     data: '2026-10-20',
     titulo: 'Evolução coordenada dos playgrounds',
     resumo: 'As instruções de desenvolvimento com IA passam a comparar decisões entre os playgrounds de PHP, Python, Terraform e Kubernetes.',
