@@ -278,12 +278,21 @@ npm install
 npm run dev      # servidor local com recarga
 npm run lint     # ESLint (regras em eslint.config.js)
 npm test         # testes (regras, motor PHP, banco e toda a trilha)
+npm run test:cobertura  # testes com cobertura (o limite mínimo está em vitest.config.js)
+npm run comuns   # confere os arquivos comuns aos quatro playgrounds (comuns.json)
 npm run build    # gera dist/
 npm run badges   # regenera as imagens e páginas dos badges em public/
 ```
 
-Pull requests para `develop` e `main` rodam os testes e o lint e validam os builds de produção e
-homologação. A branch `main` publica em produção;
+Alguns arquivos são iguais nos quatro playgrounds (php, terraform, python e kubernetes) e estão
+listados em [`comuns.json`](comuns.json) com o hash de cada um. Para mudar um deles, altere aqui e
+leve a mesma mudança aos outros com `npm run comuns:copiar -- ../terraform-playground ../python-playground ../kubernetes-playground`.
+Detalhes em [docs/debito-tecnico.md](docs/debito-tecnico.md#arquivos-comuns).
+
+Pull requests para `develop` e `main` rodam o lint, os arquivos comuns, os testes com cobertura, os
+E2E com axe e o Lighthouse (checks `qualidade`, `e2e` e `lighthouse`) e validam os builds de produção e
+homologação. Quando a `main` é publicada, o job `tag` cria a tag `v<versão>` e a release do GitHub com
+o texto da versão em `src/novidades.js`. A branch `main` publica em produção;
 `develop` publica em `/homologacao/`, com dados do navegador isolados, certificados de outra chave e
 `noindex`. Depois de um push em `develop`, o GitHub Actions testa os dois endereços publicados e abre
 ou reabre automaticamente um PR de `develop` para `main`; produção só muda quando esse PR é mesclado.
