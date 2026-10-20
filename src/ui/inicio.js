@@ -118,18 +118,18 @@ function no(item, i) {
 function trofeu(m, cert) {
   const rotulo = CERTIFICADOS[m.id].titulo;
   const espera = cert.concluido && !cert.liberado; // módulo pronto, mas falta um certificado anterior
-  const texto = cert.liberado ? 'Ver certificado'
-    : espera ? `falta o certificado de ${CERTIFICADOS[cert.falta].titulo}`
-      : `${m.resolvidos}/${m.total}`;
-  const legenda = cert.liberado ? '🎉 Certificado liberado!'
-    : espera ? `🔗 Falta o certificado de ${esc(CERTIFICADOS[cert.falta].titulo)}`
-      : `Certificado · ${texto}`;
+  // O emoji é só enfeite: fica fora do nome do botão, que é o texto visível (quem usa comando de
+  // voz fala o que vê). O nome do módulo vem depois, só para leitores de tela.
+  const enfeite = (emoji) => `<span aria-hidden="true">${emoji}</span> `;
+  const legenda = cert.liberado ? `${enfeite('🎉')}Certificado liberado!`
+    : espera ? `${enfeite('🔗')}Falta o certificado de ${esc(CERTIFICADOS[cert.falta].titulo)}`
+      : `Certificado · ${m.resolvidos}/${m.total}`;
   return `
     <li class="no trofeu ${cert.liberado ? 'conquistado' : ''} ${espera ? 'em-espera' : ''}" style="--d:0px">
       <button type="button" class="alvo" data-certificado="${m.id}"
-        ${cert.liberado ? '' : 'aria-disabled="true"'} aria-label="Certificado: ${esc(rotulo)} (${esc(texto)})">
+        ${cert.liberado ? '' : 'aria-disabled="true"'}>
         <span class="circulo" aria-hidden="true">🏆</span>
-        <span class="legenda">${legenda}</span>
+        <span class="legenda">${legenda}</span><span class="sr"> (${esc(rotulo)})</span>
       </button>
     </li>`;
 }
