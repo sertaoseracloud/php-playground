@@ -5,3 +5,5 @@ dist/
 .vitest/
 coverage/
 .lighthouseci/
+test-results/
+playwright-report/
