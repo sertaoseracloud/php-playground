@@ -14,5 +14,17 @@ export default defineConfig({
     __CHAVE_PUBLICA_ED25519__: JSON.stringify(chavePublicaDe(SEMENTE_TESTES)),
     __VERSAO__: JSON.stringify(versaoDoPacote()),
   },
-  test: { testTimeout: 60000, hookTimeout: 120000, exclude: ['**/node_modules/**', 'tests/e2e/**'] },
+  test: {
+    testTimeout: 60000,
+    hookTimeout: 120000,
+    exclude: ['**/node_modules/**', 'tests/e2e/**'], // os E2E rodam no Playwright
+    // Limites = a cobertura medida em 2026-10-20, arredondada para baixo: só pode subir.
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.js'],
+      exclude: ['src/conteudo/**'],
+      reporter: ['text-summary', 'json-summary', 'html'],
+      thresholds: { statements: 62, branches: 57, functions: 63, lines: 62 },
+    },
+  },
 });
