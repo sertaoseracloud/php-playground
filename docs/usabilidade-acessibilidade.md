@@ -5,7 +5,7 @@ surdas, mudas e neurodivergentes (TDAH, dislexia, autismo). A mesma auditoria fo
 playgrounds (DivergePHP, DivergeTerraform, DivergePython e DivergeKubernetes); este relatório é o do
 **DivergePHP**, e a tabela de consistência no fim compara os quatro.
 
-**Resumo:** 11 problemas — 0 bloqueante(s), 0 de gravidade alta,
+**Resumo:** 12 problemas — 0 bloqueante(s), 1 de gravidade alta,
 10 média(s) e 1 baixa(s).
 
 ## Como foi feito
@@ -35,17 +35,18 @@ Gravidade: **bloqueante** (impede alguém de usar), **alta** (atrapalha muito um
 
 | # | Problema | WCAG | Telas | Gravidade | Quem é afetado | Correção | Situação |
 |---|---|---|---|---|---|---|---|
-| 1 | A aba "🧪 Testes" tinha o nome acessível "Testes funcionais: …", que não contém o texto visível | 2.5.3 | exercício (todos os estados) | média | quem usa comando de voz | Nome "Testes: …", igual ao tf e ao k8s | ✅ corrigido |
-| 2 | Barra do exercício com muitos botões; no celular, vários só com ícone | 2.4.6, 3.3.2 e boas práticas cognitivas | exercício, livre | média | iniciantes, TDAH, autismo, dislexia | À vista só ▶ Executar e ⬆ Enviar; Resetar banco (só no livre), Restaurar e Compartilhar em "⋯ Mais ações" (botão com aria-expanded, Esc fecha), cada um com texto e uma frase de ajuda; os botões de posição ganharam texto | ✅ corrigido (aprovado) |
-| 3 | O mural de apoio (PIX) abria em todo carregamento, inclusive por cima de um exercício aberto por link | 3.2.1 e 2.2.4 (AAA, boa prática) | todas | média | TDAH, autismo, leitor de tela | No máximo uma vez por dia, só na landing e na trilha | ✅ corrigido (aprovado) |
-| 4 | No celular, ao andar com o Tab pela trilha, o botão fixo "Ir para o passo atual" cobria o nó focado; no exercício, a barra fixa do topo podia cobrir as abas | 2.4.11, 2.5.8 | trilha e exercício (≤ 900 px) | média | teclado, baixa visão | Folga de rolagem (scroll-margin) para o que recebe foco e para os painéis | ✅ corrigido |
-| 5 | A tabela da página de privacidade rolava de lado em 320 e 375 px sem poder receber foco | 2.1.1 | privacidade | média | quem usa só o teclado | A tabela quebra as palavras e não rola mais | ✅ corrigido |
-| 6 | A tabela do banco de dados (playground livre) rola de lado sem poder receber foco | 2.1.1 | livre | média | quem usa só o teclado | A área de rolagem recebe foco e tem nome ("Tabela alunos") | ✅ corrigido |
-| 7 | Um endereço que não existe (ou um link compartilhado cortado) caía calado na landing; um exercício que não existe caía na trilha | 3.3.1, 2.4.2 | 404 | média | todos, principalmente iniciantes | Tela "🧭 Página não encontrada" que diz o que houve e oferece a trilha e a página inicial | ✅ corrigido |
-| 8 | Animações infinitas na trilha (próximo passo pulsando, troféu brilhando, "você está aqui" flutuando) | 2.2.2 | trilha | média | TDAH, autismo, enxaqueca | Param sozinhas depois de 2 ciclos (menos de 5 s). "Reduzir movimento" para tudo | ✅ corrigido |
-| 9 | No celular, o nome do exercício era cortado com "…" | 1.4.10 | exercício (≤ 900 px) | baixa | todos no celular, dislexia | O nome aparece inteiro | ✅ corrigido |
-| 10 | Troféus e o nó "próximo passo" da trilha: o texto visível não está no nome acessível | 2.5.3 | trilha | média | quem usa comando de voz | — | ⏳ com a sessão de débito técnico (src/ui/inicio.js) |
-| 11 | Personagens dos cenários andam sem parar; o único controle é "Reduzir movimento" no painel ♿ | 2.2.2 | trilha | média | TDAH, autismo | Botão visível "⏸ Pausar cenário" | ⏳ com a sessão dos cenários (PixiJS) |
+| 1 | Os botões ❓ Tutorial, ♿ Acessibilidade e 🔒 Privacidade sumiam (sem deixar rastro) quando qualquer área rolava para baixo, inclusive a saída do terminal rolando sozinha: na tela do exercício, quem usa mouse perdia o acesso à ajuda e ao painel ♿ | 3.2.1, 2.4.3 (e boa prática) | exercício, livre | alta | quem usa mouse ou toque, iniciantes, baixa visão | Só a rolagem da página recolhe os botões; o terminal, o editor e os painéis não | ✅ corrigido |
+| 2 | A aba "🧪 Testes" tinha o nome acessível "Testes funcionais: …", que não contém o texto visível | 2.5.3 | exercício (todos os estados) | média | quem usa comando de voz | Nome "Testes: …", igual ao tf e ao k8s | ✅ corrigido |
+| 3 | Barra do exercício com muitos botões; no celular, vários só com ícone | 2.4.6, 3.3.2 e boas práticas cognitivas | exercício, livre | média | iniciantes, TDAH, autismo, dislexia | À vista só ▶ Executar e ⬆ Enviar; Resetar banco (só no livre), Restaurar e Compartilhar em "⋯ Mais ações" (botão com aria-expanded, Esc fecha), cada um com texto e uma frase de ajuda; os botões de posição ganharam texto | ✅ corrigido (aprovado) |
+| 4 | O mural de apoio (PIX) abria em todo carregamento, inclusive por cima de um exercício aberto por link | 3.2.1 e 2.2.4 (AAA, boa prática) | todas | média | TDAH, autismo, leitor de tela | No máximo uma vez por dia, só na landing e na trilha | ✅ corrigido (aprovado) |
+| 5 | No celular, ao andar com o Tab pela trilha, o botão fixo "Ir para o passo atual" cobria o nó focado; no exercício, a barra fixa do topo podia cobrir as abas | 2.4.11, 2.5.8 | trilha e exercício (≤ 900 px) | média | teclado, baixa visão | Folga de rolagem (scroll-margin) para o que recebe foco e para os painéis | ✅ corrigido |
+| 6 | A tabela da página de privacidade rolava de lado em 320 e 375 px sem poder receber foco | 2.1.1 | privacidade | média | quem usa só o teclado | A tabela quebra as palavras e não rola mais | ✅ corrigido |
+| 7 | A tabela do banco de dados (playground livre) rola de lado sem poder receber foco | 2.1.1 | livre | média | quem usa só o teclado | A área de rolagem recebe foco e tem nome ("Tabela alunos") | ✅ corrigido |
+| 8 | Um endereço que não existe (ou um link compartilhado cortado) caía calado na landing; um exercício que não existe caía na trilha | 3.3.1, 2.4.2 | 404 | média | todos, principalmente iniciantes | Tela "🧭 Página não encontrada" que diz o que houve e oferece a trilha e a página inicial | ✅ corrigido |
+| 9 | Animações infinitas na trilha (próximo passo pulsando, troféu brilhando, "você está aqui" flutuando) | 2.2.2 | trilha | média | TDAH, autismo, enxaqueca | Param sozinhas depois de 2 ciclos (menos de 5 s). "Reduzir movimento" para tudo | ✅ corrigido |
+| 10 | No celular, o nome do exercício era cortado com "…" | 1.4.10 | exercício (≤ 900 px) | baixa | todos no celular, dislexia | O nome aparece inteiro | ✅ corrigido |
+| 11 | Troféus e o nó "próximo passo" da trilha: o texto visível não está no nome acessível | 2.5.3 | trilha | média | quem usa comando de voz | — | ⏳ com a sessão de débito técnico (src/ui/inicio.js) |
+| 12 | Personagens dos cenários andam sem parar; o único controle é "Reduzir movimento" no painel ♿ | 2.2.2 | trilha | média | TDAH, autismo | Botão visível "⏸ Pausar cenário" | ⏳ com a sessão dos cenários (PixiJS) |
 
 ### O que já estava bom (e continua)
 
@@ -91,6 +92,7 @@ Em **negrito**, o que destoava do padrão antes desta rodada.
 | Endereço que não existe | landing | landing | landing | landing | "Página não encontrada" |
 | Animações da trilha | infinitas | infinitas | infinitas | infinitas | param em < 5 s |
 | Foco encoberto na trilha (celular) | sim | sim | sim | sim | não |
+| ❓ e ♿ somem quando o terminal ou um painel rola | sim | **sim (já na abertura do exercício)** | sim | sim | não |
 | Nome da ação principal | ▶ Executar | ▶ Plan | ▶ Executar | ▶ Apply | mantido: é o verbo de cada ferramenta |
 
 Os arquivos comuns ficaram iguais nos quatro: `src/acessibilidade-ux.css`, `src/ui/mais-acoes.js`,
