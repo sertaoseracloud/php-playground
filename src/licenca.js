@@ -28,7 +28,7 @@ export const CONTEUDO = {
 /** Componentes de terceiros que vão junto com o site, com a licença de cada um. */
 export const TERCEIROS = [
   { nome: 'PHP no navegador (@php-wasm/web, @php-wasm/universal)', pacotes: ['@php-wasm/web', '@php-wasm/universal'], licenca: 'GPL-2.0-or-later' },
-  { nome: 'Editor de código (CodeMirror)', pacotes: ['codemirror', '@codemirror/lang-php', '@codemirror/language', '@codemirror/state', '@codemirror/view', '@lezer/highlight'], licenca: 'MIT' },
+  { nome: 'Editor de código (CodeMirror)', pacotes: ['codemirror', '@codemirror/lang-php', '@codemirror/lang-html', '@codemirror/lang-css', '@codemirror/lang-javascript', '@codemirror/lang-json', '@codemirror/language', '@codemirror/state', '@codemirror/view', '@lezer/highlight'], licenca: 'MIT' },
   { nome: 'Assinatura digital (@noble/ed25519, @noble/hashes)', pacotes: ['@noble/ed25519', '@noble/hashes'], licenca: 'MIT' },
   { nome: 'Fontes Fira Code e Atkinson Hyperlegible', pacotes: ['@fontsource/fira-code', '@fontsource/atkinson-hyperlegible'], licenca: 'OFL-1.1' },
   { nome: 'W3.CSS (carregado do site da W3Schools nos exercícios)', pacotes: [], licenca: 'termos de uso da W3Schools' },
