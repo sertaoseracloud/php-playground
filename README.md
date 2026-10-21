@@ -10,6 +10,16 @@ Não há servidor, instalação nem custo: o site é estático e fica no GitHub 
 
 ## O que tem
 
+- **Rascunhos protegidos:** as edições são salvas por exercício após 300 ms e
+  finalizadas ao trocar de exercício ou sair da página. Restaurar o código,
+  usar uma referência ou copiar a solução descarta gravações antigas pendentes.
+  Se o navegador bloquear o armazenamento, um aviso permanece visível: copie os
+  arquivos antes de sair, pois o salvamento local não está garantido.
+- **Editor por arquivo:** PHP/HTML, HTML, CSS, JavaScript e JSON têm seus próprios
+  modos; `.txt` usa texto simples. O nome acessível identifica o arquivo ativo.
+  Alternar abas preserva seleção e desfazer; excluir um arquivo devolve o foco
+  ao editor e anuncia qual arquivo permanece ativo.
+
 - **Landing page** (`#/`): apresenta o projeto, a trilha, os certificados e os recursos de
   acessibilidade. Os números (exercícios, módulos, projetos) vêm do próprio conteúdo. A trilha fica
   em `#/trilha`, e quem já começou vê "▶ Continuar" no topo.

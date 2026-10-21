@@ -3,7 +3,12 @@ import { EditorView, basicSetup } from 'codemirror';
 import { EditorState, Prec } from '@codemirror/state';
 import { keymap } from '@codemirror/view';
 import { php as linguagemPhp } from '@codemirror/lang-php';
+import { html } from '@codemirror/lang-html';
+import { css } from '@codemirror/lang-css';
+import { javascript } from '@codemirror/lang-javascript';
+import { json } from '@codemirror/lang-json';
 import { temaEditor } from './tema-editor.js';
+import { anunciar } from './anuncios.js';
 
 const NOME_VALIDO = /^[\w-]+\.(php|html|css|js|txt|json)$/;
 
@@ -16,14 +21,12 @@ export class EditorArquivos {
     this.estados = new Map();
     this.extensoes = [
       basicSetup,
-      linguagemPhp(),
       temaEditor,
       EditorView.lineWrapping,
       Prec.highest(keymap.of([
         { key: 'Mod-Enter', run: () => { aoExecutar(); return true; } },
         { key: 'Mod-Shift-Enter', run: () => { aoEnviar(); return true; } },
       ])),
-      EditorView.contentAttributes.of({ 'aria-label': 'Editor de código PHP e HTML', tabindex: '0', 'aria-describedby': 'ajuda-editor' }),
       EditorView.updateListener.of((u) => {
         if (u.docChanged) {
           this.arquivos[this.atual] = u.state.doc.toString();
@@ -56,7 +59,21 @@ export class EditorArquivos {
   }
 
   #estadoDe(nome) {
-    return EditorState.create({ doc: this.arquivos[nome] ?? '', extensions: this.extensoes });
+    const extensao = nome?.split('.').at(-1);
+    const modos = { php: ['PHP e HTML', linguagemPhp], html: ['HTML', html], css: ['CSS', css], js: ['JavaScript', javascript], json: ['JSON', json] };
+    const [rotulo, linguagem] = modos[extensao] ?? ['texto simples', () => []];
+    return EditorState.create({
+      doc: this.arquivos[nome] ?? '',
+      extensions: [
+        ...this.extensoes,
+        linguagem(),
+        EditorView.contentAttributes.of({
+          tabindex: '0',
+          'aria-label': `Editor de ${rotulo}: ${nome}`,
+          'aria-describedby': 'ajuda-editor',
+        }),
+      ],
+    });
   }
 
   #renderAbas() {
@@ -104,6 +121,8 @@ export class EditorArquivos {
       this.view.setState(this.estados.get(this.atual) ?? this.#estadoDe(this.atual));
     }
     this.#renderAbas();
+    this.view.focus();
+    anunciar(`Arquivo ${nome} excluído. Editor de ${this.atual} ativo.`);
   }
 
   #novo() {
