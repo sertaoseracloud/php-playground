@@ -1,6 +1,6 @@
 {
   "name": "php-playground",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "DivergePHP: PHP, HTML e banco de dados no navegador, com acessibilidade para pessoas cegas, surdas e neurodivergentes",
   "scripts": {
     "dev": "vite",
@@ -30,6 +30,7 @@
     "@php-wasm/universal": "3.1.59",
     "@php-wasm/web": "3.1.59",
     "codemirror": "^6.0.2",
+    "pixi.js": "8.22.0",
     "qrcode-generator": "2.0.4"
   },
   "devDependencies": {

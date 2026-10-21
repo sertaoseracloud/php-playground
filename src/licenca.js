@@ -6,7 +6,7 @@
 // compatível e, além disso, exige publicar o código de versões modificadas oferecidas pela
 // internet, que é exatamente como este site é usado.
 
-export const ATUALIZADA_EM = '2026-10-12';
+export const ATUALIZADA_EM = '2026-10-20';
 export const TITULAR = 'Sertão será cloud';
 export const REPOSITORIO = 'https://github.com/sertaoseracloud/php-playground';
 
@@ -34,4 +34,8 @@ export const TERCEIROS = [
   { nome: 'W3.CSS (carregado do site da W3Schools nos exercícios)', pacotes: [], licenca: 'termos de uso da W3Schools' },
   { nome: 'QR Code do PIX (qrcode-generator)', pacotes: ['qrcode-generator'], licenca: 'MIT' },
   { nome: 'Cores do tema Dracula', pacotes: [], licenca: 'MIT' },
+  // Só na tela da trilha, com placa de vídeo (src/ui/cenarios/palco-pixi.js), com as dependências que entram junto.
+  { nome: 'Desenho dos cenários da trilha (PixiJS)', pacotes: ['pixi.js', '@pixi/colord', 'eventemitter3', 'ismobilejs', 'parse-svg-path'], licenca: 'MIT' },
+  { nome: 'Triangulação do PixiJS (earcut)', pacotes: ['earcut'], licenca: 'ISC' },
+  { nome: 'Cache do PixiJS (tiny-lru)', pacotes: ['tiny-lru'], licenca: 'BSD-3-Clause' },
 ];
