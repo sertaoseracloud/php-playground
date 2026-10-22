@@ -26,7 +26,9 @@ test('quota indisponível mantém código e avisa sem tirar o foco', async ({ pa
     Storage.prototype.setItem = () => { throw new DOMException('quota', 'QuotaExceededError'); };
   });
   const editor = page.locator('#editor .cm-content');
-  await editor.fill('código que não pode ser perdido');
+  await editor.click();
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('código que não pode ser perdido');
   await expect(page.locator('#aviso-armazenamento')).toBeVisible();
   await expect(page.locator('#aviso-armazenamento')).toContainText('Copie seus arquivos');
   await expect(editor).toHaveText('código que não pode ser perdido');
