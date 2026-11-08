@@ -1,0 +1,105 @@
+{
+  "versao": 1,
+  "gerado": "2026-11-08",
+  "observacao": "Chaves fictícias dos testes (vitest.config.js). Não regere para \"consertar\" uma falha: a falha quer dizer que certificados emitidos deixariam de valer.",
+  "nome": "  Maria José da Conceição  ",
+  "data": "2026-11-08",
+  "ordem": [
+    "html",
+    "w3css",
+    "php",
+    "pdo",
+    "projetos",
+    "final"
+  ],
+  "chavePublicaDosTestes": "8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c",
+  "linkSemSelo": "eyJuIjoiTWFyaWEgSm9zw6kgZGEgQ29uY2Vpw6fDo28iLCJtIjoiaHRtbCIsImQiOiIyMDI1LTAzLTEwIn0",
+  "certificados": [
+    {
+      "modulo": "html",
+      "posicao": 0,
+      "cadeia": [],
+      "codigo": "eyJuIjoiICBNYXJpYSBKb3PDqSBkYSBDb25jZWnDp8OjbyAgIiwibSI6Imh0bWwiLCJkIjoiMjAyNi0xMS0wOCIsImgiOiJiOGQwNWZkNmFjNGU2NjIwOTlmY2Q5NTc3OGNkMmZlMmIxZjMzZWQ3ODU0MDY1NmRkMGQ1M2UzOGY0NzA3MWI3In0",
+      "selo": "b8d05fd6ac4e662099fcd95778cd2fe2b1f33ed78540656dd0d53e38f47071b7",
+      "anterior": "",
+      "id": "SSC-2026-B8D0-5FD6",
+      "mensagem": "[\"2026-11-08\",\"Cláudio Raposo\",\"Sertão será cloud\",\"Maria José da Conceição\",\"html\"]",
+      "assinatura": "66ca67ee6bb57e5e02801306d94e4047d975fab5b7cd976672257b9ec9b256bd259ad6e82e379b394ef884349059ba7133015a70c9b828cc2912ee108e2c0106"
+    },
+    {
+      "modulo": "w3css",
+      "posicao": 1,
+      "cadeia": [
+        "2026-01-15"
+      ],
+      "codigo": "eyJuIjoiICBNYXJpYSBKb3PDqSBkYSBDb25jZWnDp8OjbyAgIiwibSI6InczY3NzIiwiZCI6IjIwMjYtMTEtMDgiLCJoIjoiZGJlZGQ3OGI3ZDA0YmEwZTI0ZTZjOGY1ODk2ZGIyMmNiY2MwNTkwYjNhMTc1ODQ0ZDRkZTQzMjYxYjQ4OTQyNCIsImMiOlsiMjAyNi0wMS0xNSJdfQ",
+      "selo": "dbedd78b7d04ba0e24e6c8f5896db22cbcc0590b3a175844d4de43261b489424",
+      "anterior": "cdc3241d0d61d01adac8944c562189376638cc5530a3bf63d0721e1c699582b9",
+      "id": "SSC-2026-DBED-D78B",
+      "mensagem": "[\"2026-11-08\",\"Cláudio Raposo\",\"Sertão será cloud\",\"Maria José da Conceição\",\"w3css\",\"cdc3241d0d61d01adac8944c562189376638cc5530a3bf63d0721e1c699582b9\"]",
+      "assinatura": "7caf944ecced4293fb10fa94192d1d4fe3ea0cc81736911fe34afef2e5d7452a1a130bb204453845e3fde35df45d880b91e17fc1f16abcebd42520c31dec240b"
+    },
+    {
+      "modulo": "php",
+      "posicao": 2,
+      "cadeia": [
+        "2026-01-15",
+        "2026-02-15"
+      ],
+      "codigo": "eyJuIjoiICBNYXJpYSBKb3PDqSBkYSBDb25jZWnDp8OjbyAgIiwibSI6InBocCIsImQiOiIyMDI2LTExLTA4IiwiaCI6IjA1NzE5OTk4NDk2NjVhMzEyOWUyODA2NmM0ODJhNTMzZTQxZTE5NjQwNzY3ZGRkMjg0Nzk2YzhlOGY5NGZkOGYiLCJjIjpbIjIwMjYtMDEtMTUiLCIyMDI2LTAyLTE1Il19",
+      "selo": "0571999849665a3129e28066c482a533e41e19640767ddd284796c8e8f94fd8f",
+      "anterior": "7cf9a18cd07ec43a9e8686f4e273e55e5878c5bd42f37494f98e4fe29de67c2b",
+      "id": "SSC-2026-0571-9998",
+      "mensagem": "[\"2026-11-08\",\"Cláudio Raposo\",\"Sertão será cloud\",\"Maria José da Conceição\",\"php\",\"7cf9a18cd07ec43a9e8686f4e273e55e5878c5bd42f37494f98e4fe29de67c2b\"]",
+      "assinatura": "617c753e6d0122343ac8e73d914788f04f6604ea712b91e20eb39c69744a807f115a354f03095da335d2d35bfd33166e0306b47eab57555ec06f7c7b6801770a"
+    },
+    {
+      "modulo": "pdo",
+      "posicao": 3,
+      "cadeia": [
+        "2026-01-15",
+        "2026-02-15",
+        "2026-03-15"
+      ],
+      "codigo": "eyJuIjoiICBNYXJpYSBKb3PDqSBkYSBDb25jZWnDp8OjbyAgIiwibSI6InBkbyIsImQiOiIyMDI2LTExLTA4IiwiaCI6IjMzMWRiNGIyOTQzYWU3OGEwMTc0ZWFhYzQ2NDA1NjlmYmJjMjEwNDA0MWJjYWUwMjMwYjJjMTBkNDFmYjhjMzQiLCJjIjpbIjIwMjYtMDEtMTUiLCIyMDI2LTAyLTE1IiwiMjAyNi0wMy0xNSJdfQ",
+      "selo": "331db4b2943ae78a0174eaac4640569fbbc2104041bcae0230b2c10d41fb8c34",
+      "anterior": "9c214e59397dbe42c3250ff7e95ca28bd6af0830304096b15aece96d2fd1b340",
+      "id": "SSC-2026-331D-B4B2",
+      "mensagem": "[\"2026-11-08\",\"Cláudio Raposo\",\"Sertão será cloud\",\"Maria José da Conceição\",\"pdo\",\"9c214e59397dbe42c3250ff7e95ca28bd6af0830304096b15aece96d2fd1b340\"]",
+      "assinatura": "65d11164f2e1075719a00c23271d25d6a4b41fffe671db7af5d097fcbdc75ef5d8d357405cef417081b57fae1ee05761537c70785badbac2bacc285fbf8ac70f"
+    },
+    {
+      "modulo": "projetos",
+      "posicao": 4,
+      "cadeia": [
+        "2026-01-15",
+        "2026-02-15",
+        "2026-03-15",
+        "2026-04-15"
+      ],
+      "codigo": "eyJuIjoiICBNYXJpYSBKb3PDqSBkYSBDb25jZWnDp8OjbyAgIiwibSI6InByb2pldG9zIiwiZCI6IjIwMjYtMTEtMDgiLCJoIjoiZjJkNzE1NmQxNjZmZWRkMjg3Yjg4MmZkMTUwNjI0N2I4OTIyMTQ5ZWMzYmFiOGFiYzNmYWZjZWJkNGMxMzlkMSIsImMiOlsiMjAyNi0wMS0xNSIsIjIwMjYtMDItMTUiLCIyMDI2LTAzLTE1IiwiMjAyNi0wNC0xNSJdfQ",
+      "selo": "f2d7156d166fedd287b882fd1506247b8922149ec3bab8abc3fafcebd4c139d1",
+      "anterior": "9964fb517a67df47e6726f856eed29ef6d4f2067cebe460e2ddf44cd16badcc3",
+      "id": "SSC-2026-F2D7-156D",
+      "mensagem": "[\"2026-11-08\",\"Cláudio Raposo\",\"Sertão será cloud\",\"Maria José da Conceição\",\"projetos\",\"9964fb517a67df47e6726f856eed29ef6d4f2067cebe460e2ddf44cd16badcc3\"]",
+      "assinatura": "9e835adac67d2ebf781f22a19a7d3b76fd50d6542bc1e2037061cc26f05edcb532ac924b1d7720678fdd4200b84171a72b38cd44982b864c994c58489f966c06"
+    },
+    {
+      "modulo": "final",
+      "posicao": 5,
+      "cadeia": [
+        "2026-01-15",
+        "2026-02-15",
+        "2026-03-15",
+        "2026-04-15",
+        "2026-05-15"
+      ],
+      "codigo": "eyJuIjoiICBNYXJpYSBKb3PDqSBkYSBDb25jZWnDp8OjbyAgIiwibSI6ImZpbmFsIiwiZCI6IjIwMjYtMTEtMDgiLCJoIjoiM2JhMWFiYzY2ODM0YmJlNjkwZjNmY2FmZTJlNGRhNTc5ZDU1Zjg2MGQ5NDZlOWI2NDU2ZGYzMDg3NmNkNmRkMyIsImMiOlsiMjAyNi0wMS0xNSIsIjIwMjYtMDItMTUiLCIyMDI2LTAzLTE1IiwiMjAyNi0wNC0xNSIsIjIwMjYtMDUtMTUiXX0",
+      "selo": "3ba1abc66834bbe690f3fcafe2e4da579d55f860d946e9b6456df30876cd6dd3",
+      "anterior": "c27330db2cff1cb0cadd25ab6cd7a69163a966088948ca16e2b9573f8afb6336",
+      "id": "SSC-2026-3BA1-ABC6",
+      "mensagem": "[\"2026-11-08\",\"Cláudio Raposo\",\"Sertão será cloud\",\"Maria José da Conceição\",\"final\",\"c27330db2cff1cb0cadd25ab6cd7a69163a966088948ca16e2b9573f8afb6336\"]",
+      "assinatura": "08990d78f31ea1aeeaf7c6b68e214459dc71d718ae99fc19563e676cd2ec934de2b87bc64c3d089924c359ae037d60425fe891c8df68314aa8f19598836ad10c"
+    }
+  ]
+}
